@@ -1,0 +1,156 @@
+{
+  "core_columns": [
+    "Core_Communication",
+    "Core_Teamwork",
+    "Core_ProblemSolving",
+    "Core_Adaptability",
+    "Core_TimeManagement",
+    "Core_Initiative",
+    "Core_Accountability",
+    "Core_LearningAgility"
+  ],
+  "core_descriptions": {
+    "Core_Communication": "İletişim becerisi (yazılı/sözlü, geri bildirim).",
+    "Core_Teamwork": "Takım çalışması ve iş birliği.",
+    "Core_ProblemSolving": "Problem çözme ve analitik bakış.",
+    "Core_Adaptability": "Değişime uyum ve esneklik.",
+    "Core_TimeManagement": "Zaman yönetimi ve önceliklendirme.",
+    "Core_Initiative": "Inisiyatif alma, proaktif davranma.",
+    "Core_Accountability": "Sorumluluk sahipliği, hatayı üstlenme.",
+    "Core_LearningAgility": "Öğrenme çevikliği ve kendini geliştirme isteği."
+  },
+  "dept_comp_columns": [
+    "Dept_Comp1",
+    "Dept_Comp2",
+    "Dept_Comp3"
+  ],
+  "dept_comp_labels": {
+    "Human Resources": {
+      "Dept_Comp1": "HR_Recruitment",
+      "Dept_Comp2": "HR_PolicyAndLaw",
+      "Dept_Comp3": "HR_EmployeeRelations"
+    },
+    "Technology": {
+      "Dept_Comp1": "Tech_CodingQuality",
+      "Dept_Comp2": "Tech_SystemDesign",
+      "Dept_Comp3": "Tech_TestingAndQA"
+    },
+    "Sales & Marketing": {
+      "Dept_Comp1": "Sales_SalesSkill",
+      "Dept_Comp2": "Sales_Negotiation",
+      "Dept_Comp3": "Sales_CustomerRelationship"
+    },
+    "Finance & Accounting": {
+      "Dept_Comp1": "Fin_FinancialAnalysis",
+      "Dept_Comp2": "Fin_AccountingAccuracy",
+      "Dept_Comp3": "Fin_PayrollKnowledge"
+    },
+    "Operations": {
+      "Dept_Comp1": "Ops_OperationsPlanning",
+      "Dept_Comp2": "Ops_LogisticsCoordination",
+      "Dept_Comp3": "Ops_ProcessOptimization"
+    }
+  },
+  "role_comp_columns": [
+    "Role_Comp1",
+    "Role_Comp2"
+  ],
+  "role_comp_labels": {
+    "HR Specialist": {
+      "Role_Comp1": "HR_DocumentationQuality",
+      "Role_Comp2": "HR_InternalSupport"
+    },
+    "Recruiter": {
+      "Role_Comp1": "HR_InterviewingSkill",
+      "Role_Comp2": "HR_CandidateSourcing"
+    },
+    "HR Manager": {
+      "Role_Comp1": "HR_StrategicHRManagement",
+      "Role_Comp2": "HR_ChangeManagement"
+    },
+    "Software Engineer": {
+      "Role_Comp1": "Tech_DebuggingDepth",
+      "Role_Comp2": "Tech_ProblemDecomposition"
+    },
+    "Senior Software Engineer": {
+      "Role_Comp1": "Tech_ArchitectureOwnership",
+      "Role_Comp2": "Tech_Mentoring"
+    },
+    "Data Scientist": {
+      "Role_Comp1": "DS_FeatureEngineering",
+      "Role_Comp2": "DS_ModelInterpretation"
+    },
+    "Machine Learning Engineer": {
+      "Role_Comp1": "MLE_ModelDeployment",
+      "Role_Comp2": "MLE_MLSystemDesign"
+    },
+    "QA Engineer": {
+      "Role_Comp1": "QA_TestCaseDesign",
+      "Role_Comp2": "QA_BugDetectionPrecision"
+    },
+    "DevOps Engineer": {
+      "Role_Comp1": "DevOps_CICDPipeline",
+      "Role_Comp2": "DevOps_InfrastructureAutomation"
+    },
+    "Technical Support Engineer": {
+      "Role_Comp1": "Support_IssueResolutionSpeed",
+      "Role_Comp2": "Support_CustomerCommunication"
+    },
+    "Engineering Manager": {
+      "Role_Comp1": "EngMgr_TeamLeadership",
+      "Role_Comp2": "EngMgr_TechnicalDecisionMaking"
+    },
+    "Sales Executive": {
+      "Role_Comp1": "Sales_ClosingDeals",
+      "Role_Comp2": "Sales_PipelineManagement"
+    },
+    "Sales Representative": {
+      "Role_Comp1": "Sales_ProductKnowledge",
+      "Role_Comp2": "Sales_ObjectionHandling"
+    },
+    "Account Manager": {
+      "Role_Comp1": "AM_ClientRetention",
+      "Role_Comp2": "AM_UpSelling"
+    },
+    "Marketing Specialist": {
+      "Role_Comp1": "Mkt_CampaignPlanning",
+      "Role_Comp2": "Mkt_DigitalAnalytics"
+    },
+    "Accountant": {
+      "Role_Comp1": "Acc_BookkeepingQuality",
+      "Role_Comp2": "Acc_RegulatoryCompliance"
+    },
+    "Financial Analyst": {
+      "Role_Comp1": "FA_ForecastingAccuracy",
+      "Role_Comp2": "FA_KPIAnalysis"
+    },
+    "Payroll Specialist": {
+      "Role_Comp1": "Payroll_PayrunAccuracy",
+      "Role_Comp2": "Payroll_IssueResolution"
+    },
+    "Finance Manager": {
+      "Role_Comp1": "FinMgr_BudgetOwnership",
+      "Role_Comp2": "FinMgr_FinancialStrategy"
+    },
+    "Operations Specialist": {
+      "Role_Comp1": "OpsSpec_ProcessExecution",
+      "Role_Comp2": "OpsSpec_ResourceCoordination"
+    },
+    "Logistics Coordinator": {
+      "Role_Comp1": "LogCoord_RoutePlanning",
+      "Role_Comp2": "LogCoord_OnTimeDelivery"
+    },
+    "Production Engineer": {
+      "Role_Comp1": "ProdEng_QualityControl",
+      "Role_Comp2": "ProdEng_ProcessImprovement"
+    },
+    "Field Supervisor": {
+      "Role_Comp1": "FieldSup_OnSiteLeadership",
+      "Role_Comp2": "FieldSup_SafetyCompliance"
+    },
+    "Operations Manager": {
+      "Role_Comp1": "OpsMgr_OperationalPlanning",
+      "Role_Comp2": "OpsMgr_PerformanceMonitoring"
+    }
+  }
+}

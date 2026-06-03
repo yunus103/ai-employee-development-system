@@ -1,0 +1,35 @@
+## .gitignore for ASP.NET Core / .NET
+
+# Build outputs
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Rider
+.idea/
+
+# Environment & secrets
+appsettings.Development.json
+appsettings.Production.json
+.env
+*.env
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# NuGet
+*.nupkg
+.nuget/
+
+# Test results
+TestResults/
+coverage/

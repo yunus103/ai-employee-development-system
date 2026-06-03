@@ -1,0 +1,1733 @@
+[
+  {
+    "action_id": "CORE_COMM_01",
+    "target_competency": "Core_Communication",
+    "action_category": "Core",
+    "action_type": "Behavioral Practice",
+    "difficulty": "High",
+    "estimated_effort_hours": 24,
+    "selection_rules": {
+      "min_score": 1.0,
+      "max_score": 1.7
+    },
+    "content": {
+      "title": "Structured Communication Fundamentals",
+      "delivery_type": "Self-guided + Practice",
+      "resource": "Internal communication framework guide",
+      "description": "Günlük iş akışında yazılı ve sözlü iletişimde mesaj netliği, amaç belirleme ve yapılandırılmış anlatım üzerine haftalık pratikler uygulanır."
+    }
+  },
+  {
+    "action_id": "CORE_COMM_02",
+    "target_competency": "Core_Communication",
+    "action_category": "Core",
+    "action_type": "Guided Exercise",
+    "difficulty": "Medium-High",
+    "estimated_effort_hours": 16,
+    "selection_rules": {
+      "min_score": 1.8,
+      "max_score": 2.5
+    },
+    "content": {
+      "title": "Effective Feedback Application",
+      "delivery_type": "Workshop",
+      "resource": "Feedback models playbook",
+      "description": "Verilen ve alınan geri bildirimlerde açık ifade, örnekleme ve duygu yönetimi üzerine kontrollü egzersizler yapılır."
+    }
+  },
+  {
+    "action_id": "CORE_COMM_03",
+    "target_competency": "Core_Communication",
+    "action_category": "Core",
+    "action_type": "Micro Learning",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 8,
+    "selection_rules": {
+      "min_score": 2.6,
+      "max_score": 3.2
+    },
+    "content": {
+      "title": "Clarity & Conciseness Tune-Up",
+      "delivery_type": "Digital Module",
+      "resource": "Short-form communication lessons",
+      "description": "Mesajları sadeleştirme, gereksiz detayları ayıklama ve ana mesajı öne çıkarma üzerine kısa alıştırmalar yapılır."
+    }
+  },
+  {
+    "action_id": "CORE_COMM_04",
+    "target_competency": "Core_Communication",
+    "action_category": "Core",
+    "action_type": "Reflection",
+    "difficulty": "Low",
+    "estimated_effort_hours": 4,
+    "selection_rules": {
+      "min_score": 3.3,
+      "max_score": 4.0
+    },
+    "content": {
+      "title": "Communication Self-Review",
+      "delivery_type": "Self Reflection",
+      "resource": "Personal communication checklist",
+      "description": "Son dönem iletişim örnekleri değerlendirilir, güçlü ve gelişime açık alanlar kısa notlarla analiz edilir."
+    }
+  },
+  {
+    "action_id": "CORE_TEAM_01",
+    "target_competency": "Core_Teamwork",
+    "action_category": "Core",
+    "action_type": "Behavioral Practice",
+    "difficulty": "High",
+    "estimated_effort_hours": 24,
+    "selection_rules": {
+      "min_score": 1.0,
+      "max_score": 1.7
+    },
+    "content": {
+      "title": "Collaboration Basics Immersion",
+      "delivery_type": "Guided Practice",
+      "resource": "Team collaboration guidelines",
+      "description": "Takım içi rol paylaşımı, destek verme ve ortak hedef takibi üzerine yapılandırılmış görevler uygulanır."
+    }
+  },
+  {
+    "action_id": "CORE_TEAM_02",
+    "target_competency": "Core_Teamwork",
+    "action_category": "Core",
+    "action_type": "Scenario Based Learning",
+    "difficulty": "Medium-High",
+    "estimated_effort_hours": 16,
+    "selection_rules": {
+      "min_score": 1.8,
+      "max_score": 2.5
+    },
+    "content": {
+      "title": "Conflict Handling in Teams",
+      "delivery_type": "Workshop",
+      "resource": "Team conflict scenarios",
+      "description": "Takım içi anlaşmazlıklarda iş birliğini koruma ve çözüm üretme üzerine senaryo çalışmaları yapılır."
+    }
+  },
+  {
+    "action_id": "CORE_TEAM_03",
+    "target_competency": "Core_Teamwork",
+    "action_category": "Core",
+    "action_type": "Micro Learning",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 8,
+    "selection_rules": {
+      "min_score": 2.6,
+      "max_score": 3.2
+    },
+    "content": {
+      "title": "Effective Collaboration Habits",
+      "delivery_type": "Digital Module",
+      "resource": "Collaboration best practices",
+      "description": "Takım içinde bilgi paylaşımı ve karşılıklı destek alışkanlıklarını güçlendirmeye yönelik kısa içerikler uygulanır."
+    }
+  },
+  {
+    "action_id": "CORE_TEAM_04",
+    "target_competency": "Core_Teamwork",
+    "action_category": "Core",
+    "action_type": "Reflection",
+    "difficulty": "Low",
+    "estimated_effort_hours": 4,
+    "selection_rules": {
+      "min_score": 3.3,
+      "max_score": 4.0
+    },
+    "content": {
+      "title": "Team Contribution Review",
+      "delivery_type": "Self Reflection",
+      "resource": "Personal teamwork checklist",
+      "description": "Kişinin takım içindeki katkısı, iş birliği davranışları ve destek düzeyi kısa bir öz değerlendirme ile gözden geçirilir."
+    }
+  },
+  {
+    "action_id": "CORE_PROB_01",
+    "target_competency": "Core_ProblemSolving",
+    "action_category": "Core",
+    "action_type": "Analytical Practice",
+    "difficulty": "High",
+    "estimated_effort_hours": 24,
+    "selection_rules": {
+      "min_score": 1.0,
+      "max_score": 1.7
+    },
+    "content": {
+      "title": "Problem Decomposition Fundamentals",
+      "delivery_type": "Guided Practice",
+      "resource": "Structured problem-solving framework",
+      "description": "Problemleri alt bileşenlerine ayırma, neden-sonuç ilişkisi kurma ve çözüm adımlarını sistematik olarak tanımlama çalışmaları yapılır."
+    }
+  },
+  {
+    "action_id": "CORE_PROB_02",
+    "target_competency": "Core_ProblemSolving",
+    "action_category": "Core",
+    "action_type": "Scenario Based Learning",
+    "difficulty": "Medium-High",
+    "estimated_effort_hours": 16,
+    "selection_rules": {
+      "min_score": 1.8,
+      "max_score": 2.5
+    },
+    "content": {
+      "title": "Root Cause Analysis Practice",
+      "delivery_type": "Workshop",
+      "resource": "Root cause analysis toolkit",
+      "description": "Karşılaşılan problemlerde yüzeysel belirtiler yerine temel nedenleri belirlemeye yönelik vaka çalışmaları uygulanır."
+    }
+  },
+  {
+    "action_id": "CORE_PROB_03",
+    "target_competency": "Core_ProblemSolving",
+    "action_category": "Core",
+    "action_type": "Micro Learning",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 8,
+    "selection_rules": {
+      "min_score": 2.6,
+      "max_score": 3.2
+    },
+    "content": {
+      "title": "Solution Evaluation Techniques",
+      "delivery_type": "Digital Module",
+      "resource": "Decision-making quick guides",
+      "description": "Üretilen çözüm alternatiflerini etki, risk ve uygulanabilirlik açısından değerlendirmeye yönelik kısa alıştırmalar yapılır."
+    }
+  },
+  {
+    "action_id": "CORE_PROB_04",
+    "target_competency": "Core_ProblemSolving",
+    "action_category": "Core",
+    "action_type": "Reflection",
+    "difficulty": "Low",
+    "estimated_effort_hours": 4,
+    "selection_rules": {
+      "min_score": 3.3,
+      "max_score": 4.0
+    },
+    "content": {
+      "title": "Problem-Solving Self Review",
+      "delivery_type": "Self Reflection",
+      "resource": "Personal problem-solving checklist",
+      "description": "Son dönemde çözülen problemlerin yaklaşımı gözden geçirilir, güçlü yönler ve geliştirme alanları kısa notlarla değerlendirilir."
+    }
+  },
+  {
+    "action_id": "CORE_ADAPT_01",
+    "target_competency": "Core_Adaptability",
+    "action_category": "Core",
+    "action_type": "Behavioral Practice",
+    "difficulty": "High",
+    "estimated_effort_hours": 24,
+    "selection_rules": {
+      "min_score": 1.0,
+      "max_score": 1.7
+    },
+    "content": {
+      "title": "Change Readiness Foundations",
+      "delivery_type": "Guided Practice",
+      "resource": "Change management fundamentals",
+      "description": "Değişen koşullara karşı direnç noktalarını fark etme ve yeni durumlara uyum sağlama üzerine yapılandırılmış egzersizler uygulanır."
+    }
+  },
+  {
+    "action_id": "CORE_ADAPT_02",
+    "target_competency": "Core_Adaptability",
+    "action_category": "Core",
+    "action_type": "Scenario Based Learning",
+    "difficulty": "Medium-High",
+    "estimated_effort_hours": 16,
+    "selection_rules": {
+      "min_score": 1.8,
+      "max_score": 2.5
+    },
+    "content": {
+      "title": "Responding to Change Scenarios",
+      "delivery_type": "Workshop",
+      "resource": "Change response scenarios",
+      "description": "Beklenmeyen değişim durumlarında hızlı uyum ve öncelik güncelleme üzerine senaryo bazlı çalışmalar yapılır."
+    }
+  },
+  {
+    "action_id": "CORE_ADAPT_03",
+    "target_competency": "Core_Adaptability",
+    "action_category": "Core",
+    "action_type": "Micro Learning",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 8,
+    "selection_rules": {
+      "min_score": 2.6,
+      "max_score": 3.2
+    },
+    "content": {
+      "title": "Flexibility & Adjustment Skills",
+      "delivery_type": "Digital Module",
+      "resource": "Adaptive behavior micro-lessons",
+      "description": "Farklı çalışma koşullarına hızlı uyum sağlama ve yaklaşım değiştirme becerilerini destekleyen kısa içerikler uygulanır."
+    }
+  },
+  {
+    "action_id": "CORE_ADAPT_04",
+    "target_competency": "Core_Adaptability",
+    "action_category": "Core",
+    "action_type": "Reflection",
+    "difficulty": "Low",
+    "estimated_effort_hours": 4,
+    "selection_rules": {
+      "min_score": 3.3,
+      "max_score": 4.0
+    },
+    "content": {
+      "title": "Adaptability Self Assessment",
+      "delivery_type": "Self Reflection",
+      "resource": "Personal adaptability checklist",
+      "description": "Yakın dönemde yaşanan değişimlere verilen tepkiler değerlendirilir ve gelişim alanları kısa bir öz analizle belirlenir."
+    }
+  },
+  {
+    "action_id": "CORE_TIME_01",
+    "target_competency": "Core_TimeManagement",
+    "action_category": "Core",
+    "action_type": "Behavioral Practice",
+    "difficulty": "High",
+    "estimated_effort_hours": 24,
+    "selection_rules": {
+      "min_score": 1.0,
+      "max_score": 1.7
+    },
+    "content": {
+      "title": "Time Awareness & Priority Reset",
+      "delivery_type": "Guided Practice",
+      "resource": "Time tracking and prioritization framework",
+      "description": "Günlük görevlerin zaman kullanımı analiz edilir, önceliklendirme hataları tespit edilerek yapılandırılmış planlama alışkanlığı kazandırılır."
+    }
+  },
+  {
+    "action_id": "CORE_TIME_02",
+    "target_competency": "Core_TimeManagement",
+    "action_category": "Core",
+    "action_type": "Scenario Based Learning",
+    "difficulty": "Medium-High",
+    "estimated_effort_hours": 16,
+    "selection_rules": {
+      "min_score": 1.8,
+      "max_score": 2.5
+    },
+    "content": {
+      "title": "Managing Competing Priorities",
+      "delivery_type": "Workshop",
+      "resource": "Priority conflict scenarios",
+      "description": "Aynı anda gelen işler arasında öncelik belirleme, erteleme ve yeniden planlama üzerine vaka çalışmaları yapılır."
+    }
+  },
+  {
+    "action_id": "CORE_TIME_03",
+    "target_competency": "Core_TimeManagement",
+    "action_category": "Core",
+    "action_type": "Micro Learning",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 8,
+    "selection_rules": {
+      "min_score": 2.6,
+      "max_score": 3.2
+    },
+    "content": {
+      "title": "Efficiency & Focus Techniques",
+      "delivery_type": "Digital Module",
+      "resource": "Personal productivity techniques",
+      "description": "Odaklanma, dikkat dağıtıcıları azaltma ve işleri daha kısa sürede tamamlama üzerine kısa uygulamalar yapılır."
+    }
+  },
+  {
+    "action_id": "CORE_TIME_04",
+    "target_competency": "Core_TimeManagement",
+    "action_category": "Core",
+    "action_type": "Reflection",
+    "difficulty": "Low",
+    "estimated_effort_hours": 4,
+    "selection_rules": {
+      "min_score": 3.3,
+      "max_score": 4.0
+    },
+    "content": {
+      "title": "Personal Time Review",
+      "delivery_type": "Self Reflection",
+      "resource": "Weekly time review checklist",
+      "description": "Kişinin zaman kullanım alışkanlıkları gözden geçirilir, güçlü ve zayıf yönler kısa notlarla değerlendirilir."
+    }
+  },
+  {
+    "action_id": "CORE_INIT_01",
+    "target_competency": "Core_Initiative",
+    "action_category": "Core",
+    "action_type": "Behavioral Practice",
+    "difficulty": "High",
+    "estimated_effort_hours": 24,
+    "selection_rules": {
+      "min_score": 1.0,
+      "max_score": 1.7
+    },
+    "content": {
+      "title": "Proactive Mindset Activation",
+      "delivery_type": "Guided Practice",
+      "resource": "Proactivity behavior guide",
+      "description": "Beklenmeden aksiyon alma, sorunları önden fark etme ve küçük iyileştirme önerileri geliştirme üzerine yapılandırılmış görevler uygulanır."
+    }
+  },
+  {
+    "action_id": "CORE_INIT_02",
+    "target_competency": "Core_Initiative",
+    "action_category": "Core",
+    "action_type": "Scenario Based Learning",
+    "difficulty": "Medium-High",
+    "estimated_effort_hours": 16,
+    "selection_rules": {
+      "min_score": 1.8,
+      "max_score": 2.5
+    },
+    "content": {
+      "title": "Taking Ownership in Unclear Situations",
+      "delivery_type": "Workshop",
+      "resource": "Ambiguity response scenarios",
+      "description": "Net yönlendirme olmayan durumlarda sorumluluk alma ve aksiyon başlatma üzerine senaryo bazlı çalışmalar yapılır."
+    }
+  },
+  {
+    "action_id": "CORE_INIT_03",
+    "target_competency": "Core_Initiative",
+    "action_category": "Core",
+    "action_type": "Micro Learning",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 8,
+    "selection_rules": {
+      "min_score": 2.6,
+      "max_score": 3.2
+    },
+    "content": {
+      "title": "Opportunity Spotting Habits",
+      "delivery_type": "Digital Module",
+      "resource": "Proactive thinking micro-lessons",
+      "description": "Geliştirme fırsatlarını fark etme ve küçük aksiyonlara dönüştürme becerilerini destekleyen kısa içerikler uygulanır."
+    }
+  },
+  {
+    "action_id": "CORE_INIT_04",
+    "target_competency": "Core_Initiative",
+    "action_category": "Core",
+    "action_type": "Reflection",
+    "difficulty": "Low",
+    "estimated_effort_hours": 4,
+    "selection_rules": {
+      "min_score": 3.3,
+      "max_score": 4.0
+    },
+    "content": {
+      "title": "Initiative Self Check",
+      "delivery_type": "Self Reflection",
+      "resource": "Personal initiative checklist",
+      "description": "Son dönemde alınan inisiyatifler gözden geçirilir, hangi durumlarda proaktif davranıldığı kısa bir öz değerlendirme ile analiz edilir."
+    }
+  },
+  {
+    "action_id": "CORE_ACCT_01",
+    "target_competency": "Core_Accountability",
+    "action_category": "Core",
+    "action_type": "Behavioral Practice",
+    "difficulty": "High",
+    "estimated_effort_hours": 24,
+    "selection_rules": {
+      "min_score": 1.0,
+      "max_score": 1.7
+    },
+    "content": {
+      "title": "Responsibility Ownership Reset",
+      "delivery_type": "Guided Practice",
+      "resource": "Accountability behavior framework",
+      "description": "Üstlenilen işlerin uçtan uca sahiplenilmesi, hatalardan kaçınmak yerine sorumluluk alarak çözüm üretme üzerine yapılandırılmış görevler uygulanır."
+    }
+  },
+  {
+    "action_id": "CORE_ACCT_02",
+    "target_competency": "Core_Accountability",
+    "action_category": "Core",
+    "action_type": "Scenario Based Learning",
+    "difficulty": "Medium-High",
+    "estimated_effort_hours": 16,
+    "selection_rules": {
+      "min_score": 1.8,
+      "max_score": 2.5
+    },
+    "content": {
+      "title": "Handling Mistakes & Commitments",
+      "delivery_type": "Workshop",
+      "resource": "Accountability scenarios",
+      "description": "Hata yapılan veya taahhütlerin aksadığı durumlarda sorumluluk alma, şeffaflık ve telafi aksiyonları üzerine vaka çalışmaları yapılır."
+    }
+  },
+  {
+    "action_id": "CORE_ACCT_03",
+    "target_competency": "Core_Accountability",
+    "action_category": "Core",
+    "action_type": "Micro Learning",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 8,
+    "selection_rules": {
+      "min_score": 2.6,
+      "max_score": 3.2
+    },
+    "content": {
+      "title": "Commitment Tracking Habits",
+      "delivery_type": "Digital Module",
+      "resource": "Personal commitment tracking guide",
+      "description": "Verilen sözleri takip etme, ilerleme durumunu görünür kılma ve sonuç odaklı çalışma alışkanlıklarını güçlendiren kısa içerikler uygulanır."
+    }
+  },
+  {
+    "action_id": "CORE_ACCT_04",
+    "target_competency": "Core_Accountability",
+    "action_category": "Core",
+    "action_type": "Reflection",
+    "difficulty": "Low",
+    "estimated_effort_hours": 4,
+    "selection_rules": {
+      "min_score": 3.3,
+      "max_score": 4.0
+    },
+    "content": {
+      "title": "Accountability Self Review",
+      "delivery_type": "Self Reflection",
+      "resource": "Personal accountability checklist",
+      "description": "Son dönemde üstlenilen sorumluluklar değerlendirilir, sahiplenme düzeyi ve geliştirme alanları kısa notlarla analiz edilir."
+    }
+  },
+  {
+    "action_id": "CORE_LEARN_01",
+    "target_competency": "Core_LearningAgility",
+    "action_category": "Core",
+    "action_type": "Behavioral Practice",
+    "difficulty": "High",
+    "estimated_effort_hours": 24,
+    "selection_rules": {
+      "min_score": 1.0,
+      "max_score": 1.7
+    },
+    "content": {
+      "title": "Learning Habit Foundations",
+      "delivery_type": "Guided Practice",
+      "resource": "Learning agility framework",
+      "description": "Yeni bilgi edinme, deneme-yanılma yoluyla öğrenme ve öğrenilenleri işe uyarlama üzerine yapılandırılmış öğrenme görevleri uygulanır."
+    }
+  },
+  {
+    "action_id": "CORE_LEARN_02",
+    "target_competency": "Core_LearningAgility",
+    "action_category": "Core",
+    "action_type": "Scenario Based Learning",
+    "difficulty": "Medium-High",
+    "estimated_effort_hours": 16,
+    "selection_rules": {
+      "min_score": 1.8,
+      "max_score": 2.5
+    },
+    "content": {
+      "title": "Learning from New Situations",
+      "delivery_type": "Workshop",
+      "resource": "Learning agility scenarios",
+      "description": "Bilinmeyen konularla karşılaşıldığında hızlı öğrenme, soru sorma ve deneme yaklaşımı üzerine senaryo bazlı çalışmalar yapılır."
+    }
+  },
+  {
+    "action_id": "CORE_LEARN_03",
+    "target_competency": "Core_LearningAgility",
+    "action_category": "Core",
+    "action_type": "Micro Learning",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 8,
+    "selection_rules": {
+      "min_score": 2.6,
+      "max_score": 3.2
+    },
+    "content": {
+      "title": "Continuous Improvement Micro Skills",
+      "delivery_type": "Digital Module",
+      "resource": "Continuous learning micro-lessons",
+      "description": "Kısa sürede yeni bilgi edinme, geri bildirimden öğrenme ve küçük gelişim adımları oluşturma üzerine içerikler uygulanır."
+    }
+  },
+  {
+    "action_id": "CORE_LEARN_04",
+    "target_competency": "Core_LearningAgility",
+    "action_category": "Core",
+    "action_type": "Reflection",
+    "difficulty": "Low",
+    "estimated_effort_hours": 4,
+    "selection_rules": {
+      "min_score": 3.3,
+      "max_score": 4.0
+    },
+    "content": {
+      "title": "Learning Agility Self Check",
+      "delivery_type": "Self Reflection",
+      "resource": "Personal learning agility checklist",
+      "description": "Yakın dönemde öğrenilen yeni konular ve bunların işe yansıtılması değerlendirilir, gelişim alanları kısa bir öz analizle belirlenir."
+    }
+  },
+  {
+    "action_id": "DEPT_COMP1_01",
+    "target_competency": "Dept_Comp1",
+    "action_category": "Department",
+    "action_type": "PracticalTask",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 3,
+    "selection_rules": {
+      "min_score": 1.0,
+      "max_score": 1.9
+    },
+    "content_by_department": {
+      "Human Resources": {
+        "title": "İlan Metni ve Aday Skorlama Görevi (HR_Recruitment)",
+        "delivery_type": "Task",
+        "resource": "hr_job_posting_task.docx"
+      },
+      "Technology": {
+        "title": "PR Refactor Görevi (Tech_CodingQuality)",
+        "delivery_type": "Task",
+        "resource": "tech_refactor_task.md"
+      },
+      "Sales & Marketing": {
+        "title": "Müşteri Pitch Yazımı (Sales_SalesSkill)",
+        "delivery_type": "Task",
+        "resource": "sales_pitch_task.docx"
+      },
+      "Finance & Accounting": {
+        "title": "Mini KPI Analizi (Fin_FinancialAnalysis)",
+        "delivery_type": "Task",
+        "resource": "fin_kpi_task.xlsx"
+      },
+      "Operations": {
+        "title": "Haftalık Operasyon Planı (Ops_OperationsPlanning)",
+        "delivery_type": "Task",
+        "resource": "ops_weekly_plan.xlsx"
+      }
+    }
+  },
+  {
+    "action_id": "DEPT_COMP1_02",
+    "target_competency": "Dept_Comp1",
+    "action_category": "Department",
+    "action_type": "Coaching",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 2,
+    "selection_rules": {
+      "min_score": 2.0,
+      "max_score": 2.9
+    },
+    "content_by_department": {
+      "Human Resources": {
+        "title": "İşe Alım Kalite Checklist (HR_Recruitment)",
+        "delivery_type": "Checklist",
+        "resource": "hr_recruitment_checklist.pdf"
+      },
+      "Technology": {
+        "title": "Kod İnceleme Checklist (Tech_CodingQuality)",
+        "delivery_type": "Checklist",
+        "resource": "tech_code_review_checklist.pdf"
+      },
+      "Sales & Marketing": {
+        "title": "Satış Görüşmesi Checklist (Sales_SalesSkill)",
+        "delivery_type": "Checklist",
+        "resource": "sales_call_checklist.pdf"
+      },
+      "Finance & Accounting": {
+        "title": "Analiz Öncesi Kontrol Checklist (Fin_FinancialAnalysis)",
+        "delivery_type": "Checklist",
+        "resource": "fin_validation_checklist.pdf"
+      },
+      "Operations": {
+        "title": "Planlama Öncesi Checklist (Ops_OperationsPlanning)",
+        "delivery_type": "Checklist",
+        "resource": "ops_planning_checklist.pdf"
+      }
+    }
+  },
+  {
+    "action_id": "DEPT_COMP1_03",
+    "target_competency": "Dept_Comp1",
+    "action_category": "Department",
+    "action_type": "MicroLearning",
+    "difficulty": "Easy",
+    "estimated_effort_hours": 2,
+    "selection_rules": {
+      "min_score": 3.0,
+      "max_score": 4.0
+    },
+    "content_by_department": {
+      "Human Resources": {
+        "title": "Aday Tarama ve Mülakat Akışı (HR_Recruitment)",
+        "delivery_type": "Course",
+        "resource": "hr_recruitment_pipeline.pdf"
+      },
+      "Technology": {
+        "title": "Kod Kalitesi Standartları (Tech_CodingQuality)",
+        "delivery_type": "Course",
+        "resource": "tech_coding_quality_course"
+      },
+      "Sales & Marketing": {
+        "title": "Satış Temelleri ve Değer Önerisi (Sales_SalesSkill)",
+        "delivery_type": "Course",
+        "resource": "sales_skill_basics.pptx"
+      },
+      "Finance & Accounting": {
+        "title": "Finansal Veri Okuma (Fin_FinancialAnalysis)",
+        "delivery_type": "Course",
+        "resource": "fin_analysis_intro_course"
+      },
+      "Operations": {
+        "title": "Operasyon Planlama 101 (Ops_OperationsPlanning)",
+        "delivery_type": "Course",
+        "resource": "ops_planning_101.pdf"
+      }
+    }
+  },
+  {
+    "action_id": "DEPT_COMP2_01",
+    "target_competency": "Dept_Comp2",
+    "action_category": "Department",
+    "action_type": "Simulation",
+    "difficulty": "Hard",
+    "estimated_effort_hours": 5,
+    "selection_rules": {
+      "min_score": 1.0,
+      "max_score": 1.9
+    },
+    "content_by_department": {
+      "Human Resources": {
+        "title": "Disiplin Süreci Senaryosu (HR_PolicyAndLaw)",
+        "delivery_type": "Exercise",
+        "resource": "hr_policy_simulation.pdf"
+      },
+      "Technology": {
+        "title": "Ölçeklenebilir Sistem Senaryosu (Tech_SystemDesign)",
+        "delivery_type": "Exercise",
+        "resource": "tech_system_simulation.pdf"
+      },
+      "Sales & Marketing": {
+        "title": "Pazarlık Senaryosu (Sales_Negotiation)",
+        "delivery_type": "Exercise",
+        "resource": "sales_negotiation_simulation.pdf"
+      },
+      "Finance & Accounting": {
+        "title": "Muhasebe Hata Bulma Senaryosu (Fin_AccountingAccuracy)",
+        "delivery_type": "Exercise",
+        "resource": "fin_accounting_simulation.pdf"
+      },
+      "Operations": {
+        "title": "Teslimat Gecikmesi Senaryosu (Ops_LogisticsCoordination)",
+        "delivery_type": "Exercise",
+        "resource": "ops_logistics_simulation.pdf"
+      }
+    }
+  },
+  {
+    "action_id": "DEPT_COMP2_02",
+    "target_competency": "Dept_Comp2",
+    "action_category": "Department",
+    "action_type": "MicroLearning",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 4,
+    "selection_rules": {
+      "min_score": 2.0,
+      "max_score": 2.9
+    },
+    "content_by_department": {
+      "Human Resources": {
+        "title": "İK Politika ve İş Hukuku (HR_PolicyAndLaw)",
+        "delivery_type": "Course",
+        "resource": "hr_policy_law.pdf"
+      },
+      "Technology": {
+        "title": "Sistem Tasarımı Temelleri (Tech_SystemDesign)",
+        "delivery_type": "Course",
+        "resource": "tech_system_design_course"
+      },
+      "Sales & Marketing": {
+        "title": "Müzakere Stratejileri (Sales_Negotiation)",
+        "delivery_type": "Course",
+        "resource": "sales_negotiation_course"
+      },
+      "Finance & Accounting": {
+        "title": "Muhasebe Doğruluk İlkeleri (Fin_AccountingAccuracy)",
+        "delivery_type": "Course",
+        "resource": "fin_accounting_accuracy.pdf"
+      },
+      "Operations": {
+        "title": "Lojistik Koordinasyon Süreçleri (Ops_LogisticsCoordination)",
+        "delivery_type": "Course",
+        "resource": "ops_logistics_course.pdf"
+      }
+    }
+  },
+  {
+    "action_id": "DEPT_COMP2_03",
+    "target_competency": "Dept_Comp2",
+    "action_category": "Department",
+    "action_type": "Reflection",
+    "difficulty": "Easy",
+    "estimated_effort_hours": 2,
+    "selection_rules": {
+      "min_score": 3.0,
+      "max_score": 4.0
+    },
+    "content_by_department": {
+      "Human Resources": {
+        "title": "Politika Uyum Öz Değerlendirme (HR_PolicyAndLaw)",
+        "delivery_type": "Template",
+        "resource": "hr_policy_reflection.docx"
+      },
+      "Technology": {
+        "title": "Sistem Tasarım Öz Değerlendirme (Tech_SystemDesign)",
+        "delivery_type": "Template",
+        "resource": "tech_system_reflection.md"
+      },
+      "Sales & Marketing": {
+        "title": "Müzakere Öz Değerlendirme (Sales_Negotiation)",
+        "delivery_type": "Template",
+        "resource": "sales_negotiation_reflection.docx"
+      },
+      "Finance & Accounting": {
+        "title": "Muhasebe Öz Değerlendirme (Fin_AccountingAccuracy)",
+        "delivery_type": "Template",
+        "resource": "fin_accounting_reflection.xlsx"
+      },
+      "Operations": {
+        "title": "Lojistik Öz Değerlendirme (Ops_LogisticsCoordination)",
+        "delivery_type": "Template",
+        "resource": "ops_logistics_reflection.xlsx"
+      }
+    }
+  },
+  {
+    "action_id": "DEPT_COMP3_01",
+    "target_competency": "Dept_Comp3",
+    "action_category": "Department",
+    "action_type": "Coaching",
+    "difficulty": "Hard",
+    "estimated_effort_hours": 4,
+    "selection_rules": {
+      "min_score": 1.0,
+      "max_score": 1.9
+    },
+    "content_by_department": {
+      "Human Resources": {
+        "title": "Zor Çalışan Görüşmesi Koçluğu (HR_EmployeeRelations)",
+        "delivery_type": "Checklist",
+        "resource": "hr_employee_coaching.pdf"
+      },
+      "Technology": {
+        "title": "Test Planı Review Koçluğu (Tech_TestingAndQA)",
+        "delivery_type": "Checklist",
+        "resource": "tech_testing_coaching.md"
+      },
+      "Sales & Marketing": {
+        "title": "CRM Takip Koçluğu (Sales_CustomerRelationship)",
+        "delivery_type": "Checklist",
+        "resource": "sales_crm_coaching.pdf"
+      },
+      "Finance & Accounting": {
+        "title": "Bordro Hata İnceleme Koçluğu (Fin_PayrollKnowledge)",
+        "delivery_type": "Checklist",
+        "resource": "fin_payroll_coaching.pdf"
+      },
+      "Operations": {
+        "title": "Kaizen Süreç Koçluğu (Ops_ProcessOptimization)",
+        "delivery_type": "Checklist",
+        "resource": "ops_kaizen_coaching.pdf"
+      }
+    }
+  },
+  {
+    "action_id": "DEPT_COMP3_02",
+    "target_competency": "Dept_Comp3",
+    "action_category": "Department",
+    "action_type": "MicroLearning",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 3,
+    "selection_rules": {
+      "min_score": 2.0,
+      "max_score": 2.9
+    },
+    "content_by_department": {
+      "Human Resources": {
+        "title": "Çalışan İlişkileri Yönetimi (HR_EmployeeRelations)",
+        "delivery_type": "Course",
+        "resource": "hr_employee_relations.pdf"
+      },
+      "Technology": {
+        "title": "Test ve QA Süreçleri (Tech_TestingAndQA)",
+        "delivery_type": "Course",
+        "resource": "tech_testing_course"
+      },
+      "Sales & Marketing": {
+        "title": "CRM Temelleri (Sales_CustomerRelationship)",
+        "delivery_type": "Course",
+        "resource": "sales_crm_course.pdf"
+      },
+      "Finance & Accounting": {
+        "title": "Bordro Süreci (Fin_PayrollKnowledge)",
+        "delivery_type": "Course",
+        "resource": "fin_payroll_course.pdf"
+      },
+      "Operations": {
+        "title": "Süreç Optimizasyonu (Ops_ProcessOptimization)",
+        "delivery_type": "Course",
+        "resource": "ops_process_opt_course.pdf"
+      }
+    }
+  },
+  {
+    "action_id": "DEPT_COMP3_03",
+    "target_competency": "Dept_Comp3",
+    "action_category": "Department",
+    "action_type": "MicroLearning",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 3,
+    "selection_rules": {
+      "min_score": 3.0,
+      "max_score": 4.0
+    },
+    "content_by_department": {
+      "Human Resources": {
+        "title": "Employee Relations Quiz (HR_EmployeeRelations)",
+        "delivery_type": "Course",
+        "resource": "hr_employee_quiz.json"
+      },
+      "Technology": {
+        "title": "QA Temelleri Quiz (Tech_TestingAndQA)",
+        "delivery_type": "Course",
+        "resource": "tech_testing_quiz.json"
+      },
+      "Sales & Marketing": {
+        "title": "CRM Quiz (Sales_CustomerRelationship)",
+        "delivery_type": "Course",
+        "resource": "sales_crm_quiz.json"
+      },
+      "Finance & Accounting": {
+        "title": "Bordro Quiz (Fin_PayrollKnowledge)",
+        "delivery_type": "Course",
+        "resource": "fin_payroll_quiz.json"
+      },
+      "Operations": {
+        "title": "Süreç Optimizasyonu Quiz (Ops_ProcessOptimization)",
+        "delivery_type": "Course",
+        "resource": "ops_process_quiz.json"
+      }
+    }
+  },
+  {
+    "action_id": "ROLE_COMP1_01",
+    "target_competency": "Role_Comp1",
+    "action_category": "Role",
+    "action_type": "Simulation",
+    "difficulty": "Hard",
+    "estimated_effort_hours": 6,
+    "selection_rules": {
+      "min_score": 1.0,
+      "max_score": 1.9
+    },
+    "content_by_role": {
+      "Account Manager": {
+        "title": "Müşteri Yönetimi Müşteri Tutundurma: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "am_clientretention_simulation_v1"
+      },
+      "Accountant": {
+        "title": "Muhasebe Defter Tutma Kalitesi: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "acc_bookkeepingquality_simulation_v1"
+      },
+      "Data Scientist": {
+        "title": "Veri Bilimi Özellik Mühendisliği: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "ds_featureengineering_simulation_v1"
+      },
+      "DevOps Engineer": {
+        "title": "DevOps CI/CD Pipeline: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "devops_cicdpipeline_simulation_v1"
+      },
+      "Engineering Manager": {
+        "title": "Mühendislik Yönetimi Takım Liderlik: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "engmgr_teamleadership_simulation_v1"
+      },
+      "Field Supervisor": {
+        "title": "Saha On Site Liderlik: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "fieldsup_onsiteleadership_simulation_v1"
+      },
+      "Finance Manager": {
+        "title": "Finans Yönetimi Budget Sahipliği: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "finmgr_budgetownership_simulation_v1"
+      },
+      "Financial Analyst": {
+        "title": "Finansal Analiz Tahminleme Doğruluğu: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "fa_forecastingaccuracy_simulation_v1"
+      },
+      "HR Manager": {
+        "title": "İK Strategic HR Yönetimi: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "hr_strategichrmanagement_simulation_v1"
+      },
+      "HR Specialist": {
+        "title": "İK Dokümantasyon Kalitesi: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "hr_documentationquality_simulation_v1"
+      },
+      "Logistics Coordinator": {
+        "title": "Lojistik Rota Planlama: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "logcoord_routeplanning_simulation_v1"
+      },
+      "Machine Learning Engineer": {
+        "title": "ML Model Dağıtım: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "mle_modeldeployment_simulation_v1"
+      },
+      "Marketing Specialist": {
+        "title": "Pazarlama Kampanya Planlama: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "mkt_campaignplanning_simulation_v1"
+      },
+      "Operations Manager": {
+        "title": "Operasyon Yönetimi Operasyonel Planlama: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "opsmgr_operationalplanning_simulation_v1"
+      },
+      "Operations Specialist": {
+        "title": "Operasyon Süreç Uygulama: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "opsspec_processexecution_simulation_v1"
+      },
+      "Payroll Specialist": {
+        "title": "Bordro Bordro Çalıştırma Doğruluğu: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "payroll_payrunaccuracy_simulation_v1"
+      },
+      "Production Engineer": {
+        "title": "Üretim Kalite Kontrol: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "prodeng_qualitycontrol_simulation_v1"
+      },
+      "QA Engineer": {
+        "title": "QA Test Vaka Tasarım: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "qa_testcasedesign_simulation_v1"
+      },
+      "Recruiter": {
+        "title": "İK Mülakat Skill: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "hr_interviewingskill_simulation_v1"
+      },
+      "Sales Executive": {
+        "title": "Satış Kapatma Anlaşmalar: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "sales_closingdeals_simulation_v1"
+      },
+      "Sales Representative": {
+        "title": "Satış Ürün Bilgisi: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "sales_productknowledge_simulation_v1"
+      },
+      "Senior Software Engineer": {
+        "title": "Yazılım Mimari Sahipliği: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "tech_architectureownership_simulation_v1"
+      },
+      "Software Engineer": {
+        "title": "Yazılım Hata Ayıklama Derinliği: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "tech_debuggingdepth_simulation_v1"
+      },
+      "Technical Support Engineer": {
+        "title": "Teknik Destek Sorun Çözümü Hızı: Senaryo Simülasyonu",
+        "delivery_type": "Exercise",
+        "resource": "support_issueresolutionspeed_simulation_v1"
+      }
+    }
+  },
+  {
+    "action_id": "ROLE_COMP1_02",
+    "target_competency": "Role_Comp1",
+    "action_category": "Role",
+    "action_type": "PracticalTask",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 4,
+    "selection_rules": {
+      "min_score": 2.0,
+      "max_score": 2.9
+    },
+    "content_by_role": {
+      "Account Manager": {
+        "title": "Müşteri Yönetimi Müşteri Tutundurma: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "am_clientretention_task_v1"
+      },
+      "Accountant": {
+        "title": "Muhasebe Defter Tutma Kalitesi: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "acc_bookkeepingquality_task_v1"
+      },
+      "Data Scientist": {
+        "title": "Veri Bilimi Özellik Mühendisliği: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "ds_featureengineering_task_v1"
+      },
+      "DevOps Engineer": {
+        "title": "DevOps CI/CD Pipeline: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "devops_cicdpipeline_task_v1"
+      },
+      "Engineering Manager": {
+        "title": "Mühendislik Yönetimi Takım Liderlik: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "engmgr_teamleadership_task_v1"
+      },
+      "Field Supervisor": {
+        "title": "Saha On Site Liderlik: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "fieldsup_onsiteleadership_task_v1"
+      },
+      "Finance Manager": {
+        "title": "Finans Yönetimi Budget Sahipliği: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "finmgr_budgetownership_task_v1"
+      },
+      "Financial Analyst": {
+        "title": "Finansal Analiz Tahminleme Doğruluğu: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "fa_forecastingaccuracy_task_v1"
+      },
+      "HR Manager": {
+        "title": "İK Strategic HR Yönetimi: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "hr_strategichrmanagement_task_v1"
+      },
+      "HR Specialist": {
+        "title": "İK Dokümantasyon Kalitesi: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "hr_documentationquality_task_v1"
+      },
+      "Logistics Coordinator": {
+        "title": "Lojistik Rota Planlama: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "logcoord_routeplanning_task_v1"
+      },
+      "Machine Learning Engineer": {
+        "title": "ML Model Dağıtım: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "mle_modeldeployment_task_v1"
+      },
+      "Marketing Specialist": {
+        "title": "Pazarlama Kampanya Planlama: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "mkt_campaignplanning_task_v1"
+      },
+      "Operations Manager": {
+        "title": "Operasyon Yönetimi Operasyonel Planlama: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "opsmgr_operationalplanning_task_v1"
+      },
+      "Operations Specialist": {
+        "title": "Operasyon Süreç Uygulama: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "opsspec_processexecution_task_v1"
+      },
+      "Payroll Specialist": {
+        "title": "Bordro Bordro Çalıştırma Doğruluğu: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "payroll_payrunaccuracy_task_v1"
+      },
+      "Production Engineer": {
+        "title": "Üretim Kalite Kontrol: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "prodeng_qualitycontrol_task_v1"
+      },
+      "QA Engineer": {
+        "title": "QA Test Vaka Tasarım: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "qa_testcasedesign_task_v1"
+      },
+      "Recruiter": {
+        "title": "İK Mülakat Skill: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "hr_interviewingskill_task_v1"
+      },
+      "Sales Executive": {
+        "title": "Satış Kapatma Anlaşmalar: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "sales_closingdeals_task_v1"
+      },
+      "Sales Representative": {
+        "title": "Satış Ürün Bilgisi: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "sales_productknowledge_task_v1"
+      },
+      "Senior Software Engineer": {
+        "title": "Yazılım Mimari Sahipliği: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "tech_architectureownership_task_v1"
+      },
+      "Software Engineer": {
+        "title": "Yazılım Hata Ayıklama Derinliği: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "tech_debuggingdepth_task_v1"
+      },
+      "Technical Support Engineer": {
+        "title": "Teknik Destek Sorun Çözümü Hızı: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "support_issueresolutionspeed_task_v1"
+      }
+    }
+  },
+  {
+    "action_id": "ROLE_COMP1_03",
+    "target_competency": "Role_Comp1",
+    "action_category": "Role",
+    "action_type": "MicroLearning",
+    "difficulty": "Easy",
+    "estimated_effort_hours": 2,
+    "selection_rules": {
+      "min_score": 3.0,
+      "max_score": 4.0
+    },
+    "content_by_role": {
+      "Account Manager": {
+        "title": "Müşteri Yönetimi Müşteri Tutundurma: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "am_clientretention_microlearning_v1"
+      },
+      "Accountant": {
+        "title": "Muhasebe Defter Tutma Kalitesi: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "acc_bookkeepingquality_microlearning_v1"
+      },
+      "Data Scientist": {
+        "title": "Veri Bilimi Özellik Mühendisliği: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "ds_featureengineering_microlearning_v1"
+      },
+      "DevOps Engineer": {
+        "title": "DevOps CI/CD Pipeline: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "devops_cicdpipeline_microlearning_v1"
+      },
+      "Engineering Manager": {
+        "title": "Mühendislik Yönetimi Takım Liderlik: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "engmgr_teamleadership_microlearning_v1"
+      },
+      "Field Supervisor": {
+        "title": "Saha On Site Liderlik: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "fieldsup_onsiteleadership_microlearning_v1"
+      },
+      "Finance Manager": {
+        "title": "Finans Yönetimi Budget Sahipliği: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "finmgr_budgetownership_microlearning_v1"
+      },
+      "Financial Analyst": {
+        "title": "Finansal Analiz Tahminleme Doğruluğu: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "fa_forecastingaccuracy_microlearning_v1"
+      },
+      "HR Manager": {
+        "title": "İK Strategic HR Yönetimi: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "hr_strategichrmanagement_microlearning_v1"
+      },
+      "HR Specialist": {
+        "title": "İK Dokümantasyon Kalitesi: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "hr_documentationquality_microlearning_v1"
+      },
+      "Logistics Coordinator": {
+        "title": "Lojistik Rota Planlama: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "logcoord_routeplanning_microlearning_v1"
+      },
+      "Machine Learning Engineer": {
+        "title": "ML Model Dağıtım: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "mle_modeldeployment_microlearning_v1"
+      },
+      "Marketing Specialist": {
+        "title": "Pazarlama Kampanya Planlama: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "mkt_campaignplanning_microlearning_v1"
+      },
+      "Operations Manager": {
+        "title": "Operasyon Yönetimi Operasyonel Planlama: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "opsmgr_operationalplanning_microlearning_v1"
+      },
+      "Operations Specialist": {
+        "title": "Operasyon Süreç Uygulama: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "opsspec_processexecution_microlearning_v1"
+      },
+      "Payroll Specialist": {
+        "title": "Bordro Bordro Çalıştırma Doğruluğu: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "payroll_payrunaccuracy_microlearning_v1"
+      },
+      "Production Engineer": {
+        "title": "Üretim Kalite Kontrol: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "prodeng_qualitycontrol_microlearning_v1"
+      },
+      "QA Engineer": {
+        "title": "QA Test Vaka Tasarım: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "qa_testcasedesign_microlearning_v1"
+      },
+      "Recruiter": {
+        "title": "İK Mülakat Skill: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "hr_interviewingskill_microlearning_v1"
+      },
+      "Sales Executive": {
+        "title": "Satış Kapatma Anlaşmalar: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "sales_closingdeals_microlearning_v1"
+      },
+      "Sales Representative": {
+        "title": "Satış Ürün Bilgisi: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "sales_productknowledge_microlearning_v1"
+      },
+      "Senior Software Engineer": {
+        "title": "Yazılım Mimari Sahipliği: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "tech_architectureownership_microlearning_v1"
+      },
+      "Software Engineer": {
+        "title": "Yazılım Hata Ayıklama Derinliği: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "tech_debuggingdepth_microlearning_v1"
+      },
+      "Technical Support Engineer": {
+        "title": "Teknik Destek Sorun Çözümü Hızı: Mikro Eğitim",
+        "delivery_type": "Course",
+        "resource": "support_issueresolutionspeed_microlearning_v1"
+      }
+    }
+  },
+  {
+    "action_id": "ROLE_COMP2_01",
+    "target_competency": "Role_Comp2",
+    "action_category": "Role",
+    "action_type": "PracticalTask",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 3,
+    "selection_rules": {
+      "min_score": 1.0,
+      "max_score": 1.9
+    },
+    "content_by_role": {
+      "Account Manager": {
+        "title": "Müşteri Yönetimi Ek Satış: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "am_upselling_task_v1"
+      },
+      "Accountant": {
+        "title": "Muhasebe Mevzuat Uyum: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "acc_regulatorycompliance_task_v1"
+      },
+      "Data Scientist": {
+        "title": "Veri Bilimi Model Yorumlama: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "ds_modelinterpretation_task_v1"
+      },
+      "DevOps Engineer": {
+        "title": "DevOps Altyapı Otomasyon: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "devops_infrastructureautomation_task_v1"
+      },
+      "Engineering Manager": {
+        "title": "Mühendislik Yönetimi Teknik Karar Verme: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "engmgr_technicaldecisionmaking_task_v1"
+      },
+      "Field Supervisor": {
+        "title": "Saha Güvenlik Uyum: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "fieldsup_safetycompliance_task_v1"
+      },
+      "Finance Manager": {
+        "title": "Finans Yönetimi Finansal Strategy: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "finmgr_financialstrategy_task_v1"
+      },
+      "Financial Analyst": {
+        "title": "Finansal Analiz KPI Analiz: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "fa_kpianalysis_task_v1"
+      },
+      "HR Manager": {
+        "title": "İK Değişim Yönetimi: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "hr_changemanagement_task_v1"
+      },
+      "HR Specialist": {
+        "title": "İK İç Destek: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "hr_internalsupport_task_v1"
+      },
+      "Logistics Coordinator": {
+        "title": "Lojistik Zamanında Teslimat: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "logcoord_ontimedelivery_task_v1"
+      },
+      "Machine Learning Engineer": {
+        "title": "ML ML Sistem Tasarım: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "mle_mlsystemdesign_task_v1"
+      },
+      "Marketing Specialist": {
+        "title": "Pazarlama Dijital Analitik: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "mkt_digitalanalytics_task_v1"
+      },
+      "Operations Manager": {
+        "title": "Operasyon Yönetimi Performans İzleme: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "opsmgr_performancemonitoring_task_v1"
+      },
+      "Operations Specialist": {
+        "title": "Operasyon Kaynak Koordinasyon: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "opsspec_resourcecoordination_task_v1"
+      },
+      "Payroll Specialist": {
+        "title": "Bordro Sorun Çözümü: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "payroll_issueresolution_task_v1"
+      },
+      "Production Engineer": {
+        "title": "Üretim Süreç İyileştirme: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "prodeng_processimprovement_task_v1"
+      },
+      "QA Engineer": {
+        "title": "QA Hata Tespit Hassasiyeti: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "qa_bugdetectionprecision_task_v1"
+      },
+      "Recruiter": {
+        "title": "İK Aday Bulma: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "hr_candidatesourcing_task_v1"
+      },
+      "Sales Executive": {
+        "title": "Satış Pipeline Yönetimi: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "sales_pipelinemanagement_task_v1"
+      },
+      "Sales Representative": {
+        "title": "Satış İtiraz Yönetimi: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "sales_objectionhandling_task_v1"
+      },
+      "Senior Software Engineer": {
+        "title": "Yazılım Mentorluk: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "tech_mentoring_task_v1"
+      },
+      "Software Engineer": {
+        "title": "Yazılım Problem Parçalama: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "tech_problemdecomposition_task_v1"
+      },
+      "Technical Support Engineer": {
+        "title": "Teknik Destek Müşteri İletişimi: Uygulamalı Görev",
+        "delivery_type": "Task",
+        "resource": "support_customercommunication_task_v1"
+      }
+    }
+  },
+  {
+    "action_id": "ROLE_COMP2_02",
+    "target_competency": "Role_Comp2",
+    "action_category": "Role",
+    "action_type": "Coaching",
+    "difficulty": "Medium",
+    "estimated_effort_hours": 2,
+    "selection_rules": {
+      "min_score": 2.0,
+      "max_score": 2.9
+    },
+    "content_by_role": {
+      "Account Manager": {
+        "title": "Müşteri Yönetimi Ek Satış: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "am_upselling_checklist_v1"
+      },
+      "Accountant": {
+        "title": "Muhasebe Mevzuat Uyum: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "acc_regulatorycompliance_checklist_v1"
+      },
+      "Data Scientist": {
+        "title": "Veri Bilimi Model Yorumlama: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "ds_modelinterpretation_checklist_v1"
+      },
+      "DevOps Engineer": {
+        "title": "DevOps Altyapı Otomasyon: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "devops_infrastructureautomation_checklist_v1"
+      },
+      "Engineering Manager": {
+        "title": "Mühendislik Yönetimi Teknik Karar Verme: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "engmgr_technicaldecisionmaking_checklist_v1"
+      },
+      "Field Supervisor": {
+        "title": "Saha Güvenlik Uyum: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "fieldsup_safetycompliance_checklist_v1"
+      },
+      "Finance Manager": {
+        "title": "Finans Yönetimi Finansal Strategy: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "finmgr_financialstrategy_checklist_v1"
+      },
+      "Financial Analyst": {
+        "title": "Finansal Analiz KPI Analiz: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "fa_kpianalysis_checklist_v1"
+      },
+      "HR Manager": {
+        "title": "İK Değişim Yönetimi: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "hr_changemanagement_checklist_v1"
+      },
+      "HR Specialist": {
+        "title": "İK İç Destek: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "hr_internalsupport_checklist_v1"
+      },
+      "Logistics Coordinator": {
+        "title": "Lojistik Zamanında Teslimat: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "logcoord_ontimedelivery_checklist_v1"
+      },
+      "Machine Learning Engineer": {
+        "title": "ML ML Sistem Tasarım: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "mle_mlsystemdesign_checklist_v1"
+      },
+      "Marketing Specialist": {
+        "title": "Pazarlama Dijital Analitik: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "mkt_digitalanalytics_checklist_v1"
+      },
+      "Operations Manager": {
+        "title": "Operasyon Yönetimi Performans İzleme: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "opsmgr_performancemonitoring_checklist_v1"
+      },
+      "Operations Specialist": {
+        "title": "Operasyon Kaynak Koordinasyon: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "opsspec_resourcecoordination_checklist_v1"
+      },
+      "Payroll Specialist": {
+        "title": "Bordro Sorun Çözümü: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "payroll_issueresolution_checklist_v1"
+      },
+      "Production Engineer": {
+        "title": "Üretim Süreç İyileştirme: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "prodeng_processimprovement_checklist_v1"
+      },
+      "QA Engineer": {
+        "title": "QA Hata Tespit Hassasiyeti: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "qa_bugdetectionprecision_checklist_v1"
+      },
+      "Recruiter": {
+        "title": "İK Aday Bulma: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "hr_candidatesourcing_checklist_v1"
+      },
+      "Sales Executive": {
+        "title": "Satış Pipeline Yönetimi: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "sales_pipelinemanagement_checklist_v1"
+      },
+      "Sales Representative": {
+        "title": "Satış İtiraz Yönetimi: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "sales_objectionhandling_checklist_v1"
+      },
+      "Senior Software Engineer": {
+        "title": "Yazılım Mentorluk: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "tech_mentoring_checklist_v1"
+      },
+      "Software Engineer": {
+        "title": "Yazılım Problem Parçalama: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "tech_problemdecomposition_checklist_v1"
+      },
+      "Technical Support Engineer": {
+        "title": "Teknik Destek Müşteri İletişimi: Koçluk Kontrol Listesi",
+        "delivery_type": "Checklist",
+        "resource": "support_customercommunication_checklist_v1"
+      }
+    }
+  },
+  {
+    "action_id": "ROLE_COMP2_03",
+    "target_competency": "Role_Comp2",
+    "action_category": "Role",
+    "action_type": "Reflection",
+    "difficulty": "Easy",
+    "estimated_effort_hours": 1,
+    "selection_rules": {
+      "min_score": 3.0,
+      "max_score": 4.0
+    },
+    "content_by_role": {
+      "Account Manager": {
+        "title": "Müşteri Yönetimi Ek Satış: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "am_upselling_template_v1"
+      },
+      "Accountant": {
+        "title": "Muhasebe Mevzuat Uyum: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "acc_regulatorycompliance_template_v1"
+      },
+      "Data Scientist": {
+        "title": "Veri Bilimi Model Yorumlama: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "ds_modelinterpretation_template_v1"
+      },
+      "DevOps Engineer": {
+        "title": "DevOps Altyapı Otomasyon: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "devops_infrastructureautomation_template_v1"
+      },
+      "Engineering Manager": {
+        "title": "Mühendislik Yönetimi Teknik Karar Verme: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "engmgr_technicaldecisionmaking_template_v1"
+      },
+      "Field Supervisor": {
+        "title": "Saha Güvenlik Uyum: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "fieldsup_safetycompliance_template_v1"
+      },
+      "Finance Manager": {
+        "title": "Finans Yönetimi Finansal Strategy: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "finmgr_financialstrategy_template_v1"
+      },
+      "Financial Analyst": {
+        "title": "Finansal Analiz KPI Analiz: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "fa_kpianalysis_template_v1"
+      },
+      "HR Manager": {
+        "title": "İK Değişim Yönetimi: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "hr_changemanagement_template_v1"
+      },
+      "HR Specialist": {
+        "title": "İK İç Destek: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "hr_internalsupport_template_v1"
+      },
+      "Logistics Coordinator": {
+        "title": "Lojistik Zamanında Teslimat: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "logcoord_ontimedelivery_template_v1"
+      },
+      "Machine Learning Engineer": {
+        "title": "ML ML Sistem Tasarım: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "mle_mlsystemdesign_template_v1"
+      },
+      "Marketing Specialist": {
+        "title": "Pazarlama Dijital Analitik: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "mkt_digitalanalytics_template_v1"
+      },
+      "Operations Manager": {
+        "title": "Operasyon Yönetimi Performans İzleme: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "opsmgr_performancemonitoring_template_v1"
+      },
+      "Operations Specialist": {
+        "title": "Operasyon Kaynak Koordinasyon: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "opsspec_resourcecoordination_template_v1"
+      },
+      "Payroll Specialist": {
+        "title": "Bordro Sorun Çözümü: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "payroll_issueresolution_template_v1"
+      },
+      "Production Engineer": {
+        "title": "Üretim Süreç İyileştirme: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "prodeng_processimprovement_template_v1"
+      },
+      "QA Engineer": {
+        "title": "QA Hata Tespit Hassasiyeti: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "qa_bugdetectionprecision_template_v1"
+      },
+      "Recruiter": {
+        "title": "İK Aday Bulma: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "hr_candidatesourcing_template_v1"
+      },
+      "Sales Executive": {
+        "title": "Satış Pipeline Yönetimi: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "sales_pipelinemanagement_template_v1"
+      },
+      "Sales Representative": {
+        "title": "Satış İtiraz Yönetimi: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "sales_objectionhandling_template_v1"
+      },
+      "Senior Software Engineer": {
+        "title": "Yazılım Mentorluk: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "tech_mentoring_template_v1"
+      },
+      "Software Engineer": {
+        "title": "Yazılım Problem Parçalama: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "tech_problemdecomposition_template_v1"
+      },
+      "Technical Support Engineer": {
+        "title": "Teknik Destek Müşteri İletişimi: Öz Değerlendirme Şablonu",
+        "delivery_type": "Template",
+        "resource": "support_customercommunication_template_v1"
+      }
+    }
+  }
+]

@@ -1,0 +1,21 @@
+# .NET
+**/bin/
+**/obj/
+**/*.user
+**/.vs/
+**/appsettings.Development.json
+**/appsettings.Production.json
+
+# Python / ML
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/.venv/
+**/venv/
+**/*.egg-info/
+**/.env
+
+# General
+.DS_Store
+Thumbs.db
+*.log

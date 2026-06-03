@@ -1,0 +1,9 @@
+services:
+  ml-service:
+    build: .
+    container_name: ai-action-recommendation-api
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./models:/app/models
+    restart: unless-stopped

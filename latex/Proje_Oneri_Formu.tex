@@ -1,0 +1,326 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[turkish]{babel}
+\usepackage{geometry}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage[autostyle=true]{csquotes}
+\DeclareQuoteStyle{turkish}
+  {\guillemotleft}{\guillemotright}[0.05em]
+  {\guillemotleft}{\guillemotright}
+
+\usepackage{url} % KAYNAKÇA URL
+\usepackage[hidelinks,breaklinks]{hyperref} %KAYNAKÇA URL FORMAT
+\def\UrlBreaks{\do\/\do-\do_} %KAYNAKÇA URL FORMAT
+
+\bibliographystyle{ieeetr}   
+
+
+
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+\setstretch{1.2}
+
+
+\begin{document}
+\begin{center}
+
+\textbf{\Large İSTANBUL ÜNİVERSİTESİ – CERRAHPAŞA}\\[4pt]
+\textbf{\Large BİLGİSAYAR MÜHENDİSLİĞİ BÖLÜMÜ}\\[8pt]
+\textbf{\large BİTİRME PROJESİ ÖNERİ FORMU}
+\end{center}
+\vspace{1cm}
+\hfill 04/03/2026 \\[6pt]
+\noindent \textbf{Proje Başlığı: 360° Değerlendirme Sonuçlarına Dayalı Yapay Zeka Destekli Kişisel Gelişim Planlama ve Değerlendirme Sistemi} \\[6pt]
+\noindent \textbf{İngilizce Proje Başlığı: Artificial Intelligence-Supported Personal Development Planning and Evaluation System Based on 360° Assessment Results} \\[6pt]
+\textbf{Proje Danışmanı:} Prof. Dr. Selçuk Sevgen \hfill \textbf{İmzası:} \\[6pt]
+\textbf{Proje Ekip Üyeleri:}
+
+\begin{tabular}{p{2cm}p{4cm}p{6cm}}
+Üye 1 & 1306210040 & Yunus Emre Aytekin \\
+Üye 2 & 1306220106 & Zübeyir Ali Demir \\
+Üye 3 & 1306220174 & Eren Sel \\
+
+\end{tabular}
+
+\subsection*{Proje Özeti}
+\noindent
+Bu proje, kurumlarda kullanılan geleneksel performans değerlendirme süreçlerini çok kaynaklı geri bildirim yöntemi olan 360° değerlendirme modeliyle bütünleştirerek dijital bir yapay zekâ destekli analiz platformu geliştirmeyi amaçlamaktadır. Proje kapsamında, çalışanların yöneticilerinden, ekip arkadaşlarından ve öz değerlendirmelerinden toplanan veriler bir araya getirilerek her çalışan için sayısal bir Performans Skoru hesaplanacaktır. Bu skor, çalışanların güçlü ve zayıf yönlerini belirleyip kişisel gelişim planlarının oluşturulmasına temel teşkil edecektir. 
+
+Sistem, yapay zekâ ve doğal dil işleme (NLP) tekniklerini kullanarak metin tabanlı geri bildirimleri analiz edecek ve her kullanıcıya özel gelişim önerileri üretecektir. Ayrıca kurum düzeyinde yetkinlik analizi ve istatistiksel raporlamalar sağlayarak yöneticilerin veri odaklı kararlar almasına imkân tanıyacaktır. Bu kapsamda proje yalnızca bir yazılım ürünü değil, aynı zamanda kişiselleştirilmiş öğrenme, çalışan motivasyonu ve insan kaynakları analitiği literatürüne katkı sağlayan bilimsel bir model sunmaktadır. 
+
+Projede kullanılacak veriler, Kaggle üzerindeki açık HR (İnsan Kaynakları) veri setlerinden ve sentetik olarak oluşturulacak 360° değerlendirme skorlarından elde edilecektir. Çalışma sonunda geliştirilen sistemin doğruluk, tutarlılık ve kullanıcı memnuniyeti metrikleriyle ölçülmesi hedeflenmektedir. Proje tamamlandığında, çalışanların gelişim sürecini nesnel biçimde değerlendiren, yapay zekâ destekli ve ölçülebilir bir performans yönetim platformu ortaya çıkacaktır.  
+
+\vspace{0.5cm}
+\noindent \textbf{Anahtar Kelimeler:} 360° değerlendirme, yapay zekâ, kişisel gelişim planı, NLP, insan kaynakları analitiği.
+
+
+\subsection*{Abstract}
+\noindent
+This project aims to develop a digital, AI-supported analysis platform that integrates the traditional performance evaluation processes used in organizations with the multi-source feedback approach known as the 360° assessment model. The system collects feedback from managers, peers, and self-evaluations to calculate a numerical Performance Score for each employee. This score will serve as the foundation for identifying employees’ strengths and weaknesses and creating personalized development plans.  
+
+By utilizing artificial intelligence and natural language processing (NLP) techniques, the system will analyze text-based feedback and generate customized improvement suggestions for each user. In addition, it will provide organization-wide competency analysis and statistical reporting, enabling managers to make data-driven decisions. Therefore, the project is not only a software application but also a scientific model contributing to the literature on personalized learning, employee motivation, and human resources analytics.  
+
+The project will use open-source HR datasets from Kaggle, combined with synthetically generated 360° evaluation scores. At the end of the study, the developed system will be evaluated through accuracy, consistency, and user satisfaction metrics. The final outcome will be an AI-driven, measurable, and objective performance management platform that supports both organizational decision-making and individual professional growth.  
+
+\vspace{0.5cm}
+\noindent \textbf{Keywords:} 360° assessment, artificial intelligence, personal development plan, NLP, human resources analytics.
+
+\newpage
+\section*{Projenin Özgünlüğü, Amacı ve Yöntemi}
+\subsection*{Konunun Önemi, Özgün Değeri ve Araştırma Sorusu/Hipotezi}
+\noindent 
+\subsubsection*{Konunun Önemi}
+360 derece performans değerlendirme sistemi, çalışanların performansı hakkında çok yönlü geribildirim toplayarak (yöneticiler, iş arkadaşları, astlar) geleneksel tek yönlü
+değerlendirmelere kıyasla daha kapsamlı ve objektif bir bakış açısı sunar. Performans
+değerlendirme genel olarak insan kaynakları yönetiminin en kritik araçlarından biridir ve kurumsal
+başarının anahtarı olarak görülmektedir. Özellikle 360 derece geribildirim, bir çalışanın birden fazla
+kaynaktan değerlendirildiği için önyargıları azaltarak daha adil bir değerlendirme sağlar.
+Araştırmalar, çalışanların değerlendirme sürecini adil ve kapsayıcı bulduklarında kuruma olan
+bağlılıklarının ve motivasyonlarının arttığını göstermektedir. Nitekim, yalnızca motive edilmiş
+çalışanlar yüksek performans gösterebilir; bu nedenle çalışan motivasyonunu artırmak için
+performanslarının adil biçimde değerlendirildiği bir sisteme ihtiyaç vardır. Literatürde 360 derece
+değerlendirme ile elde edilen geribildirimin çalışan gelişimini desteklediği, öz farkındalığı artırdığı ve
+yapıcı geri bildirim kültürü oluşturduğu vurgulanmaktadır. Bu değerlendirmenin önemi, çalışan
+bağlılığı ve motivasyonunu güçlendirmesinden ileri gelmektedir: çok yönlü geribildirim uygulayan
+şirketlerde çalışan performansında yaklaşık \%14’e varan artışlar gözlemlenmiştir~\cite{datalligence2025_guide}. Güncel akademik çalışmalar da çok
+kaynaklı performans değerlendirmesinin çalışanların motivasyon düzeylerini ve işe angaje olma
+seviyelerini belirgin biçimde yükselttiğini ortaya koymuştur~\cite{bapar2024_360}. Kısacası, 360 derece performans
+değerlendirme, hem bireysel gelişimi teşvik eden yapısıyla hem de örgütsel hedeflerle çalışan
+hedeflerini bütünleştirmesiyle günümüz rekabetçi iş ortamında kritik bir öneme sahiptir~\cite{uygur2015_360tr}. 
+
+\subsubsection*{Projenin Özgün Değeri} Literatürde 360 derece performans değerlendirme sisteminin faydaları iyi belgelenmiş olsa da, bu sistemin çalışan motivasyonu ve bağlılığı üzerindeki etkilerinin farklı örgütsel bağlamlarda tam olarak nasıl gerçekleştiği hâlâ sınırlı biçimde anlaşılabilmiştir~\cite{bapar2024_360}. Özellikle Batı dışındaki hiyerarşik organizasyonlarda 360 derece geribildirimin motivasyon sağlayıcı rolüne ilişkin araştırma eksikliği mevcuttur. Bu proje, söz konusu boşluğu doldurarak 360 derece değerlendirme sürecini dijital ortama taşıyan ve yapay zekâ destekli analizlerle zenginleştiren özgün bir yaklaşım sunmaktadır. Proje kapsamında, çok kaynaklı performans verileri yalnızca bir değerlendirme çıktısı olarak kalmayacak; aynı zamanda doğal dil işleme (NLP) ve öneri motoru teknolojileriyle yorumlanarak her çalışana kişiselleştirilmiş gelişim planları sunulacaktır. Bu sayede 360 derece değerlendirme süreci, klasik biçiminden farklı olarak hem bireysel öğrenme hem de kurumsal gelişim aracı haline gelecektir. Bu yaklaşım, insan kaynakları literatüründe veri odaklı karar verme ve kişiselleştirilmiş öğrenme kavramlarını bütünleştirerek metodolojik bir yenilik ortaya koymaktadır. 
+\subsubsection*{Araştırma Sorusu ve Hipotezi}
+Bu projenin ele aldığı temel problem, mevcut performans değerlendirme süreçlerinin çalışan motivasyonu ve gelişimi üzerindeki etkisinin sınırlı kalmasıdır. Tek yönlü ve periyodik değerlendirmeler çoğu zaman çalışanların hangi alanlarda nasıl gelişeceğine dair yol gösterici olmamakta, geri bildirimler aksiyona dönüşmediği için motivasyon ve bağlılık artışı sınırlı kalmaktadır. Bu doğrultuda araştırma sorumuz: 
+\begin{quote}
+\textit{“360 derece performans değerlendirme çıktılarının yapay zekâ destekli kişisel önerilerle zenginleştirilmesi, çalışanların gelişim sürecini geleneksel yöntemlere kıyasla artırmakta mıdır?”}
+\end{quote}
+Bu soruya paralel olarak hipotezimiz şudur: 
+\begin{quote}
+\textit{“Yapay zekâ tabanlı öneri sistemi entegrasyonu sayesinde 360 derece performans değerlendirmeleri, klasik yöntemlere kıyasla çalışanların gelişim oranında ve motivasyonunda anlamlı bir artış sağlayacaktır.”}
+\end{quote}
+
+\vspace{2cm}
+
+\subsection*{Amaç ve Hedefler}
+\noindent Bu projenin amacı, 360° performans değerlendirme sürecini yapay zekâ ve veri analitiği teknikleriyle birleştirerek çalışanların güçlü ve zayıf yönlerini objektif, ölçülebilir ve eyleme dönük biçimde analiz eden bir sistem geliştirmektir. Proje, geleneksel geri bildirim süreçlerini dijitalleştirip veriye dayalı hale getirerek hem çalışan hem de yönetici için kişiselleştirilmiş gelişim planları sunmayı ve çalışanların artılarını ve eksilerini objektif olarak yöneticilere sunmayı hedefler.
+
+
+Günümüz iş dünyasında rekabet avantajı, çalışanların sürekli gelişimine ve doğru performans yönetimine bağlıdır; bu nedenle 360° geri bildirim ile yapay zekâ temelli analizlerin birleşimi, kurumların stratejik insan kaynağı yönetiminde kritik bir yenilik sunmaktadır.
+
+Proje, çalışanların kendilerini çok yönlü olarak değerlendirebildiği, yöneticilerin ise önyargısız ve veriye dayalı kararlar verebildiği bir ortam oluşturarak daha adil, şeffaf ve motive edici bir kurumsal kültür yaratmayı amaçlamaktadır.
+
+Bilimsel açıdan amaç, çok kaynaklı geri bildirimlerin ağırlıklandırılarak tek bir performans skoruna dönüştürülmesi ve doğal dil işleme (NLP) teknikleriyle açık uçlu yorumlardan anlamlı metrikler çıkarılması yoluyla insan kaynakları yönetiminde veri odaklı bir model ortaya koymaktır.
+
+Uygulama kısmında hedef, performans skorlarını hesaplayan, yorumları otomatik analiz eden, kişiselleştirilmiş gelişim önerileri üreten ve kurum genelinde yetkinlik haritası çıkaran web tabanlı bir yapay zekâ destekli platformun geliştirilmesidir.
+
+\begin{itemize}
+    \item Yaklaşık 5000+ çalışana ait sentetik 360° değerlendirme verisi (puan + yorum) kullanılarak model eğitilecektir.
+    \item Veri seti \%70 eğitim – \%30 test oranında bölünerek performans doğrulaması yapılacaktır.
+    \item Performans skoru tahmin modelinde en az \%80 doğruluk veya RMSE $\leq$ 0.5 hedeflenmektedir.
+    \item NLP modülünün duygu analizinde F1 skoru $\geq$ 0.80 hedeflenmektedir.
+    \item Öneri motorunun ürettiği gelişim önerilerinin uzmanlarca “uygun” bulunma oranı $\geq$ \%75 olacaktır.
+    \item Sistem kullanılabilirlik testinde SUS (System Usability Score) $\geq$ 75 hedeflenmektedir.
+\end{itemize}
+
+
+\vspace{2cm}
+
+\subsection*{Yöntem}
+
+\noindent Kurum çalışanlarının 360° değerlendirme sonuçlarını temel alarak kişiye özel gelişim planları oluşturabilen yapay zeka destekli bir insan kaynakları değerlendirme ve öneri sistemi geliştirilecektir. Sistem, veri toplama, ön işleme, analiz, modelleme ve sonuç raporlama aşamalarından oluşmaktadır.
+
+\subsubsection*{Araştırma Tasarımı}
+
+Proje; veri odaklı, uygulamalı bir tasarıma sahiptir. Çalışmada kullanılacak HR (İnsan Kaynakları) verisi, açık kaynaklı Kaggle veri setlerinden alınacak ve bu veriler birleştirilerek yaklaşık 5.000 gözlemden oluşan bir yapay (sentetik) veri havuzu oluşturulacaktır.
+Bu veri setine ek olarak, her departman için özel yetkinlik (competency) sütunları sistematik olarak eklenecek ve bu sütunlar “problem çözme”, “takım çalışması”, “liderlik”, “iletişim”, “yenilikçilik” gibi ölçütlerden oluşacaktır.
+
+Projede kullanılan yaklaşım; klasik insan kaynakları analitiğini (HR analytics) makine öğrenmesi teknikleri ile birleştirerek, çalışan performansını ve gelişim alanlarını analiz etmeyi amaçlamaktadır.
+
+\subsubsection*{Veri Toplama ve Veri Kaynağı}
+Veriler doğrudan bir kurumdan alınmayacak, Kaggle platformundaki açık veri setlerinden temin edilecektir. Kullanılacak temel veri setleri şunlardır:
+\begin{itemize}
+    \item IBM HR Analytics Attrition Dataset \cite{ibm_hr_analytics_dataset}
+    \item HR Analytics Employee Attrition \& Performance \cite{hr_analytics_attrition}
+    \item Employee Attrition \cite{employee_attrition}
+\end{itemize}
+
+\noindent Bu veri setleri; çalışan yaşı, eğitim seviyesi, departman, işe giriş yılı, maaş, terfi geçmişi, memnuniyet skoru, çalışma yılı gibi değişkenleri içermektedir. Bu veriler birleştirilerek ortak bir yapıya dönüştürülecek, gereksiz veya tekrarlayan sütunlar çıkarılacak, ardından departman bazlı “competency” sütunları eklenecektir.
+
+\noindent Veri temini sonrasında aşağıdaki veri ön işleme adımları uygulanacaktır:
+\begin{itemize}
+    \item Eksik veri temizleme (imputation)
+    \item Kategorik değişkenlerin Label Encoding / One-Hot Encoding ile dönüştürülmesi
+    \item Sürekli değişkenlerin Min-Max Scaling ile normalizasyonu
+    \item Outlier değerlerin IQR yöntemi ile kontrol edilmesi \cite{tukey1977exploratory}
+    \item Sentetik competency skorlarının rastgele ama dağılımsal olarak dengeli şekilde eklenmesi
+\end{itemize}
+
+\subsubsection*{Analiz Yöntemi ve Modelleme}
+\noindent Projede kullanılan temel analiz yaklaşımı, hem tanımlayıcı istatistiksel analiz (descriptive analytics) hem de yapay zeka destekli çıkarımsal analiz (AI-based inferential analytics) bileşenlerini içermektedir.
+
+\vspace{10pt} \textbf{a) Tanımlayıcı Analiz:}
+
+Veri setinden elde edilen metriklerle aşağıdaki ölçümler yapılacaktır:
+
+\begin{itemize}
+    \item Departman bazlı ortalama performans skoru
+    \item Yetkinlik bazlı ortalama skorlar (competency heatmap)
+    \item Çalışan performans dağılımı (histogram / radar chart)
+\end{itemize}
+
+\textbf{b) Yapay Zeka Modülü (Öneri Motoru):}
+
+Gelişim önerilerinin oluşturulmasında iki yöntem kullanılacaktır:
+
+\begin{enumerate}
+    \item Kural Tabanlı Model (Baseline):
+    
+    Belirli eşik değerlerine göre öneri yapılır.
+    \item Makine Öğrenmesi Tabanlı Model (AI Model):
+    
+    Çalışanın genel performans skorunu tahminlemek için denetimli öğrenme yöntemlerinden Random Forest \cite{breiman2001random}, XGBoost \cite{chen2016xgboost} ve Logistic Regression \cite{hosmer2013applied} modelleri denenerek en yüksek doğruluk veren model seçilecektir.
+
+    Modelin başarısı Accuracy, Precision, Recall, F1-score metrikleriyle \cite{han2011data} değerlendirilecektir.
+\end{enumerate}
+
+\noindent Model eğitiminde kullanılacak bağımsız değişkenler:
+\begin{itemize}
+    \item Yaş, eğitim seviyesi, maaş, çalışma yılı, iş memnuniyeti, departman, yetkinlik skorları
+\end{itemize}
+
+\noindent Bağımlı değişken:
+\begin{itemize}
+    \item Çalışan performans skoru veya terfi olasılığı (0–1 arası kategorik hedef değişken)
+
+\end{itemize}
+
+\noindent Model sonuçları, NLP tabanlı duygu analizi ile birlikte değerlendirilerek çalışanlara özel gelişim önerileri oluşturulacaktır. Örneğin, düşük liderlik puanına sahip bir çalışana ‘iletişim ve takım çalışması modüllerine yönlendirme’ önerisi sunulacaktır.
+\subsubsection*{Deneysel Ortam ve Araçlar}
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3} % satır aralığını biraz artırır
+\begin{tabular}{|p{3cm}|p{5cm}|p{7cm}|}
+\hline
+\textbf{Kategori} & \textbf{Araç / Ortam} & \textbf{Açıklama} \\ \hline
+Backend & ASP.NET Core 9.0 & API katmanı, veri akışı ve model sonuçlarının servis edilmesi \\ \hline
+Frontend & React, Next.js & Dinamik dashboard ve raporlama ekranları \\ \hline
+Veritabanı & PostgreSQL 18.0 & Veri depolama ve model sonuçlarının saklanması \\ \hline
+Veri Analizi ve AI & Python 3.13.9 (pandas \cite{mckinney2010pandas}, scikit-learn \cite{pedregosa2011sklearn}, numpy \cite{harris2020numpy}) & Veri temizleme, model eğitimi, istatistiksel analiz \\ \hline
+NLP ve Öneri Motoru & Python – NLTK 3.9.2 \cite{bird2009nltk} / SpaCy v3.7 \cite{honnibal2020spacy} & Değerlendirme yorumları üzerinden duygu analizi \\ \hline
+Donanım Ortamı & AMD Ryzen 9 7940HS, 32 GB RAM, RTX 4060 100W  & Model eğitiminde kullanılan bilgisayar donanımı \\ \hline
+Versiyon Kontrol & Git, GitHub & Takım içi proje yönetimi \\ \hline
+İşletim Sistemi & Windows 11 24H2  & Geliştirme ortamları \\ \hline
+\end{tabular}
+\caption{Proje Geliştirme Ortamı ve Kullanılan Teknolojiler}
+\label{tab:teknolojiler}
+\end{table}
+
+
+\subsubsection*{İstatistiksel Yöntemler}
+\noindent Bilimsel ölçüm için şu metrikler hesaplanacaktır:
+
+\begin{itemize}
+    \item Model Başarısı: Accuracy, Precision, Recall, F1-Score \cite{han2011data}
+    \item Öneri Tutarlılığı: Kullanıcı skorları ile öneri motoru skorlarının korelasyonu
+    \item Performans Skor Dağılımı: Ortalama, standart sapma, varyans analizi \cite{montgomery2017design}
+    \item Gelişim Trend Analizi: Zaman serisi benzeri değerlendirme (mock data ile)
+\end{itemize}
+
+\noindent Bu ölçümler sayesinde projenin hem teknik (AI performansı) hem de işlevsel (doğru öneri üretimi) başarısı değerlendirilecektir.
+
+
+\subsubsection*{Araştırma Yönteminin İş Paketleriyle İlişkisi}
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3} % satır aralığını biraz artırır
+\begin{tabular}{|p{3cm}|p{6cm}|p{7cm}|}
+\hline
+\textbf{İş Paketi (WP)} & \textbf{Açıklama} & \textbf{Kullanılan Yöntem / Teknik} \\ \hline
+WP1 & Veri toplama, birleştirme ve temizleme & Veri ön işleme teknikleri (missing value imputation, label/one-hot encoding, min-max scaling, IQR-based outlier removal) \\ \hline
+WP2 & Mevcut HR verisiyle uyumlu departman bazlı yetkinlik(competency) verilerinin eklenmesi & Sentetik veri üretimi (randomized scaling, rule-based assignment) \\ \hline
+WP3 & Modelin eğitimi ve test edilmesi & Supervised learning (Random Forest, XGBoost), train-test split, cross-validation \\ \hline
+WP4 & Sistem entegrasyonu ve temel arayüz & RESTful API geliştirme (ASP.NET), veri tabanı bağlantısı (MySQL/PostgreSQL), frontend entegrasyonu (React/Next.js) \\ \hline
+WP5 & Model performansı değerlendirme ve raporlama  & İstatistiksel analiz (Accuracy, F1-score, correlation metrics), görselleştirme \\ \hline
+WP6 & Son testler, hata giderme ve nihai ölçümler & Sistem testleri, hata analizi, performans ölçümü ve model stabilite kontrolü. \\ \hline
+\end{tabular}
+\caption{Araştırma Yönteminin İş Paketleriyle İlişkisi}
+\label{tab:is_paketi_iliski}
+\end{table}
+
+
+
+
+\newpage
+
+\section*{PROJE YÖNETİMİ}
+\subsection*{İş-Zaman Çizelgesi}
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{|p{1cm}|p{3cm}|p{2cm}|p{2cm}|p{6cm}|}
+\hline
+\textbf{İş Pkt No} & \textbf{İş Paketlerinin Adı ve Hedefleri} & \textbf{Görev Kim(ler)in}& \textbf{Planlanan Haftalar} & \textbf{İş Paketi Açıklaması Başarı Ölçütü ve Projenin Başarısına Katkısı } \\
+\hline
+1 & WP1 – Veri toplama, birleştirme ve temizleme & Tüm Üyeler & 1–4 & HR veri setleri birleştirilecektir. Eksik verilerin \%100 tamamlanması ve tutarsızlık oranının \%5’in altına düşmesi hedeflenir. Bu sayede modelin doğru ve güvenilir verilerle eğitilmesi sağlanacaktır.\\
+\hline
+2 & WP2 – Competency verilerinin eklenmesi (sentetik üretim) & Tüm Üyeler & 5–7 & Departman bazlı sentetik competency sütunları veriyle entegre edilecektir. Competency dağılımının \%90+ dengeli olması hedeflenir. Modelin yetkinlik odaklı tahmin kabiliyetini güçlendirir..\\
+\hline
+3 & Modelin eğitimi ve test edilmesi & Tüm Üyeler & 8–13 & Supervised learning ile model eğitilecek ve doğrulama yapılacaktır. Model doğruluk oranının \%80 üzerinde olması hedeflenir. Güvenilir tahminlerin temeli oluşturulur.\\
+\hline
+4 & Sistem entegrasyonu ve temel arayüz & Arayüz: Üye 1, Backend: Üye 2, Üye 3 & 14–16 & Model API aracılığıyla backend’e entegre edilecek ve temel kullanıcı arayüzleri geliştirilecektir. Sistem kullanılabilir ve etkileşimli hale gelir.\\
+\hline
+5 & Model performansı değerlendirme ve raporlama & Tüm Üyeler & 17–19 & Model farklı senaryolarda test edilip F1-score, accuracy ve correlation metrikleri hesaplanacaktır. $\mathrm{F1} \ge 0.75$, correlation $\ge 0.7$ hedeflenir. Modelin doğruluk ve güvenilirliği ölçülür.\\
+\hline
+6 &  Son testler, hata giderme ve nihai ölçümler & Tüm Üyeler & 20–22 & Entegrasyon sonrası testler ve hata düzeltmeleri yapılacaktır. Test senaryolarında başarı oranının \%95+ olması hedeflenir. Proje hatasız, stabil ve sunuma hazır olur.\\
+\hline
+\end{tabular}
+\caption{İş-Zaman Çizelgesi }
+\end{table}
+
+
+
+\noindent (*) Tablodaki haftalar 1-8 hafta arası BPG dersi 9-22 hafta arası BP dersini kapar.
+
+
+\subsection*{Risk Yönetimi}
+\noindent Projenin başarısını olumsuz yönde etkileyebilecek riskler ve bu risklerle karşılaşıldığında projenin başarıyla yürütülmesini sağlamak için alınacak tedbirler (B Planı) ilgili iş paketleri belirtilerek ana hatlarıyla aşağıdaki Risk Yönetimi Tablosu’nda ifade edilir. B planlarının uygulanması araştırmanın temel hedeflerinden sapmaya yol açmamalıdır.
+	
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{|p{1cm}|p{4cm}|p{9cm}|}
+\hline
+\textbf{İş Pkt No} & \textbf{Risk(ler)in Tanımı} & \textbf{Alınacak Tedbir(ler) (B Planı)}  \\
+\hline
+1 & Farklı HR veri setlerinin yapısal uyumsuzluğu nedeniyle veri birleştirme sürecinde sorun yaşanması &  Ortak sütun yapısı tanımlanacak; önceden veri sözlüğü (data dictionary) oluşturulacak; gerekli durumlarda eksik değişkenler için sentetik veri üretilecek.  \\
+\hline
+2 & Sentetik competency verilerinin gerçekçi olmaması veya dengesiz dağılması &  Sentetik competency verilerinin gerçekçi olmaması veya dengesiz dağılması \\
+\hline
+3 & Yapay zekâ modelinin düşük doğruluk göstermesi veya aşırı öğrenme (overfitting) yaşanması & Farklı algoritmalar (Random Forest, XGBoost) test edilecek; cross-validation ve hyperparameter tuning uygulanacak.   \\
+\hline
+\end{tabular}
+\caption{Risk Yönetimi Tablosu }
+\end{table}
+
+
+\subsection*{Başvrulması Planlana Program}
+\noindent Projenin yürütülmesi sürecinde, TÜBİTAK 2209-A Üniversite Öğrencileri Araştırma Projeleri Destek Programına başvurulması planlanmaktadır. Program, lisans öğrencilerinin bilimsel araştırma projeleri geliştirmelerine ve uygulamalarını gerçekleştirmelerine katkı sağlamayı hedeflemektedir \cite{tubitak2209a}.
+\newpage
+\section*{KAYNAKÇA}
+
+
+\bibliography{referans}
+
+\vspace{4cm}
+
+
+\vfill
+\noindent \textit{İstanbul Üniversitesi-Cerrahpaşa Bilgisayar Mühendisliği Bölümü Bitirme Projesi Teklif Formu (TÜBİTAK–2209-A ÜNİVERSİTE ÖĞRENCİLERİ ARAŞTIRMA PROJELERİ DESTEĞİ PROGRAMI formundan uyarlanmıştır).}
+
+\end{document}

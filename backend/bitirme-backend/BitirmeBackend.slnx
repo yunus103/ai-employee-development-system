@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BitirmeBackend.Api/BitirmeBackend.Api.csproj" />
+    <Project Path="src/BitirmeBackend.Application/BitirmeBackend.Application.csproj" />
+    <Project Path="src/BitirmeBackend.Contracts/BitirmeBackend.Contracts.csproj" />
+    <Project Path="src/BitirmeBackend.Domain/BitirmeBackend.Domain.csproj" />
+    <Project Path="src/BitirmeBackend.Infrastructure/BitirmeBackend.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BitirmeBackend.Tests/BitirmeBackend.Tests.csproj" />
+  </Folder>
+</Solution>
