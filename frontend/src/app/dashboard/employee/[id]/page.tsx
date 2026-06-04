@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../../services/apiClient';
 import { toast } from '../../../../store/useToastStore';
 import { useConfirmStore } from '../../../../store/useConfirmStore';
+import { useStore } from '../../../../store/useStore';
 import {
   EmployeeDetail,
   Assessment,
@@ -38,6 +39,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const employeeId = parseInt(id);
 
   // States
+  const { user } = useStore();
   const [employee, setEmployee] = useState<EmployeeDetail | null>(null);
   const [activeAssessment, setActiveAssessment] = useState<Assessment | null>(null);
   const [scores, setScores] = useState<AssessmentScore[]>([]);
@@ -66,9 +68,39 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     try {
       // 1. Fetch Employee Details
       const empRes = await apiClient.employees.get(employeeId);
+      let targetEmp = null;
       if (empRes.success) {
         setEmployee(empRes.data);
+        targetEmp = empRes.data;
       }
+
+      // 1b. Fetch Logged-in User Employee Details if not HR/Admin
+      let userEmp = null;
+      if (user && user.employeeId !== null) {
+        const userEmpRes = await apiClient.employees.get(user.employeeId);
+        if (userEmpRes.success) {
+          userEmp = userEmpRes.data;
+        }
+      }
+
+      // Determine and set relationship evaluator type
+      let determinedType: EvaluatorType = 'Peer';
+      if (user) {
+        if (user.role === 'HR' || user.role === 'Admin') {
+          determinedType = 'Manager';
+        } else if (user.employeeId !== null && targetEmp) {
+          if (user.employeeId === targetEmp.id) {
+            determinedType = 'Self';
+          } else if (targetEmp.managerId === user.employeeId) {
+            determinedType = 'Manager';
+          } else if (userEmp && userEmp.managerId === targetEmp.id) {
+            determinedType = 'Subordinate';
+          } else if (userEmp && userEmp.department === targetEmp.department) {
+            determinedType = 'Peer';
+          }
+        }
+      }
+      setScorecardEvaluator(determinedType);
 
       // 2. Fetch Employee Assessments
       const assRes = await apiClient.employees.getAssessments(employeeId, 1, 100);
@@ -79,8 +111,23 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           
           // 3. Fetch Assessment Scores
           const scoreRes = await apiClient.assessments.getScores(active.id);
+          let loadedScores: AssessmentScore[] = [];
           if (scoreRes.success) {
             setScores(scoreRes.data);
+            loadedScores = scoreRes.data;
+          }
+
+          // Initialize scorecardInput with 13 defaults or existing draft scores
+          if (active.status === 'Draft') {
+            const initial: Record<number, number> = {};
+            for (let i = 1; i <= 13; i++) {
+              initial[i] = 3.0;
+            }
+            const evaluatorScores = loadedScores.filter(s => s.evaluatorType === determinedType);
+            for (const s of evaluatorScores) {
+              initial[s.competencyId] = s.score;
+            }
+            setScorecardInput(initial);
           }
 
           // 4. Fetch Action Plan if exists
@@ -116,7 +163,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       active = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [employeeId]);
+  }, [employeeId, user]);
 
   // Handle Assessment Score Inputs
   const handleScoreChange = (competencyId: number, score: number) => {
@@ -648,17 +695,43 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                     <h4 className="text-base font-bold text-foreground">360° Puan Girişleri</h4>
                     <p className="text-xs text-muted mt-0.5">Lütfen tüm yetkinlikler için derecelendirmeleri girin.</p>
                   </div>
-                  {/* Evaluator Selector */}
-                  <select
-                    value={scorecardEvaluator}
-                    onChange={(e) => setScorecardEvaluator(e.target.value as EvaluatorType)}
-                    className="rounded-lg bg-card border border-card-border py-1.5 px-3 text-xs text-foreground outline-none cursor-pointer"
-                  >
-                    <option value="Manager">Yönetici Değerlendirmesi</option>
-                    <option value="Self">Öz Değerlendirme</option>
-                    <option value="Peer">Ekip Arkadaşı Değerlendirmesi</option>
-                    <option value="Subordinate">Ast Değerlendirmesi</option>
-                  </select>
+                  {/* Evaluator Selector - Only visible for HR or Admin */}
+                  {(user?.role === 'HR' || user?.role === 'Admin') ? (
+                    <select
+                      value={scorecardEvaluator}
+                      onChange={(e) => {
+                        const newEval = e.target.value as EvaluatorType;
+                        setScorecardEvaluator(newEval);
+                        
+                        // Update scorecardInput for the new evaluator
+                        const initial: Record<number, number> = {};
+                        for (let i = 1; i <= 13; i++) {
+                          initial[i] = 3.0;
+                        }
+                        const evaluatorScores = scores.filter(s => s.evaluatorType === newEval);
+                        for (const s of evaluatorScores) {
+                          initial[s.competencyId] = s.score;
+                        }
+                        setScorecardInput(initial);
+                      }}
+                      className="rounded-lg bg-card border border-card-border py-1.5 px-3 text-xs text-foreground outline-none cursor-pointer"
+                    >
+                      <option value="Manager">Yönetici Değerlendirmesi</option>
+                      <option value="Self">Öz Değerlendirme</option>
+                      <option value="Peer">Ekip Arkadaşı Değerlendirmesi</option>
+                      <option value="Subordinate">Ast Değerlendirmesi</option>
+                    </select>
+                  ) : (
+                    <span className="text-xs text-muted font-semibold bg-card border border-card-border py-1.5 px-3 rounded-lg">
+                      {scorecardEvaluator === 'Self'
+                        ? 'Öz Değerlendirme'
+                        : scorecardEvaluator === 'Manager'
+                        ? 'Yönetici Değerlendirmesi'
+                        : scorecardEvaluator === 'Subordinate'
+                        ? 'Ast Değerlendirmesi'
+                        : 'Akran Değerlendirmesi'}
+                    </span>
+                  )}
                 </div>
 
                 <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">

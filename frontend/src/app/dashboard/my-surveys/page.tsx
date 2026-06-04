@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../../../store/useStore';
 import { apiClient } from '../../../services/apiClient';
-import { Assessment, EvaluatorType } from '../../../types';
+import { Assessment, EvaluatorType, EmployeeDetail } from '../../../types';
 import competencyMapping from '../../../data/competency_mapping.json';
 import { toast } from '../../../store/useToastStore';
 import {
@@ -16,6 +16,7 @@ import {
 
 export default function MySurveysPage() {
   const { user } = useStore();
+  const [employees, setEmployees] = useState<EmployeeDetail[]>([]);
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [selectedAssessment, setSelectedAssessment] = useState<Assessment | null>(null);
   const [evaluatorType, setEvaluatorType] = useState<EvaluatorType>('Peer');
@@ -30,6 +31,7 @@ export default function MySurveysPage() {
       // For demo, list all active assessments in the system
       const empRes = await apiClient.employees.list(1, 100);
       if (empRes.success) {
+        setEmployees(empRes.data);
         const allAss: Assessment[] = [];
         for (const emp of empRes.data) {
           const assRes = await apiClient.employees.getAssessments(emp.id, 1, 50);
@@ -37,8 +39,30 @@ export default function MySurveysPage() {
             allAss.push(...assRes.data);
           }
         }
-        // filter out completed if desired, but keep draft/active ones
-        setAssessments(allAss.filter(a => a.status === 'Draft'));
+        
+        let filteredAss = allAss.filter(a => a.status === 'Draft');
+
+        // Filter: Standard users only see assessments where they have a relation with the target employee.
+        // HR / Admin without a linked employeeId can see all assessments for demo/admin purposes.
+        if (user && user.employeeId !== null) {
+          const currentUserEmp = empRes.data.find(e => e.id === user.employeeId);
+          filteredAss = filteredAss.filter(ass => {
+            if (user.employeeId === ass.employeeId) return true;
+            
+            const targetEmp = empRes.data.find(e => e.id === ass.employeeId);
+            if (!targetEmp) return false;
+
+            if (targetEmp.managerId === user.employeeId) return true;
+
+            if (currentUserEmp && currentUserEmp.managerId === targetEmp.id) return true;
+
+            if (currentUserEmp && currentUserEmp.department === targetEmp.department) return true;
+
+            return false;
+          });
+        }
+
+        setAssessments(filteredAss);
       }
     } catch (err) {
       console.error('Error fetching surveys', err);
@@ -57,27 +81,70 @@ export default function MySurveysPage() {
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // Synchronize scores when selected assessment or evaluator type changes
+  useEffect(() => {
+    if (!selectedAssessment) return;
+
+    let active = true;
+    const loadScores = async () => {
+      const initialScores: Record<number, number> = {};
+      for (let i = 1; i <= 13; i++) {
+        initialScores[i] = 3.0;
+      }
+
+      try {
+        const scoreRes = await apiClient.assessments.getScores(selectedAssessment.id);
+        if (active && scoreRes.success && scoreRes.data) {
+          const evaluatorScores = scoreRes.data.filter(s => s.evaluatorType === evaluatorType);
+          for (const s of evaluatorScores) {
+            initialScores[s.competencyId] = s.score;
+          }
+          setScores(initialScores);
+        }
+      } catch (err) {
+        console.error('Error fetching scores', err);
+        if (active) {
+          setScores(initialScores);
+        }
+      }
+    };
+
+    loadScores();
+
+    return () => {
+      active = false;
+    };
+  }, [selectedAssessment, evaluatorType]);
 
   const handleStartEvaluation = (ass: Assessment) => {
     setSelectedAssessment(ass);
     setSubmitSuccess(false);
 
-    // Default evaluator type based on logged role relative to target
-    if (user?.employeeId === ass.employeeId) {
-      setEvaluatorType('Self');
-    } else if (user?.role === 'Manager') {
-      setEvaluatorType('Manager');
-    } else {
-      setEvaluatorType('Peer');
-    }
+    // Determine evaluator type based on logged role relative to target
+    let determinedType: EvaluatorType = 'Peer';
+    if (user && user.employeeId !== null) {
+      if (user.employeeId === ass.employeeId) {
+        determinedType = 'Self';
+      } else {
+        const targetEmp = employees.find(e => e.id === ass.employeeId);
+        const currentUserEmp = employees.find(e => e.id === user.employeeId);
 
-    // Initialize scores with default 3.0
-    const initialScores: Record<number, number> = {};
-    for (let i = 1; i <= 13; i++) {
-      initialScores[i] = 3.0;
+        if (targetEmp && targetEmp.managerId === user.employeeId) {
+          determinedType = 'Manager';
+        } else if (currentUserEmp && targetEmp && currentUserEmp.managerId === targetEmp.id) {
+          determinedType = 'Subordinate';
+        } else if (currentUserEmp && targetEmp && currentUserEmp.department === targetEmp.department) {
+          determinedType = 'Peer';
+        }
+      }
+    } else {
+      // Default to Manager for HR / Admin without employeeId
+      determinedType = 'Manager';
     }
-    setScores(initialScores);
+    setEvaluatorType(determinedType);
   };
 
   const handleScoreChange = (competencyId: number, val: number) => {
@@ -188,29 +255,35 @@ export default function MySurveysPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 max-w-3xl">
-              {assessments.map((ass) => (
-                <div
-                  key={ass.id}
-                  className="glass-panel rounded-2xl p-5 border border-card-border flex items-center justify-between transition hover:border-card-border/80"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
-                      <ClipboardList className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground">{ass.employeeName} - Yetkinlik Değerlendirmesi</p>
-                      <p className="text-xs text-muted mt-0.5">{ass.cycleName} • Durum: Puan Girişi Bekleniyor</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleStartEvaluation(ass)}
-                    className="flex items-center space-x-1 rounded-xl bg-primary hover:bg-primary-hover px-4 py-2.5 text-xs font-semibold text-white shadow-md transition duration-150"
+              {assessments.map((ass) => {
+                const targetEmp = employees.find((e) => e.id === ass.employeeId);
+                const roleSuffix = targetEmp ? ` (${targetEmp.jobRole})` : '';
+                return (
+                  <div
+                    key={ass.id}
+                    className="glass-panel rounded-2xl p-5 border border-card-border flex items-center justify-between transition hover:border-card-border/80"
                   >
-                    <span>Değerlendir</span>
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
+                    <div className="flex items-center space-x-4">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+                        <ClipboardList className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-foreground">
+                          {ass.employeeName}{roleSuffix} - Yetkinlik Değerlendirmesi
+                        </p>
+                        <p className="text-xs text-muted mt-0.5">{ass.cycleName} • Durum: Puan Girişi Bekleniyor</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleStartEvaluation(ass)}
+                      className="flex items-center space-x-1 rounded-xl bg-primary hover:bg-primary-hover px-4 py-2.5 text-xs font-semibold text-white shadow-md transition duration-150"
+                    >
+                      <span>Değerlendir</span>
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -241,34 +314,42 @@ export default function MySurveysPage() {
             ) : (
               <form onSubmit={handleSubmitEvaluation} className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-bold text-foreground">{selectedAssessment.employeeName}</h3>
+                  <h3 className="text-lg font-bold text-foreground">
+                    {selectedAssessment.employeeName}
+                    {(() => {
+                      const targetEmp = employees.find((e) => e.id === selectedAssessment.employeeId);
+                      return targetEmp ? ` (${targetEmp.jobRole})` : '';
+                    })()}
+                  </h3>
                   <p className="text-xs text-muted mt-0.5">
                     Lütfen çalışanın yetkinlik seviyelerini 1.0 (Çok Zayıf) ile 5.0 (Mükemmel) arasında değerlendirin.
                   </p>
                 </div>
 
-                {/* Evaluator Selector */}
-                <div className="rounded-2xl bg-card border border-card-border p-4">
-                  <label className="block text-xs font-medium text-muted uppercase tracking-wider mb-2">
-                    Değerlendiren Rolü / İlişki Tipi
-                  </label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {(['Self', 'Manager', 'Peer', 'Subordinate'] as EvaluatorType[]).map((type) => (
-                      <button
-                        key={type}
-                        type="button"
-                        onClick={() => setEvaluatorType(type)}
-                        className={`rounded-lg py-2 text-center text-xs font-semibold border transition ${
-                          evaluatorType === type
-                            ? 'bg-primary border-primary text-white shadow-md'
-                            : 'bg-background border-card-border text-muted hover:text-foreground'
-                        }`}
-                      >
-                        {type === 'Self' ? 'Kendi' : type === 'Manager' ? 'Yönetici' : type === 'Peer' ? 'Meslektaş' : 'Ast'}
-                      </button>
-                    ))}
+                {/* Evaluator Selector - Only visible for HR or Admin */}
+                {(user?.role === 'HR' || user?.role === 'Admin') && (
+                  <div className="rounded-2xl bg-card border border-card-border p-4">
+                    <label className="block text-xs font-medium text-muted uppercase tracking-wider mb-2">
+                      Değerlendiren Rolü / İlişki Tipi (Yönetici Görünümü)
+                    </label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {(['Self', 'Manager', 'Peer', 'Subordinate'] as EvaluatorType[]).map((type) => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => setEvaluatorType(type)}
+                          className={`rounded-lg py-2 text-center text-xs font-semibold border transition ${
+                            evaluatorType === type
+                              ? 'bg-primary border-primary text-white shadow-md'
+                              : 'bg-background border-card-border text-muted hover:text-foreground'
+                          }`}
+                        >
+                          {type === 'Self' ? 'Kendi' : type === 'Manager' ? 'Yönetici' : type === 'Peer' ? 'Meslektaş' : 'Ast'}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Scorecards */}
                 <div className="space-y-5">
