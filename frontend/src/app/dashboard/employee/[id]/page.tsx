@@ -4,6 +4,7 @@ import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../../services/apiClient';
 import { toast } from '../../../../store/useToastStore';
+import { useConfirmStore } from '../../../../store/useConfirmStore';
 import {
   EmployeeDetail,
   Assessment,
@@ -147,22 +148,28 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
   const handleCompleteAssessment = async () => {
     if (!activeAssessment) return;
-    if (confirm('Değerlendirmeyi tamamlamak istediğinize emin misiniz? Değerlendirme bittiğinde AI gelişim planı aşamasına geçebilirsiniz.')) {
-      setIsActionLoading(true);
-      try {
-        const res = await apiClient.assessments.complete(activeAssessment.id);
-        if (res.success) {
-          toast.success('Değerlendirme başarıyla tamamlandı. Artık AI planı üretebilirsiniz.');
-          fetchData();
-        } else {
-          toast.error(res.message || 'Hata oluştu.');
+    useConfirmStore.getState().showConfirm({
+      title: 'Değerlendirmeyi Tamamla',
+      message: 'Değerlendirmeyi tamamlamak istediğinize emin misiniz? Değerlendirme bittiğinde AI gelişim planı aşamasına geçebilirsiniz.',
+      confirmLabel: 'Tamamla',
+      cancelLabel: 'İptal',
+      onConfirm: async () => {
+        setIsActionLoading(true);
+        try {
+          const res = await apiClient.assessments.complete(activeAssessment.id);
+          if (res.success) {
+            toast.success('Değerlendirme başarıyla tamamlandı. Artık AI planı üretebilirsiniz.');
+            fetchData();
+          } else {
+            toast.error(res.message || 'Hata oluştu.');
+          }
+        } catch (err) {
+          console.error('Error completing assessment', err);
+        } finally {
+          setIsActionLoading(false);
         }
-      } catch (err) {
-        console.error('Error completing assessment', err);
-      } finally {
-        setIsActionLoading(false);
       }
-    }
+    });
   };
 
   // AI Plan Generation Trigger
@@ -219,16 +226,22 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
   const handleDeleteItem = async (itemId: number) => {
     if (!actionPlan) return;
-    if (confirm('Bu gelişim görevini plandan kaldırmak istediğinize emin misiniz?')) {
-      try {
-        const res = await apiClient.actionPlans.deleteItem(actionPlan.id, itemId);
-        if (res.success) {
-          setActionPlan({ ...actionPlan, items: actionPlan.items.filter(i => i.id !== itemId) });
+    useConfirmStore.getState().showConfirm({
+      title: 'Görevi Kaldır',
+      message: 'Bu gelişim görevini plandan kaldırmak istediğinize emin misiniz?',
+      confirmLabel: 'Kaldır',
+      cancelLabel: 'İptal',
+      onConfirm: async () => {
+        try {
+          const res = await apiClient.actionPlans.deleteItem(actionPlan.id, itemId);
+          if (res.success) {
+            setActionPlan({ ...actionPlan, items: actionPlan.items.filter(i => i.id !== itemId) });
+          }
+        } catch (e) {
+          console.error(e);
         }
-      } catch (e) {
-        console.error(e);
       }
-    }
+    });
   };
 
   const handleAddManualItem = async (e: React.FormEvent) => {

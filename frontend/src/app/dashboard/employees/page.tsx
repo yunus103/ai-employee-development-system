@@ -6,6 +6,7 @@ import { useStore } from '../../../store/useStore';
 import { apiClient } from '../../../services/apiClient';
 import { EmployeeDetail } from '../../../types';
 import { toast } from '../../../store/useToastStore';
+import { useConfirmStore } from '../../../store/useConfirmStore';
 import {
   Search,
   Filter,
@@ -72,21 +73,27 @@ export default function EmployeesPage() {
   }, [page, searchTerm, selectedDept]);
 
   const handleStartAssessment = async (empId: number) => {
-    if (confirm('Bu çalışan için yeni bir 360° yetkinlik değerlendirmesi başlatmak istiyor musunuz?')) {
-      try {
-        const res = await apiClient.assessments.create(empId, 1); // default cycleId = 1
-        if (res.success && res.data) {
-          toast.success('Değerlendirme başarıyla oluşturuldu. Şimdi puanları girmek için yönlendirileceksiniz.');
-          router.push(`/dashboard/employee/${empId}`);
-        } else {
-          toast.error(res.message || 'Değerlendirme başlatılamadı.');
+    useConfirmStore.getState().showConfirm({
+      title: 'Değerlendirme Başlat',
+      message: 'Bu çalışan için yeni bir 360° yetkinlik değerlendirmesi başlatmak istiyor musunuz?',
+      confirmLabel: 'Başlat',
+      cancelLabel: 'İptal',
+      onConfirm: async () => {
+        try {
+          const res = await apiClient.assessments.create(empId, 1); // default cycleId = 1
+          if (res.success && res.data) {
+            toast.success('Değerlendirme başarıyla oluşturuldu. Şimdi puanları girmek için yönlendirileceksiniz.');
+            router.push(`/dashboard/employee/${empId}`);
+          } else {
+            toast.error(res.message || 'Değerlendirme başlatılamadı.');
+          }
+        } catch (err) {
+          console.error('Error creating assessment', err);
+          const errMsg = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'İşlem başarısız oldu.';
+          toast.error(errMsg);
         }
-      } catch (err) {
-        console.error('Error creating assessment', err);
-        const errMsg = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'İşlem başarısız oldu.';
-        toast.error(errMsg);
       }
-    }
+    });
   };
 
   const departments = [

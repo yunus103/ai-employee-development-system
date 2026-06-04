@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import ToastContainer from '../components/ToastContainer';
+import ConfirmModal from '../components/ConfirmModal';
 import './globals.css';
 
 const inter = Inter({
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="tr" className={`${inter.variable} h-full`}>
       <body className="min-h-full bg-background text-foreground selection:bg-primary selection:text-white">
         <ToastContainer />
+        <ConfirmModal />
         {children}
       </body>
     </html>

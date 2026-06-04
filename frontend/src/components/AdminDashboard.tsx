@@ -5,20 +5,27 @@ import { useStore } from '../store/useStore';
 import { Users, Database, Activity, RefreshCw } from 'lucide-react';
 import { initializeMockDatabase } from '../services/mockData';
 import { toast } from '../store/useToastStore';
+import { useConfirmStore } from '../store/useConfirmStore';
 
 export default function AdminDashboard() {
   const router = useRouter();
   const { isMockMode } = useStore();
 
   const handleResetDatabase = () => {
-    if (confirm('Tüm mock veritabanını sıfırlamak istediğinize emin misiniz?')) {
-      localStorage.clear();
-      initializeMockDatabase();
-      toast.success('Veritabanı sıfırlandı ve varsayılan veriler yüklendi.');
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
-    }
+    useConfirmStore.getState().showConfirm({
+      title: 'Veritabanını Sıfırla',
+      message: 'Tüm mock veritabanını sıfırlamak istediğinize emin misiniz? Bu işlem geri alınamaz.',
+      confirmLabel: 'Sıfırla',
+      cancelLabel: 'İptal',
+      onConfirm: () => {
+        localStorage.clear();
+        initializeMockDatabase();
+        toast.success('Veritabanı sıfırlandı ve varsayılan veriler yüklendi.');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      }
+    });
   };
 
   return (
