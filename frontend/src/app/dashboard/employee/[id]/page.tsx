@@ -290,6 +290,199 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const handleDownloadPDF = async () => {
     if (!actionPlan) return;
     try {
+      if (apiClient.isMock) {
+        // Generate a beautiful, print-ready HTML page for Mock Mode
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+          alert('Pop-up engelleyiciyi devre dışı bırakıp tekrar deneyin.');
+          return;
+        }
+
+        const priorityWeights: Record<ActionPriority, number> = { High: 3, Medium: 2, Low: 1 };
+        const sortedItems = [...actionPlan.items].sort((a, b) => {
+          const weightA = priorityWeights[a.priority] || 0;
+          const weightB = priorityWeights[b.priority] || 0;
+          return weightB - weightA;
+        });
+
+        const itemsHtml = sortedItems
+          .map(
+            (item) => `
+          <tr style="border-bottom: 1px solid #e4e4e7;">
+            <td style="padding: 14px 12px; font-weight: bold; font-size: 13px; color: #18181b;">${item.title}</td>
+            <td style="padding: 14px 12px; font-size: 12px; color: #52525b; line-height: 1.5; max-width: 320px;">${item.description}</td>
+            <td style="padding: 14px 12px; font-size: 12px; font-weight: bold; color: ${
+              item.priority === 'High' ? '#ef4444' : item.priority === 'Medium' ? '#f59e0b' : '#71717a'
+            };">${item.priority === 'High' ? 'Yüksek' : item.priority === 'Medium' ? 'Orta' : 'Düşük'}</td>
+            <td style="padding: 14px 12px; font-size: 12px; color: #18181b;">${
+              item.dueDate ? new Date(item.dueDate).toLocaleDateString('tr-TR') : 'Belirtilmedi'
+            }</td>
+            <td style="padding: 14px 12px; font-size: 11px; font-weight: 600; color: #8b5cf6;">${
+              item.source === 'AI' ? 'AI Önerisi' : 'Manuel'
+            }</td>
+          </tr>
+        `
+          )
+          .join('');
+
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Gelişim Planı Raporu - ${employee?.fullName}</title>
+              <style>
+                body {
+                  font-family: 'Segoe UI', system-ui, sans-serif;
+                  color: #18181b;
+                  padding: 40px;
+                  margin: 0;
+                  background-color: #ffffff;
+                }
+                .header-container {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: flex-start;
+                  border-bottom: 2px solid #8b5cf6;
+                  padding-bottom: 20px;
+                  margin-bottom: 35px;
+                }
+                .title {
+                  font-size: 24px;
+                  font-weight: 800;
+                  color: #8b5cf6;
+                  letter-spacing: -0.5px;
+                }
+                .subtitle {
+                  font-size: 12px;
+                  color: #71717a;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                  font-weight: 700;
+                  margin-bottom: 5px;
+                }
+                .meta-table {
+                  width: 100%;
+                  margin-bottom: 30px;
+                  font-size: 13px;
+                  border-collapse: collapse;
+                }
+                .meta-table td {
+                  padding: 8px 0;
+                  color: #52525b;
+                }
+                .meta-table td strong {
+                  color: #18181b;
+                }
+                .section-title {
+                  font-size: 16px;
+                  font-weight: 700;
+                  margin: 35px 0 15px 0;
+                  color: #18181b;
+                  border-left: 4px solid #8b5cf6;
+                  padding-left: 12px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                }
+                table.tasks-table {
+                  width: 100%;
+                  border-collapse: collapse;
+                  margin-top: 10px;
+                }
+                table.tasks-table th {
+                  background-color: #f4f4f5;
+                  text-align: left;
+                  padding: 12px;
+                  font-size: 11px;
+                  font-weight: 700;
+                  text-transform: uppercase;
+                  color: #71717a;
+                  border-bottom: 2px solid #e4e4e7;
+                }
+                .footer {
+                  margin-top: 60px;
+                  border-top: 1px solid #e4e4e7;
+                  padding-top: 20px;
+                  font-size: 11px;
+                  color: #a1a1aa;
+                  text-align: center;
+                  line-height: 1.5;
+                }
+                @media print {
+                  body { padding: 0; }
+                  @page { margin: 1.5cm; }
+                }
+              </style>
+            </head>
+            <body>
+              <div class="header-container">
+                <div>
+                  <div class="subtitle">Kişisel Gelişim ve Analiz Raporu</div>
+                  <div class="title">360° AI Destekli Gelişim Planı</div>
+                </div>
+                <div style="text-align: right; font-size: 11px; color: #71717a;">
+                  Rapor No: AP-${actionPlan.id}<br>
+                  Tarih: ${new Date().toLocaleDateString('tr-TR')}
+                </div>
+              </div>
+
+              <div class="section-title">Çalışan Bilgileri</div>
+              <table class="meta-table">
+                <tr>
+                  <td style="width: 50%;"><strong>Ad Soyad:</strong> ${employee?.fullName}</td>
+                  <td style="width: 50%;"><strong>Çalışan Kodu:</strong> ${employee?.employeeCode}</td>
+                </tr>
+                <tr>
+                  <td><strong>Departman:</strong> ${employee?.department}</td>
+                  <td><strong>Görev Tanımı:</strong> ${employee?.jobRole}</td>
+                </tr>
+                <tr>
+                  <td><strong>Yönetici:</strong> ${employee?.managerName || 'Belirtilmedi'}</td>
+                  <td><strong>Plan Durumu:</strong> ${
+                    actionPlan.status === 'Sent'
+                      ? 'Çalışana Gönderildi (Aktif)'
+                      : actionPlan.status === 'Approved'
+                      ? 'Onaylandı'
+                      : 'Taslak Düzenleme'
+                  }</td>
+                </tr>
+              </table>
+
+              <div class="section-title">Gelişim Aksiyon Listesi</div>
+              <table class="tasks-table">
+                <thead>
+                  <tr>
+                    <th style="width: 25%;">Görev Adı</th>
+                    <th style="width: 40%;">Açıklama</th>
+                    <th style="width: 12%;">Öncelik</th>
+                    <th style="width: 13%;">Bitiş Tarihi</th>
+                    <th style="width: 10%;">Kaynak</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${itemsHtml}
+                </tbody>
+              </table>
+
+              <div class="footer">
+                Bu rapor çalışanın yöneticileri, ekip arkadaşları ve öz değerlendirmesinden toplanan 360° yetkinlik analiz sonuçlarına dayalı olarak sistem tarafından otomatik olarak üretilmiştir.<br>
+                <strong>360° AI-Supported Employee Development Recommendation System &copy; 2026</strong>
+              </div>
+
+              <script>
+                window.onload = function() {
+                  setTimeout(function() {
+                    window.print();
+                  }, 250);
+                }
+              </script>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        return;
+      }
+
+      // Real Mode PDF download
       const blob = await apiClient.actionPlans.exportPdf(actionPlan.id);
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -650,59 +843,67 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
           {/* Action plan items list */}
           <div className="space-y-4">
-            {actionPlan.items.map((item) => (
-              <div key={item.id} className="glass-panel rounded-2xl p-6 border border-card-border flex flex-col md:flex-row justify-between gap-6 transition hover:border-card-border/80">
-                <div className="space-y-2 flex-1 min-w-0">
-                  <div className="flex items-center space-x-2">
-                    <span className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
-                      item.source === 'AI'
-                        ? 'bg-primary/10 border border-primary/20 text-primary'
-                        : 'bg-info/10 border border-info/20 text-info'
-                    }`}>
-                      {item.source === 'AI' ? 'AI Önerisi' : 'Manuel'}
-                    </span>
-                    <h5 className="text-sm font-bold text-foreground truncate">{item.title}</h5>
+            {(() => {
+              const priorityWeights: Record<ActionPriority, number> = { High: 3, Medium: 2, Low: 1 };
+              const sortedItems = [...actionPlan.items].sort((a, b) => {
+                const weightA = priorityWeights[a.priority] || 0;
+                const weightB = priorityWeights[b.priority] || 0;
+                return weightB - weightA;
+              });
+              return sortedItems.map((item) => (
+                <div key={item.id} className="glass-panel rounded-2xl p-6 border border-card-border flex flex-col md:flex-row justify-between gap-6 transition hover:border-card-border/80">
+                  <div className="space-y-2 flex-1 min-w-0">
+                    <div className="flex items-center space-x-2">
+                      <span className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                        item.source === 'AI'
+                          ? 'bg-primary/10 border border-primary/20 text-primary'
+                          : 'bg-info/10 border border-info/20 text-info'
+                      }`}>
+                        {item.source === 'AI' ? 'AI Önerisi' : 'Manuel'}
+                      </span>
+                      <h5 className="text-sm font-bold text-foreground truncate">{item.title}</h5>
+                    </div>
+                    <p className="text-xs text-muted leading-relaxed">{item.description}</p>
                   </div>
-                  <p className="text-xs text-muted leading-relaxed">{item.description}</p>
-                </div>
 
-                {/* Edit inline configs */}
-                <div className="flex items-center space-x-3 shrink-0">
-                  {/* Select Priority */}
-                  <select
-                    value={item.priority}
-                    disabled={actionPlan.status === 'Sent'}
-                    onChange={(e) => handleUpdateItem(item.id, 'priority', e.target.value as ActionPriority)}
-                    className="rounded-lg bg-card border border-card-border py-1.5 px-2.5 text-xs text-foreground outline-none cursor-pointer focus:border-primary disabled:opacity-50"
-                  >
-                    <option value="Low">Düşük Öncelik</option>
-                    <option value="Medium">Orta Öncelik</option>
-                    <option value="High">Yüksek Öncelik</option>
-                  </select>
-
-                  {/* Input Date */}
-                  <div className="relative">
-                    <input
-                      type="date"
+                  {/* Edit inline configs */}
+                  <div className="flex items-center space-x-3 shrink-0">
+                    {/* Select Priority */}
+                    <select
+                      value={item.priority}
                       disabled={actionPlan.status === 'Sent'}
-                      value={item.dueDate ? new Date(item.dueDate).toISOString().split('T')[0] : ''}
-                      onChange={(e) => handleUpdateItem(item.id, 'dueDate', e.target.value ? new Date(e.target.value).toISOString() : null)}
-                      className="rounded-lg bg-card border border-card-border py-1.5 px-2.5 text-xs text-foreground outline-none focus:border-primary disabled:opacity-50"
-                    />
-                  </div>
-
-                  {/* Delete Button */}
-                  {actionPlan.status !== 'Sent' && (
-                    <button
-                      onClick={() => handleDeleteItem(item.id)}
-                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-danger/20 bg-danger/5 hover:bg-danger/10 text-danger transition duration-150"
+                      onChange={(e) => handleUpdateItem(item.id, 'priority', e.target.value as ActionPriority)}
+                      className="rounded-lg bg-card border border-card-border py-1.5 px-2.5 text-xs text-foreground outline-none cursor-pointer focus:border-primary disabled:opacity-50"
                     >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  )}
+                      <option value="Low">Düşük Öncelik</option>
+                      <option value="Medium">Orta Öncelik</option>
+                      <option value="High">Yüksek Öncelik</option>
+                    </select>
+
+                    {/* Input Date */}
+                    <div className="relative">
+                      <input
+                        type="date"
+                        disabled={actionPlan.status === 'Sent'}
+                        value={item.dueDate ? new Date(item.dueDate).toISOString().split('T')[0] : ''}
+                        onChange={(e) => handleUpdateItem(item.id, 'dueDate', e.target.value ? new Date(e.target.value).toISOString() : null)}
+                        className="rounded-lg bg-card border border-card-border py-1.5 px-2.5 text-xs text-foreground outline-none focus:border-primary disabled:opacity-50"
+                      />
+                    </div>
+
+                    {/* Delete Button */}
+                    {actionPlan.status !== 'Sent' && (
+                      <button
+                        onClick={() => handleDeleteItem(item.id)}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-danger/20 bg-danger/5 hover:bg-danger/10 text-danger transition duration-150"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ));
+            })()}
           </div>
 
           {/* Add Manual Item Modal */}

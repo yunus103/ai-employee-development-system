@@ -63,10 +63,18 @@ export default function EmployeePlanPage() {
     );
   }
 
+  // Sort tasks by priority (High -> Medium -> Low)
+  const priorityWeights: Record<ActionPriority, number> = { High: 3, Medium: 2, Low: 1 };
+  const sortedTasks = [...tasks].sort((a, b) => {
+    const weightA = priorityWeights[a.priority] || 0;
+    const weightB = priorityWeights[b.priority] || 0;
+    return weightB - weightA;
+  });
+
   // Group tasks into buckets
-  const todoTasks = tasks.filter((t) => t.status === 'Assigned');
-  const inProgressTasks = tasks.filter((t) => t.status === 'InProgress');
-  const completedTasks = tasks.filter((t) => t.status === 'Completed');
+  const todoTasks = sortedTasks.filter((t) => t.status === 'Assigned');
+  const inProgressTasks = sortedTasks.filter((t) => t.status === 'InProgress');
+  const completedTasks = sortedTasks.filter((t) => t.status === 'Completed');
 
   // Stats
   const totalCount = tasks.length;

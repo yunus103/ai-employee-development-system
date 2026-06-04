@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '../store/useStore';
 import { apiClient } from '../services/apiClient';
-import { EmployeeTask, ActionPlan, AssessmentScore } from '../types';
+import { EmployeeTask, ActionPlan, AssessmentScore, ActionPriority } from '../types';
 import {
   BookOpen,
   CheckCircle,
@@ -228,30 +228,38 @@ export default function EmployeeDashboard() {
 
           <div className="mt-6 flex-1 space-y-3.5 overflow-y-auto max-h-[300px]">
             {tasks.length > 0 ? (
-              tasks.slice(0, 4).map((task) => (
-                <div key={task.id} className="glass-card rounded-xl p-4 border border-card-border flex items-start space-x-3.5">
-                  <div className={`mt-1 flex h-2 w-2 shrink-0 rounded-full ${
-                    task.status === 'Completed'
-                      ? 'bg-success'
-                      : task.status === 'InProgress'
-                      ? 'bg-warning'
-                      : 'bg-primary'
-                  }`}></div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-foreground">{task.title}</p>
-                    <p className="truncate text-xs text-muted mt-0.5">{task.description}</p>
+              (() => {
+                const priorityWeights: Record<ActionPriority, number> = { High: 3, Medium: 2, Low: 1 };
+                const sortedTasks = [...tasks].sort((a, b) => {
+                  const weightA = priorityWeights[a.priority] || 0;
+                  const weightB = priorityWeights[b.priority] || 0;
+                  return weightB - weightA;
+                });
+                return sortedTasks.slice(0, 4).map((task) => (
+                  <div key={task.id} className="glass-card rounded-xl p-4 border border-card-border flex items-start space-x-3.5">
+                    <div className={`mt-1 flex h-2 w-2 shrink-0 rounded-full ${
+                      task.status === 'Completed'
+                        ? 'bg-success'
+                        : task.status === 'InProgress'
+                        ? 'bg-warning'
+                        : 'bg-primary'
+                    }`}></div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-foreground">{task.title}</p>
+                      <p className="truncate text-xs text-muted mt-0.5">{task.description}</p>
+                    </div>
+                    <span className={`shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                      task.priority === 'High'
+                        ? 'bg-danger/10 border border-danger/20 text-danger'
+                        : task.priority === 'Medium'
+                        ? 'bg-warning/10 border border-warning/20 text-warning'
+                        : 'bg-muted/10 border border-muted/20 text-muted'
+                    }`}>
+                      {task.priority === 'High' ? 'Yüksek' : task.priority === 'Medium' ? 'Orta' : 'Düşük'}
+                    </span>
                   </div>
-                  <span className={`shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
-                    task.priority === 'High'
-                      ? 'bg-danger/10 border border-danger/20 text-danger'
-                      : task.priority === 'Medium'
-                      ? 'bg-warning/10 border border-warning/20 text-warning'
-                      : 'bg-muted/10 border border-muted/20 text-muted'
-                  }`}>
-                    {task.priority === 'High' ? 'Yüksek' : task.priority === 'Medium' ? 'Orta' : 'Düşük'}
-                  </span>
-                </div>
-              ))
+                ));
+              })()
             ) : (
               <div className="flex flex-col items-center justify-center text-center p-8 space-y-3 h-full">
                 <ClipboardList className="h-10 w-10 text-muted" />

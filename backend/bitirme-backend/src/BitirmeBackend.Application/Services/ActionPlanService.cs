@@ -438,7 +438,8 @@ public class ActionPlanService : IActionPlanService
         UpdatedAt        = plan.UpdatedAt,
         Items            = plan.Items
             .Where(i => !i.IsDeleted)
-            .OrderBy(i => i.OrderNo)
+            .OrderByDescending(i => i.Priority)
+            .ThenBy(i => i.OrderNo)
             .Select(ToItemDto)
     };
 
