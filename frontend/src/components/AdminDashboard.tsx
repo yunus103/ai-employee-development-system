@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useStore } from '../store/useStore';
 import { Users, Database, Activity, RefreshCw } from 'lucide-react';
 import { initializeMockDatabase } from '../services/mockData';
+import { toast } from '../store/useToastStore';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -13,8 +14,10 @@ export default function AdminDashboard() {
     if (confirm('Tüm mock veritabanını sıfırlamak istediğinize emin misiniz?')) {
       localStorage.clear();
       initializeMockDatabase();
-      alert('Veritabanı sıfırlandı ve varsayılan veriler yüklendi.');
-      window.location.reload();
+      toast.success('Veritabanı sıfırlandı ve varsayılan veriler yüklendi.');
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     }
   };
 

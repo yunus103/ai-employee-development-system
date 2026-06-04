@@ -5,6 +5,7 @@ import { useStore } from '../../../store/useStore';
 import { apiClient } from '../../../services/apiClient';
 import { Assessment, EvaluatorType } from '../../../types';
 import competencyMapping from '../../../data/competency_mapping.json';
+import { toast } from '../../../store/useToastStore';
 import {
   ClipboardList,
   Star,
@@ -112,7 +113,7 @@ export default function MySurveysPage() {
       }, 2000);
     } catch (err) {
       console.error('Error submitting scores', err);
-      alert('Değerlendirme kaydedilirken bir hata oluştu.');
+      toast.error('Değerlendirme kaydedilirken bir hata oluştu.');
     } finally {
       setIsSubmitting(false);
     }

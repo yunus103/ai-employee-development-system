@@ -3,6 +3,7 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../../services/apiClient';
+import { toast } from '../../../../store/useToastStore';
 import {
   EmployeeDetail,
   Assessment,
@@ -134,11 +135,11 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           val
         );
       }
-      alert('Puanlar başarıyla kaydedildi.');
+      toast.success('Puanlar başarıyla kaydedildi.');
       fetchData();
     } catch (err) {
       console.error('Error upserting scores', err);
-      alert('Puanlar kaydedilirken hata oluştu.');
+      toast.error('Puanlar kaydedilirken hata oluştu.');
     } finally {
       setIsActionLoading(false);
     }
@@ -151,10 +152,10 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       try {
         const res = await apiClient.assessments.complete(activeAssessment.id);
         if (res.success) {
-          alert('Değerlendirme başarıyla tamamlandı. Artık AI planı üretebilirsiniz.');
+          toast.success('Değerlendirme başarıyla tamamlandı. Artık AI planı üretebilirsiniz.');
           fetchData();
         } else {
-          alert(res.message || 'Hata oluştu.');
+          toast.error(res.message || 'Hata oluştu.');
         }
       } catch (err) {
         console.error('Error completing assessment', err);
@@ -171,16 +172,16 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     try {
       const res = await apiClient.actionPlans.generate(activeAssessment.id, 13);
       if (res.success && res.data) {
-        alert('Yapay zeka gelişim planı başarıyla üretildi!');
+        toast.success('Yapay zeka gelişim planı başarıyla üretildi!');
         fetchData();
         setActiveTab('plan');
       } else {
-        alert(res.message || 'Gelişim planı oluşturulamadı.');
+        toast.error(res.message || 'Gelişim planı oluşturulamadı.');
       }
     } catch (err) {
       console.error('Error generating AI plan', err);
       const errMsg = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'AI planlama servisiyle bağlantı kurulamadı.';
-      alert(errMsg);
+      toast.error(errMsg);
     } finally {
       setIsActionLoading(false);
     }
@@ -258,7 +259,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     try {
       const res = await apiClient.actionPlans.approve(actionPlan.id);
       if (res.success) {
-        alert('Gelişim planı onaylandı.');
+        toast.success('Gelişim planı onaylandı.');
         setActionPlan(res.data);
       }
     } catch (e) {
@@ -274,7 +275,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     try {
       const res = await apiClient.actionPlans.send(actionPlan.id);
       if (res.success) {
-        alert('Gelişim planı çalışana gönderildi ve panosuna görev olarak eklendi!');
+        toast.success('Gelişim planı çalışana gönderildi ve panosuna görev olarak eklendi!');
         setActionPlan(res.data);
       }
     } catch (e) {
@@ -291,7 +292,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         // Generate a beautiful, print-ready HTML page for Mock Mode
         const printWindow = window.open('', '_blank');
         if (!printWindow) {
-          alert('Pop-up engelleyiciyi devre dışı bırakıp tekrar deneyin.');
+          toast.warning('Pop-up engelleyiciyi devre dışı bırakıp tekrar deneyin.');
           return;
         }
 
@@ -494,7 +495,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       link.click();
       document.body.removeChild(link);
     } catch {
-      alert('PDF indirilirken hata oluştu.');
+      toast.error('PDF indirilirken hata oluştu.');
     }
   };
 
@@ -605,7 +606,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           <button
             onClick={() => {
               if (!actionPlan) {
-                alert('Öncelikle değerlendirme sürecini tamamlayıp AI gelişim planını üretmelisiniz.');
+                toast.warning('Öncelikle değerlendirme sürecini tamamlayıp AI gelişim planını üretmelisiniz.');
                 return;
               }
               setActiveTab('plan');

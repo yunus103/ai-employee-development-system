@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useStore } from '../../../store/useStore';
 import { apiClient } from '../../../services/apiClient';
 import { EmployeeTask, TaskStatus, ActionPriority } from '../../../types';
+import { toast } from '../../../store/useToastStore';
 import {
   Clock,
   CheckCircle,
@@ -55,11 +56,11 @@ export default function EmployeePlanPage() {
         // Reload tasks list
         fetchTasks();
       } else {
-        alert(res.message || 'Durum güncellenirken bir hata oluştu.');
+        toast.error(res.message || 'Durum güncellenirken bir hata oluştu.');
       }
     } catch (err) {
       console.error('Error updating task status', err);
-      alert('İşlem başarısız oldu.');
+      toast.error('İşlem başarısız oldu.');
     }
   };
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useStore } from '../../../store/useStore';
 import { apiClient } from '../../../services/apiClient';
 import { EmployeeDetail } from '../../../types';
+import { toast } from '../../../store/useToastStore';
 import {
   Search,
   Filter,
@@ -75,15 +76,15 @@ export default function EmployeesPage() {
       try {
         const res = await apiClient.assessments.create(empId, 1); // default cycleId = 1
         if (res.success && res.data) {
-          alert('Değerlendirme başarıyla oluşturuldu. Şimdi puanları girmek için yönlendirileceksiniz.');
+          toast.success('Değerlendirme başarıyla oluşturuldu. Şimdi puanları girmek için yönlendirileceksiniz.');
           router.push(`/dashboard/employee/${empId}`);
         } else {
-          alert(res.message || 'Değerlendirme başlatılamadı.');
+          toast.error(res.message || 'Değerlendirme başlatılamadı.');
         }
       } catch (err) {
         console.error('Error creating assessment', err);
         const errMsg = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'İşlem başarısız oldu.';
-        alert(errMsg);
+        toast.error(errMsg);
       }
     }
   };

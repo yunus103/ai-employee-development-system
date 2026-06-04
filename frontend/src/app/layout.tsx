@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import ToastContainer from '../components/ToastContainer';
 import './globals.css';
 
 const inter = Inter({
@@ -21,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="tr" className={`${inter.variable} h-full`}>
       <body className="min-h-full bg-background text-foreground selection:bg-primary selection:text-white">
+        <ToastContainer />
         {children}
       </body>
     </html>
