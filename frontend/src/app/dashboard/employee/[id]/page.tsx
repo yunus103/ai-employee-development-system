@@ -190,16 +190,16 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const handleUpdateItem = async (
     itemId: number,
     field: 'title' | 'description' | 'priority' | 'dueDate',
-    val: string
+    val: string | null
   ) => {
     if (!actionPlan) return;
     const item = actionPlan.items.find((i) => i.id === itemId);
     if (!item) return;
 
     const updatedData = {
-      title: field === 'title' ? val : item.title,
-      description: field === 'description' ? val : item.description,
-      priority: (field === 'priority' ? val : item.priority) as ActionPriority,
+      title: field === 'title' ? (val ?? '') : item.title,
+      description: field === 'description' ? (val ?? '') : item.description,
+      priority: (field === 'priority' ? (val ?? 'Medium') : item.priority) as ActionPriority,
       dueDate: field === 'dueDate' ? val : item.dueDate,
       orderNo: item.orderNo
     };
