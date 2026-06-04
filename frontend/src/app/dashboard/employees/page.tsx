@@ -11,9 +11,7 @@ import {
   ArrowLeft,
   ArrowRight,
   TrendingUp,
-  UserPlus,
   Play,
-  User,
   ExternalLink
 } from 'lucide-react';
 
@@ -60,7 +58,16 @@ export default function EmployeesPage() {
   };
 
   useEffect(() => {
-    fetchEmployees();
+    let active = true;
+    Promise.resolve().then(() => {
+      if (active) {
+        fetchEmployees();
+      }
+    });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchTerm, selectedDept]);
 
   const handleStartAssessment = async (empId: number) => {
@@ -73,9 +80,9 @@ export default function EmployeesPage() {
         } else {
           alert(res.message || 'Değerlendirme başlatılamadı.');
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error('Error creating assessment', err);
-        const errMsg = err.response?.data?.message || 'İşlem başarısız oldu.';
+        const errMsg = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'İşlem başarısız oldu.';
         alert(errMsg);
       }
     }

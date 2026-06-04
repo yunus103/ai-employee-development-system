@@ -2,12 +2,12 @@
 
 import { useRouter } from 'next/navigation';
 import { useStore } from '../store/useStore';
-import { Shield, Users, Settings, Database, Activity, RefreshCw } from 'lucide-react';
+import { Users, Database, Activity, RefreshCw } from 'lucide-react';
 import { initializeMockDatabase } from '../services/mockData';
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const { user, isMockMode } = useStore();
+  const { isMockMode } = useStore();
 
   const handleResetDatabase = () => {
     if (confirm('Tüm mock veritabanını sıfırlamak istediğinize emin misiniz?')) {

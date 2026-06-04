@@ -2,14 +2,12 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { useStore } from '../../../../store/useStore';
 import { apiClient } from '../../../../services/apiClient';
 import {
   EmployeeDetail,
   Assessment,
   AssessmentScore,
   ActionPlan,
-  ActionPlanItem,
   ActionPriority,
   EvaluatorType
 } from '../../../../types';
@@ -17,19 +15,11 @@ import competencyMapping from '../../../../data/competency_mapping.json';
 import {
   ArrowLeft,
   Sparkles,
-  Award,
-  CheckCircle,
   FileText,
   Trash2,
   Plus,
-  Edit2,
-  Calendar,
   AlertTriangle,
-  UserCheck,
-  TrendingUp,
-  Cpu,
-  Layers,
-  Star
+  Cpu
 } from 'lucide-react';
 import {
   Radar,
@@ -42,13 +32,11 @@ import {
 
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const { user } = useStore();
   const { id } = use(params);
   const employeeId = parseInt(id);
 
   // States
   const [employee, setEmployee] = useState<EmployeeDetail | null>(null);
-  const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [activeAssessment, setActiveAssessment] = useState<Assessment | null>(null);
   const [scores, setScores] = useState<AssessmentScore[]>([]);
   const [actionPlan, setActionPlan] = useState<ActionPlan | null>(null);
@@ -83,7 +71,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       // 2. Fetch Employee Assessments
       const assRes = await apiClient.employees.getAssessments(employeeId, 1, 100);
       if (assRes.success) {
-        setAssessments(assRes.data);
         const active = assRes.data[0]; // latest assessment
         if (active) {
           setActiveAssessment(active);
@@ -117,7 +104,16 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   };
 
   useEffect(() => {
-    fetchData();
+    let active = true;
+    Promise.resolve().then(() => {
+      if (active) {
+        fetchData();
+      }
+    });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [employeeId]);
 
   // Handle Assessment Score Inputs
@@ -181,9 +177,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       } else {
         alert(res.message || 'Gelişim planı oluşturulamadı.');
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error generating AI plan', err);
-      const errMsg = err.response?.data?.message || 'AI planlama servisiyle bağlantı kurulamadı.';
+      const errMsg = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'AI planlama servisiyle bağlantı kurulamadı.';
       alert(errMsg);
     } finally {
       setIsActionLoading(false);
@@ -194,7 +190,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const handleUpdateItem = async (
     itemId: number,
     field: 'title' | 'description' | 'priority' | 'dueDate',
-    val: any
+    val: string
   ) => {
     if (!actionPlan) return;
     const item = actionPlan.items.find((i) => i.id === itemId);
@@ -203,7 +199,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     const updatedData = {
       title: field === 'title' ? val : item.title,
       description: field === 'description' ? val : item.description,
-      priority: field === 'priority' ? val : item.priority,
+      priority: (field === 'priority' ? val : item.priority) as ActionPriority,
       dueDate: field === 'dueDate' ? val : item.dueDate,
       orderNo: item.orderNo
     };
@@ -497,7 +493,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    } catch (e) {
+    } catch {
       alert('PDF indirilirken hata oluştu.');
     }
   };
@@ -513,13 +509,13 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   // Get dynamic descriptions depending on mapped titles
   const getCompetencyName = (competencyCode: string) => {
     if (competencyCode.startsWith('Core_')) {
-      return (competencyMapping.core_descriptions as any)[competencyCode] || competencyCode;
+      return (competencyMapping.core_descriptions as Record<string, string>)[competencyCode] || competencyCode;
     }
     if (competencyCode.startsWith('Dept_')) {
-      return (competencyMapping.dept_comp_labels as any)[employee.department]?.[competencyCode] || competencyCode;
+      return (competencyMapping.dept_comp_labels as Record<string, Record<string, string>>)[employee.department]?.[competencyCode] || competencyCode;
     }
     if (competencyCode.startsWith('Role_')) {
-      return (competencyMapping.role_comp_labels as any)[employee.jobRole]?.[competencyCode] || competencyCode;
+      return (competencyMapping.role_comp_labels as Record<string, Record<string, string>>)[employee.jobRole]?.[competencyCode] || competencyCode;
     }
     return competencyCode;
   };

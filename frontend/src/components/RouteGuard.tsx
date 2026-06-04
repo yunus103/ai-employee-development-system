@@ -13,7 +13,7 @@ interface RouteGuardProps {
 export default function RouteGuard({ children, allowedRoles }: RouteGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isAuthenticated, isLoading, checkAuth } = useStore();
+  const { isLoading, checkAuth } = useStore();
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {

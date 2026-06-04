@@ -16,7 +16,7 @@ interface AuthState {
   refreshUser: () => Promise<void>;
 }
 
-export const useStore = create<AuthState>((set, get) => ({
+export const useStore = create<AuthState>((set) => ({
   user: null,
   accessToken: null,
   isAuthenticated: false,

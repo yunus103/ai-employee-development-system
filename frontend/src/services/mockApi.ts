@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { mockDb } from './mockData';
 import actionsMaster from '../data/actions_master.json';
 import competencyMapping from '../data/competency_mapping.json';

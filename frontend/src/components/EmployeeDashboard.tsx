@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '../store/useStore';
 import { apiClient } from '../services/apiClient';
-import { EmployeeTask, ActionPlan, AssessmentScore, ActionPriority } from '../types';
+import { EmployeeTask, AssessmentScore, ActionPriority } from '../types';
 import {
   BookOpen,
   CheckCircle,
@@ -27,7 +27,6 @@ export default function EmployeeDashboard() {
   const router = useRouter();
   const { user } = useStore();
   const [tasks, setTasks] = useState<EmployeeTask[]>([]);
-  const [plans, setPlans] = useState<ActionPlan[]>([]);
   const [scores, setScores] = useState<AssessmentScore[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -45,8 +44,6 @@ export default function EmployeeDashboard() {
         // Fetch plans
         const planRes = await apiClient.employees.getActionPlans(user.employeeId);
         if (planRes.success && planRes.data.length > 0) {
-          setPlans(planRes.data);
-          
           // Get the latest plan's assessment scores for Radar chart
           const activePlan = planRes.data[0];
           const scoreRes = await apiClient.assessments.getScores(activePlan.assessmentId);

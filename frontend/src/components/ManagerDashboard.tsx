@@ -10,7 +10,6 @@ import {
   ClipboardList,
   Sparkles,
   ArrowRight,
-  TrendingUp,
   UserCheck,
   AlertCircle
 } from 'lucide-react';

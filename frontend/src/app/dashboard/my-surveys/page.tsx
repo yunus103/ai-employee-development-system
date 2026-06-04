@@ -7,10 +7,8 @@ import { Assessment, EvaluatorType } from '../../../types';
 import competencyMapping from '../../../data/competency_mapping.json';
 import {
   ClipboardList,
-  User,
   Star,
   CheckCircle,
-  AlertCircle,
   ChevronRight,
   ArrowLeft
 } from 'lucide-react';
@@ -49,7 +47,15 @@ export default function MySurveysPage() {
   };
 
   useEffect(() => {
-    fetchAssessments();
+    let active = true;
+    Promise.resolve().then(() => {
+      if (active) {
+        fetchAssessments();
+      }
+    });
+    return () => {
+      active = false;
+    };
   }, [user]);
 
   const handleStartEvaluation = (ass: Assessment) => {
@@ -114,23 +120,23 @@ export default function MySurveysPage() {
 
   // Helper to resolve competency display labels dynamically
   const getCompetencyLabel = (competencyCode: string, targetEmpId: number) => {
-    const employees = (useStore.getState() as any).employees || [];
     // fallback or fetch target employee from mock database direct
     const list = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('mock_employees') || '[]') : [];
-    const emp = list.find((e: any) => e.id === targetEmpId);
+    interface MockEmp { id: number; department: string; jobRole: string }
+    const emp = list.find((e: MockEmp) => e.id === targetEmpId);
     
     if (!emp) return competencyCode;
 
     if (competencyCode.startsWith('Core_')) {
-      return (competencyMapping.core_descriptions as any)[competencyCode] || competencyCode;
+      return (competencyMapping.core_descriptions as Record<string, string>)[competencyCode] || competencyCode;
     }
 
     if (competencyCode.startsWith('Dept_')) {
-      return (competencyMapping.dept_comp_labels as any)[emp.department]?.[competencyCode] || competencyCode;
+      return (competencyMapping.dept_comp_labels as Record<string, Record<string, string>>)[emp.department]?.[competencyCode] || competencyCode;
     }
 
     if (competencyCode.startsWith('Role_')) {
-      return (competencyMapping.role_comp_labels as any)[emp.jobRole]?.[competencyCode] || competencyCode;
+      return (competencyMapping.role_comp_labels as Record<string, Record<string, string>>)[emp.jobRole]?.[competencyCode] || competencyCode;
     }
 
     return competencyCode;

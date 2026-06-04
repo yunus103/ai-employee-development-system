@@ -29,13 +29,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     api: 'ok' | 'error';
     ml: 'ok' | 'error' | 'not-loaded';
   }>({ api: 'ok', ml: 'ok' });
-  const [isCheckingHealth, setIsCheckingHealth] = useState(true);
 
   useEffect(() => {
     const checkSystemHealth = async () => {
       if (apiClient.isMock) {
         setHealthStatus({ api: 'ok', ml: 'ok' });
-        setIsCheckingHealth(false);
         return;
       }
 
@@ -50,10 +48,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         } else {
           setHealthStatus({ api: 'error', ml: 'error' });
         }
-      } catch (err) {
+      } catch {
         setHealthStatus({ api: 'error', ml: 'error' });
-      } finally {
-        setIsCheckingHealth(false);
       }
     };
 

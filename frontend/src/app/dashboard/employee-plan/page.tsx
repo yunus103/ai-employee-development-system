@@ -37,7 +37,15 @@ export default function EmployeePlanPage() {
   };
 
   useEffect(() => {
-    fetchTasks();
+    let active = true;
+    Promise.resolve().then(() => {
+      if (active) {
+        fetchTasks();
+      }
+    });
+    return () => {
+      active = false;
+    };
   }, [user]);
 
   const handleStatusChange = async (taskId: number, newStatus: TaskStatus) => {

@@ -5,6 +5,7 @@ import {
   LoginResponse,
   UserSession,
   EmployeeDetail,
+  EmployeeFeatures,
   Assessment,
   AssessmentScore,
   ActionPlan,
@@ -50,9 +51,13 @@ axiosInstance.interceptors.request.use(
 
 // Interceptor to handle Token Refresh (401 rotation)
 let isRefreshing = false;
-let failedQueue: any[] = [];
+interface FailedRequest {
+  resolve: (token: string | null) => void;
+  reject: (err: unknown) => void;
+}
+let failedQueue: FailedRequest[] = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -138,10 +143,10 @@ export const apiClient = {
       }
       return res.data;
     },
-    logout: async (): Promise<ApiResponse<{}>> => {
+    logout: async (): Promise<ApiResponse<Record<string, never>>> => {
       if (USE_MOCK) return mockApi.logout();
       const refreshToken = localStorage.getItem('refreshToken');
-      const res = await axiosInstance.post<ApiResponse<{}>>('/api/auth/logout', { refreshToken });
+      const res = await axiosInstance.post<ApiResponse<Record<string, never>>>('/api/auth/logout', { refreshToken });
       if (typeof window !== 'undefined') {
         localStorage.clear();
       }
@@ -172,9 +177,9 @@ export const apiClient = {
       const res = await axiosInstance.put<ApiResponse<EmployeeDetail>>(`/api/employees/${id}`, data);
       return res.data;
     },
-    getFeatures: async (id: number, assessmentId: number): Promise<ApiResponse<any>> => {
+    getFeatures: async (id: number, assessmentId: number): Promise<ApiResponse<EmployeeFeatures>> => {
       if (USE_MOCK) return mockApi.getEmployeeFeatures(id, assessmentId);
-      const res = await axiosInstance.get<ApiResponse<any>>(`/api/employees/${id}/features`, {
+      const res = await axiosInstance.get<ApiResponse<EmployeeFeatures>>(`/api/employees/${id}/features`, {
         params: { assessmentId }
       });
       return res.data;
@@ -235,9 +240,9 @@ export const apiClient = {
   },
 
   actionPlans: {
-    generate: async (assessmentId: number, topK: number = 13): Promise<ApiResponse<any>> => {
+    generate: async (assessmentId: number, topK: number = 13): Promise<ApiResponse<{ actionPlanId: number; status: string; itemCount: number; createdAt: string }>> => {
       if (USE_MOCK) return mockApi.generateActionPlan(assessmentId, topK);
-      const res = await axiosInstance.post<ApiResponse<any>>('/api/action-plans/generate', { assessmentId, topK });
+      const res = await axiosInstance.post<ApiResponse<{ actionPlanId: number; status: string; itemCount: number; createdAt: string }>>('/api/action-plans/generate', { assessmentId, topK });
       return res.data;
     },
     get: async (id: number): Promise<ApiResponse<ActionPlan>> => {
@@ -262,9 +267,9 @@ export const apiClient = {
       const res = await axiosInstance.post<ApiResponse<ActionPlanItem>>(`/api/action-plans/${planId}/items`, data);
       return res.data;
     },
-    deleteItem: async (planId: number, itemId: number): Promise<ApiResponse<{}>> => {
+    deleteItem: async (planId: number, itemId: number): Promise<ApiResponse<Record<string, never>>> => {
       if (USE_MOCK) return mockApi.deleteActionPlanItem(planId, itemId);
-      const res = await axiosInstance.delete<ApiResponse<{}>>(`/api/action-plans/${planId}/items/${itemId}`);
+      const res = await axiosInstance.delete<ApiResponse<Record<string, never>>>(`/api/action-plans/${planId}/items/${itemId}`);
       return res.data;
     },
     approve: async (id: number): Promise<ApiResponse<ActionPlan>> => {

@@ -6,13 +6,10 @@ import { useStore } from '../store/useStore';
 import { apiClient } from '../services/apiClient';
 import { EmployeeDetail } from '../types';
 import {
-  Shield,
   Layers,
   Users,
-  ClipboardCheck,
   TrendingUp,
-  ArrowRight,
-  TrendingDown
+  ArrowRight
 } from 'lucide-react';
 
 export default function HRDashboard() {

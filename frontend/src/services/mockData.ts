@@ -3,10 +3,8 @@ import {
   Assessment,
   AssessmentScore,
   ActionPlan,
-  EmployeeTask,
-  UserSession
+  EmployeeTask
 } from '../types';
-import competencyMapping from '../data/competency_mapping.json';
 
 // Helper to get/set localStorage safely
 const getLocalStorage = <T>(key: string, defaultValue: T): T => {
