@@ -605,6 +605,8 @@ Yeni çalışan oluşturur.
 }
 ```
 
+> **Not:** `items` listesindeki her bir gelişim planı kaleminde `taskStatus` alanı bulunur ve kalemler tamamlananlar en sonda olacak şekilde sıralanmış olarak gelir (Bkz. `GET /api/action-plans/{id}`).
+
 ---
 
 ## 5. Assessment Endpointleri
@@ -628,6 +630,19 @@ Yeni değerlendirme oluşturur.
 |------|-----|---------|----------|
 | `employeeId` | integer | ✅ | Değerlendirilecek çalışan ID'si |
 | `cycleId` | integer | ✅ | Değerlendirme dönemi ID'si |
+
+**Validation & Constraints:**
+- **Aktif Plan Kontrolü:** Eğer çalışanın `Completed` veya `Cancelled` statüsünde olmayan (devam eden) aktif bir gelişim planı varsa, yeni bir değerlendirme süreci başlatılamaz. Bu durumda API `400 Bad Request` hatası döndürür.
+
+**Hata Yanıtı (400 Bad Request):**
+
+```json
+{
+  "success": false,
+  "message": "Çalışanın devam eden tamamlanmamış bir gelişim planı bulunmaktadır. Yeni bir değerlendirme süreci başlatılamaz.",
+  "data": null
+}
+```
 
 **Response (201 Created):**
 
@@ -796,6 +811,19 @@ ML servisi kullanarak taslak aksiyon planı oluşturur. Değerlendirme `Complete
 | `assessmentId` | integer | ✅ | Tamamlanmış değerlendirme ID'si |
 | `topK` | integer | ❌ | Önerilen aksiyon sayısı (varsayılan: 13) |
 
+**Validation & Constraints:**
+- **Aktif Plan Kontrolü:** Eğer çalışanın `Completed` veya `Cancelled` statüsünde olmayan (devam eden) aktif bir gelişim planı varsa, yeni bir gelişim planı oluşturulamaz. Bu durumda API `400 Bad Request` hatası döndürür.
+
+**Hata Yanıtı (400 Bad Request):**
+
+```json
+{
+  "success": false,
+  "message": "Çalışanın devam eden tamamlanmamış bir gelişim planı bulunmaktadır. Yeni bir plan oluşturulamaz.",
+  "data": null
+}
+```
+
 **Response (201 Created):**
 
 ```json
@@ -852,7 +880,8 @@ Aksiyon planı detayını tüm kalemlerle birlikte döndürür.
         "priority": "High",
         "dueDate": null,
         "source": "AI",
-        "orderNo": 1
+        "orderNo": 1,
+        "taskStatus": "Assigned"
       }
     ]
   }
@@ -862,6 +891,14 @@ Aksiyon planı detayını tüm kalemlerle birlikte döndürür.
 **ActionPlanItem `priority` değerleri:** `Low`, `Medium`, `High`
 
 **ActionPlanItem `source` değerleri:** `AI` (ML önerisi) veya `Manual` (manuel eklendi)
+
+**ActionPlanItem `taskStatus` değerleri:** `Assigned`, `InProgress`, `Completed`, `Cancelled` veya `null` (plan henüz çalışana gönderilmemişse `null` döner)
+
+**Sıralama (Sorting) Kuralları:**
+Gelişim planı detaylarındaki (`items`) veya PDF çıktısındaki tüm kalemler şu öncelik sırasına göre sıralanarak döndürülür:
+1. **Tamamlanma Durumu:** Henüz tamamlanmamış kalemler (görev durumu `Completed` olmayanlar) önce gösterilir. Tamamlanan görevler (`Completed` olanlar) listenin en sonuna atılır.
+2. **Öncelik Derecesi:** Kendi içinde azalan öncelik sırasına göre sıralanır (`High` -> `Medium` -> `Low`).
+3. **Sıra Numarası (`OrderNo`):** Son olarak orijinal sıra numarasına (`OrderNo`) göre artan şekilde sıralanır.
 
 **ActionPlan `status` değerleri:**
 
@@ -1081,6 +1118,9 @@ InProgress → Cancelled
 **Response (200 OK):** Güncellenmiş `EmployeeTaskDto`
 
 **Hata (400 Bad Request):** Geçersiz status string veya izin verilmeyen geçiş
+
+**Otomatik Plan Tamamlama Tetikleyicisi:**
+Bir çalışanın aktif gelişim planına bağlı **tüm** görevler `Completed` (Tamamlandı) durumuna getirildiğinde, sistem otomatik olarak ilgili gelişim planının statüsünü de `Completed` (5) olarak günceller ve planın güncelleme tarihini (`updatedAt`) yeniler.
 
 ---
 
@@ -1386,3 +1426,23 @@ hasNextPage = pageNumber < totalPages
 ```javascript
 const hasMore = response.pageNumber < response.totalPages;
 ```
+
+---
+
+## 13. Frontend Mock API ve Mock Mode Dokümantasyonu
+
+Uygulamanın frontend katmanında, backend servisinin ayakta olmadığı veya demo sunumu senaryoları için tamamen istemci tarafında çalışan bir Mock API mekanizması ([mockApi.ts](file:///c:/PROJECTS/employee-development-project/frontend/src/services/mockApi.ts)) mevcuttur.
+
+### Genel Kurallar ve Davranışlar
+
+1. **Bellek & LocalStorage Yönetimi:**
+   - Mock API, tüm durumunu ve verilerini tarayıcının `localStorage` alanında ve bellek içinde saklar. 
+   - Sayfa yenilendiğinde veya uygulama yeniden başlatıldığında, `localStorage` üzerindeki `mock_` ile başlayan anahtarlar (`mock_current_user`, `mock_access_token` vb.) ve `mockDb` deposu kullanılır.
+   
+2. **Kullanıcı Girişleri:**
+   - [Demo Kullanıcıları](#10-demo-kullanıcıları) bölümündeki e-posta adresleri kullanılarak giriş yapıldığında, Mock API otomatik olarak ilgili rol için bir JWT token formatında sahte access token ve refresh token üretir ve `localStorage`'da saklar.
+
+3. **Backend Kurallarının Simülasyonu:**
+   - **Devam Eden Plan Kısıtı:** Frontend mock API üzerinde de bir çalışana yeni bir değerlendirme süreci başlatılmak istendiğinde (`mockApi.createAssessment`) veya yeni bir plan oluşturulmak istendiğinde (`mockApi.generateActionPlan`), çalışanın devam eden tamamlanmamış bir gelişim planı olup olmadığı denetlenir ve varsa `400 Bad Request` benzeri hata yanıtı döner.
+   - **Görev Durumu ve Plan Tamamlama:** Bir çalışan kendi görev listesindeki son görevi de `Completed` durumuna getirdiğinde, mock veri tabanındaki parent gelişim planı da otomatik olarak `Completed` durumuna güncellenir.
+   - **TaskStatus Alanı ve Sıralama:** Mock API'den dönen tüm gelişim planı kalemlerine ilgili görevin `taskStatus` değeri eklenir ve bu kalemler completed olanlar sonda olacak şekilde sıralanır.
