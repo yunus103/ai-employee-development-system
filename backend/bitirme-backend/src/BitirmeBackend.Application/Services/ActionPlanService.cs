@@ -56,6 +56,12 @@ public class ActionPlanService : IActionPlanService
         if (existingPlan is not null)
             throw new ArgumentException("Bu assessment için zaten aktif bir aksiyon planı mevcut.");
 
+        // Check if there is an active incomplete plan for this employee from ANY assessment cycle
+        var employeePlans = await _actionPlans.GetByEmployeeIdAsync(employeeId);
+        var activeIncompletePlan = employeePlans.FirstOrDefault(p => p.Status != ActionPlanStatus.Completed && p.Status != ActionPlanStatus.Cancelled);
+        if (activeIncompletePlan != null)
+            throw new ArgumentException("Çalışanın devam eden tamamlanmamış bir gelişim planı bulunmaktadır. Yeni bir plan oluşturulamaz.");
+
         // Step 4: ML health check
         var isHealthy = await _mlClient.IsHealthyAsync();
         if (!isHealthy)
@@ -438,7 +444,8 @@ public class ActionPlanService : IActionPlanService
         UpdatedAt        = plan.UpdatedAt,
         Items            = plan.Items
             .Where(i => !i.IsDeleted)
-            .OrderByDescending(i => i.Priority)
+            .OrderBy(i => i.EmployeeTasks.Any(t => !t.IsDeleted && t.Status == EmployeeTaskStatus.Completed) ? 1 : 0)
+            .ThenByDescending(i => i.Priority)
             .ThenBy(i => i.OrderNo)
             .Select(ToItemDto)
     };
@@ -454,6 +461,7 @@ public class ActionPlanService : IActionPlanService
         Priority            = item.Priority.ToString(),
         DueDate             = item.DueDate,
         Source              = item.Source.ToString(),
-        OrderNo             = item.OrderNo
+        OrderNo             = item.OrderNo,
+        TaskStatus          = item.EmployeeTasks?.FirstOrDefault(t => !t.IsDeleted)?.Status.ToString()
     };
 }

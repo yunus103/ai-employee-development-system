@@ -231,6 +231,11 @@ export default function EmployeeDashboard() {
               (() => {
                 const priorityWeights: Record<ActionPriority, number> = { High: 3, Medium: 2, Low: 1 };
                 const sortedTasks = [...tasks].sort((a, b) => {
+                  const isCompletedA = a.status === 'Completed';
+                  const isCompletedB = b.status === 'Completed';
+                  if (isCompletedA && !isCompletedB) return 1;
+                  if (!isCompletedA && isCompletedB) return -1;
+
                   const weightA = priorityWeights[a.priority] || 0;
                   const weightB = priorityWeights[b.priority] || 0;
                   return weightB - weightA;

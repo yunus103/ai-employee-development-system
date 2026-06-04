@@ -12,4 +12,5 @@ public class ActionPlanItemDto
     public DateTime? DueDate { get; set; }
     public string Source { get; set; } = string.Empty;
     public int OrderNo { get; set; }
+    public string? TaskStatus { get; set; }
 }

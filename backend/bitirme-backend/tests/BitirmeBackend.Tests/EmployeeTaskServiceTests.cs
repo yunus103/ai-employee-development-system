@@ -10,11 +10,12 @@ namespace BitirmeBackend.Tests;
 public class EmployeeTaskServiceTests
 {
     private static EmployeeTaskService Build(
-        Mock<IEmployeeTaskRepository> repo, Mock<IUnitOfWork>? uow = null)
+        Mock<IEmployeeTaskRepository> repo, Mock<IUnitOfWork>? uow = null, Mock<IActionPlanRepository>? planRepo = null)
     {
         uow ??= new Mock<IUnitOfWork>();
         uow.Setup(u => u.SaveChangesAsync(default)).ReturnsAsync(1);
-        return new EmployeeTaskService(repo.Object, uow.Object);
+        planRepo ??= new Mock<IActionPlanRepository>();
+        return new EmployeeTaskService(repo.Object, planRepo.Object, uow.Object);
     }
 
     private static EmployeeTask MakeTask(

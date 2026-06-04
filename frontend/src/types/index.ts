@@ -142,6 +142,7 @@ export interface ActionPlanItem {
   dueDate: string | null;
   source: 'AI' | 'Manual';
   orderNo: number;
+  taskStatus?: string;
 }
 
 export interface ActionPlan {

@@ -73,9 +73,10 @@ export default function EmployeesPage() {
         } else {
           alert(res.message || 'Değerlendirme başlatılamadı.');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error creating assessment', err);
-        alert('İşlem başarısız oldu.');
+        const errMsg = err.response?.data?.message || 'İşlem başarısız oldu.';
+        alert(errMsg);
       }
     }
   };

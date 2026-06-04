@@ -297,6 +297,18 @@ export const mockApi = {
 
   createAssessment: async (employeeId: number, cycleId: number): Promise<ApiResponse<Assessment>> => {
     await delay(300);
+    // Check if there is an active incomplete plan
+    const activePlan = mockDb.getActionPlans().find(
+      (p) => p.employeeId === employeeId && p.status !== 'Completed' && p.status !== 'Cancelled'
+    );
+    if (activePlan) {
+      return {
+        success: false,
+        message: 'Çalışanın devam eden tamamlanmamış bir gelişim planı bulunmaktadır. Yeni bir değerlendirme süreci başlatılamaz.',
+        data: null as any
+      };
+    }
+
     const employees = mockDb.getEmployees();
     const emp = employees.find((e) => e.id === employeeId);
     if (!emp) {
@@ -429,6 +441,18 @@ export const mockApi = {
     const employee = mockDb.getEmployees().find((e) => e.id === assessment.employeeId);
     if (!employee) {
       return { success: false, message: 'Çalışan bulunamadı.', data: null };
+    }
+
+    // Check if there is an active incomplete plan
+    const activePlan = mockDb.getActionPlans().find(
+      (p) => p.employeeId === employee.id && p.status !== 'Completed' && p.status !== 'Cancelled'
+    );
+    if (activePlan) {
+      return {
+        success: false,
+        message: 'Çalışanın devam eden tamamlanmamış bir gelişim planı bulunmaktadır. Yeni bir plan oluşturulamaz.',
+        data: null
+      };
     }
 
     // Get aggregated scores
@@ -652,13 +676,35 @@ export const mockApi = {
     if (!plan) {
       return { success: false, message: 'Aksiyon planı bulunamadı.', data: null as any };
     }
-    return { success: true, message: null, data: plan };
+
+    // Enrich items with task status
+    const tasks = mockDb.getTasks();
+    const enrichedItems = plan.items.map((item) => {
+      const task = tasks.find((t) => t.actionPlanItemId === item.id && t.employeeId === plan.employeeId);
+      return {
+        ...item,
+        taskStatus: task ? task.status : undefined
+      };
+    });
+
+    return { success: true, message: null, data: { ...plan, items: enrichedItems } };
   },
 
   getEmployeeActionPlans: async (employeeId: number): Promise<ApiResponse<ActionPlan[]>> => {
     await delay(200);
     const plans = mockDb.getActionPlans().filter((p) => p.employeeId === employeeId);
-    return { success: true, message: null, data: plans };
+    const tasks = mockDb.getTasks();
+    const enrichedPlans = plans.map((plan) => {
+      const enrichedItems = plan.items.map((item) => {
+        const task = tasks.find((t) => t.actionPlanItemId === item.id && t.employeeId === plan.employeeId);
+        return {
+          ...item,
+          taskStatus: task ? task.status : undefined
+        };
+      });
+      return { ...plan, items: enrichedItems };
+    });
+    return { success: true, message: null, data: enrichedPlans };
   },
 
   updateActionPlanItem: async (
@@ -900,8 +946,29 @@ export const mockApi = {
     
     // Check if all tasks for the parent ActionPlan are completed
     // If so, we could update action plan status to Completed
-    const planItem = tasks[idx].actionPlanItemId;
-    // (Optional trigger to mark plan completed in mock db)
+    if (newStatus === 'Completed') {
+      const planItem = tasks[idx].actionPlanItemId;
+      const plans = mockDb.getActionPlans();
+      let planUpdated = false;
+      for (const plan of plans) {
+        const item = plan.items.find(i => i.id === planItem);
+        if (item) {
+          // Find all tasks associated with this plan's items
+          const planItemIds = plan.items.map(i => i.id);
+          const planTasks = tasks.filter(t => t.employeeId === plan.employeeId && planItemIds.includes(t.actionPlanItemId));
+          const allCompleted = planTasks.every(t => t.status === 'Completed');
+          if (allCompleted) {
+            plan.status = 'Completed';
+            plan.updatedAt = new Date().toISOString();
+            planUpdated = true;
+          }
+          break;
+        }
+      }
+      if (planUpdated) {
+        mockDb.setActionPlans(plans);
+      }
+    }
     
     return { success: true, message: 'Görev durumu güncellendi.', data: tasks[idx] };
   }

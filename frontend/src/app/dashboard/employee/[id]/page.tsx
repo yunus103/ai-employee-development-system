@@ -181,9 +181,10 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       } else {
         alert(res.message || 'Gelişim planı oluşturulamadı.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error generating AI plan', err);
-      alert('AI planlama servisiyle bağlantı kurulamadı.');
+      const errMsg = err.response?.data?.message || 'AI planlama servisiyle bağlantı kurulamadı.';
+      alert(errMsg);
     } finally {
       setIsActionLoading(false);
     }
@@ -300,6 +301,11 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
         const priorityWeights: Record<ActionPriority, number> = { High: 3, Medium: 2, Low: 1 };
         const sortedItems = [...actionPlan.items].sort((a, b) => {
+          const isCompletedA = a.taskStatus === 'Completed';
+          const isCompletedB = b.taskStatus === 'Completed';
+          if (isCompletedA && !isCompletedB) return 1;
+          if (!isCompletedA && isCompletedB) return -1;
+
           const weightA = priorityWeights[a.priority] || 0;
           const weightB = priorityWeights[b.priority] || 0;
           return weightB - weightA;
@@ -792,7 +798,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                 </span>
               </div>
               <p className="text-xs text-muted mt-1">
-                Atanan Toplam Görev: {actionPlan.items.length} • Oluşturma: {new Date(actionPlan.createdAt).toLocaleDateString('tr-TR')}
+                Atanan Toplam Görev: {actionPlan.items.length} {(actionPlan.status === 'Sent' || actionPlan.status === 'Completed') && `(Tamamlanan: ${actionPlan.items.filter(i => i.taskStatus === 'Completed').length}/${actionPlan.items.length})`} • Oluşturma: {new Date(actionPlan.createdAt).toLocaleDateString('tr-TR')}
               </p>
             </div>
 
@@ -844,8 +850,13 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           {/* Action plan items list */}
           <div className="space-y-4">
             {(() => {
-              const priorityWeights: Record<ActionPriority, number> = { High: 3, Medium: 2, Low: 1 };
+               const priorityWeights: Record<ActionPriority, number> = { High: 3, Medium: 2, Low: 1 };
               const sortedItems = [...actionPlan.items].sort((a, b) => {
+                const isCompletedA = a.taskStatus === 'Completed';
+                const isCompletedB = b.taskStatus === 'Completed';
+                if (isCompletedA && !isCompletedB) return 1;
+                if (!isCompletedA && isCompletedB) return -1;
+
                 const weightA = priorityWeights[a.priority] || 0;
                 const weightB = priorityWeights[b.priority] || 0;
                 return weightB - weightA;
@@ -861,6 +872,21 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                       }`}>
                         {item.source === 'AI' ? 'AI Önerisi' : 'Manuel'}
                       </span>
+                      {item.taskStatus && (
+                        <span className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${
+                          item.taskStatus === 'Completed'
+                            ? 'bg-success/10 border-success/20 text-success'
+                            : item.taskStatus === 'InProgress'
+                            ? 'bg-warning/10 border-warning/20 text-warning'
+                            : item.taskStatus === 'Cancelled'
+                            ? 'bg-danger/10 border-danger/20 text-danger'
+                            : 'bg-info/10 border-info/20 text-info'
+                        }`}>
+                          {item.taskStatus === 'Completed' ? 'Tamamlandı' :
+                           item.taskStatus === 'InProgress' ? 'Devam Ediyor' :
+                           item.taskStatus === 'Cancelled' ? 'İptal Edildi' : 'Başlanmadı'}
+                        </span>
+                      )}
                       <h5 className="text-sm font-bold text-foreground truncate">{item.title}</h5>
                     </div>
                     <p className="text-xs text-muted leading-relaxed">{item.description}</p>

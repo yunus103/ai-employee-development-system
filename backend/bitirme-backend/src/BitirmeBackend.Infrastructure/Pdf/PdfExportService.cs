@@ -39,10 +39,11 @@ public class PdfExportService : IPdfExportService
         // 2. Load assessment (for cycle name)
         var assessment = await _assessments.GetByIdWithDetailsAsync(plan.AssessmentId);
 
-        // 3. Active items only sorted by priority (High -> Medium -> Low) then OrderNo
+        // 3. Active items only sorted by completion status (completed last), then priority, then OrderNo
         var items = plan.Items
             .Where(i => !i.IsDeleted)
-            .OrderByDescending(i => i.Priority)
+            .OrderBy(i => i.EmployeeTasks.Any(t => !t.IsDeleted && t.Status == EmployeeTaskStatus.Completed) ? 1 : 0)
+            .ThenByDescending(i => i.Priority)
             .ThenBy(i => i.OrderNo)
             .ToList();
 

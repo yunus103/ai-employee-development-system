@@ -20,9 +20,16 @@ public class MockActionPlanRepository : IActionPlanRepository
             plan.Employee       = MockDataStore.Employees.FirstOrDefault(e => e.Id == plan.EmployeeId)!;
             plan.CreatedByUser  = MockDataStore.Users.FirstOrDefault(u => u.Id == plan.CreatedByUserId)!;
             // Items: only non-deleted ones
-            plan.Items = MockDataStore.ActionPlanItems
+            var items = MockDataStore.ActionPlanItems
                 .Where(i => i.ActionPlanId == plan.Id && !i.IsDeleted)
                 .ToList();
+            foreach (var item in items)
+            {
+                item.EmployeeTasks = MockDataStore.EmployeeTasks
+                    .Where(t => t.ActionPlanItemId == item.Id && !t.IsDeleted)
+                    .ToList();
+            }
+            plan.Items = items;
         }
         return Task.FromResult(plan);
     }

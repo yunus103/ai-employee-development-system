@@ -11,10 +11,12 @@ namespace BitirmeBackend.Application.Services;
 public class AssessmentService : IAssessmentService
 {
     private readonly IAssessmentRepository _assessments;
+    private readonly IActionPlanRepository _actionPlans;
 
-    public AssessmentService(IAssessmentRepository assessments)
+    public AssessmentService(IAssessmentRepository assessments, IActionPlanRepository actionPlans)
     {
         _assessments = assessments;
+        _actionPlans = actionPlans;
     }
 
     public async Task<AssessmentDetailDto> GetAssessmentByIdAsync(int id)
@@ -26,6 +28,14 @@ public class AssessmentService : IAssessmentService
 
     public async Task<AssessmentDetailDto> CreateAssessmentAsync(CreateAssessmentRequest request, int createdByUserId)
     {
+        // Check if there is an active incomplete plan for this employee (Draft, Edited, Approved, Sent)
+        var plans = await _actionPlans.GetByEmployeeIdAsync(request.EmployeeId);
+        var activePlan = plans.FirstOrDefault(p => p.Status != ActionPlanStatus.Completed && p.Status != ActionPlanStatus.Cancelled);
+        if (activePlan != null)
+        {
+            throw new ArgumentException("Çalışanın devam eden tamamlanmamış bir gelişim planı bulunmaktadır. Yeni bir değerlendirme süreci başlatılamaz.");
+        }
+
         var assessment = new Assessment
         {
             EmployeeId      = request.EmployeeId,

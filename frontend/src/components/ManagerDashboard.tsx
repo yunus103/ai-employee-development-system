@@ -187,6 +187,18 @@ export default function ManagerDashboard() {
                       <div>
                         <p className="text-sm font-semibold text-foreground">{emp.fullName}</p>
                         <p className="text-xs text-muted">{emp.jobRole} • {emp.department}</p>
+                        {(() => {
+                          const empActivePlan = plans.find(p => p.employeeId === emp.id && (p.status === 'Sent' || p.status === 'Completed'));
+                          if (empActivePlan) {
+                            const completedCount = empActivePlan.items.filter(i => i.taskStatus === 'Completed').length;
+                            return (
+                              <p className="text-[10px] text-primary font-semibold mt-1">
+                                İlerleme: {completedCount}/{empActivePlan.items.length} Görev Bitti
+                              </p>
+                            );
+                          }
+                          return null;
+                        })()}
                       </div>
                     </div>
                     <span className="rounded-md bg-info/10 px-2 py-0.5 text-[10px] font-bold text-info">

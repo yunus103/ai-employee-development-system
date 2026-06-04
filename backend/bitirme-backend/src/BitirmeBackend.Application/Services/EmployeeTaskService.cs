@@ -9,11 +9,13 @@ namespace BitirmeBackend.Application.Services;
 public class EmployeeTaskService : IEmployeeTaskService
 {
     private readonly IEmployeeTaskRepository _tasks;
+    private readonly IActionPlanRepository _actionPlans;
     private readonly IUnitOfWork _uow;
 
-    public EmployeeTaskService(IEmployeeTaskRepository tasks, IUnitOfWork uow)
+    public EmployeeTaskService(IEmployeeTaskRepository tasks, IActionPlanRepository actionPlans, IUnitOfWork uow)
     {
         _tasks = tasks;
+        _actionPlans = actionPlans;
         _uow   = uow;
     }
 
@@ -72,6 +74,35 @@ public class EmployeeTaskService : IEmployeeTaskService
         task.UpdatedAt = DateTime.UtcNow;
         _tasks.Update(task);
         await _uow.SaveChangesAsync();
+
+        if (newStatus == EmployeeTaskStatus.Completed && task.ActionPlanItem != null)
+        {
+            var planId = task.ActionPlanItem.ActionPlanId;
+            var plan = await _actionPlans.GetByIdWithItemsAsync(planId);
+            if (plan != null)
+            {
+                var activeItems = plan.Items.Where(i => !i.IsDeleted).ToList();
+                bool allCompleted = true;
+                foreach (var pi in activeItems)
+                {
+                    var planItemTasks = await _tasks.GetByActionPlanItemIdAsync(pi.Id);
+                    var t = planItemTasks.FirstOrDefault();
+                    if (t == null || t.Status != EmployeeTaskStatus.Completed)
+                    {
+                        allCompleted = false;
+                        break;
+                    }
+                }
+
+                if (allCompleted)
+                {
+                    plan.Status = ActionPlanStatus.Completed;
+                    plan.UpdatedAt = DateTime.UtcNow;
+                    _actionPlans.Update(plan);
+                    await _uow.SaveChangesAsync();
+                }
+            }
+        }
 
         return ToDto(task);
     }

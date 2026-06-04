@@ -139,6 +139,7 @@ public class ActionPlanServiceTests
 
         m.Assessments.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(assessment);
         m.ActionPlans.Setup(r => r.GetActiveByAssessmentIdAsync(1)).ReturnsAsync((ActionPlan?)null);
+        m.ActionPlans.Setup(r => r.GetByEmployeeIdAsync(assessment.EmployeeId)).ReturnsAsync(new List<ActionPlan>());
         m.MlClient.Setup(c => c.IsHealthyAsync()).ReturnsAsync(true);
         m.EmployeeService.Setup(s => s.GetEmployeeFeaturesForPredictionAsync(assessment.EmployeeId, 1))
                          .ReturnsAsync(MakeFeatures());
@@ -200,6 +201,7 @@ public class ActionPlanServiceTests
 
         m.Assessments.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(MakeAssessment());
         m.ActionPlans.Setup(r => r.GetActiveByAssessmentIdAsync(1)).ReturnsAsync((ActionPlan?)null);
+        m.ActionPlans.Setup(r => r.GetByEmployeeIdAsync(10)).ReturnsAsync(new List<ActionPlan>());
         m.MlClient.Setup(c => c.IsHealthyAsync()).ReturnsAsync(true);
         m.EmployeeService.Setup(s => s.GetEmployeeFeaturesForPredictionAsync(It.IsAny<int>(), It.IsAny<int>()))
                          .ReturnsAsync(MakeFeatures());
