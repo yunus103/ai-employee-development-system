@@ -160,6 +160,8 @@ export interface ActionPlanItem {
   aiPredictedActionId: number | null;
   title: string;
   description: string;
+  resource?: string | null;
+  deliveryType?: string | null;
   priority: ActionPriority;
   dueDate: string | null;
   source: 'AI' | 'Manual';
@@ -189,6 +191,8 @@ export interface EmployeeTask {
   actionPlanItemId: number;
   title: string;
   description: string;
+  resource?: string | null;
+  deliveryType?: string | null;
   priority: ActionPriority;
   employeeId: number;
   employeeName: string;

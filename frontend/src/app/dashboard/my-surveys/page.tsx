@@ -172,19 +172,25 @@ export default function MySurveysPage() {
     }
   };
 
-  const getCompetencyLabel = (competencyCode: string) => {
+  const getCompetencyLabel = (competencyCode: string): string => {
+    // Core competencies → short Turkish label
     if (competencyCode.startsWith('Core_')) {
-      return (competencyMapping.core_descriptions as Record<string, string>)[competencyCode] || competencyCode;
+      const coreLabels = (competencyMapping as unknown as Record<string, Record<string, string>>)['core_labels'];
+      return coreLabels?.[competencyCode] || competencyCode;
     }
 
     if (!targetEmployee) return competencyCode;
 
+    // Department competencies → display label by department
     if (competencyCode.startsWith('Dept_')) {
-      return (competencyMapping.dept_comp_labels as Record<string, Record<string, string>>)[targetEmployee.department]?.[competencyCode] || competencyCode;
+      const deptDisplayLabels = (competencyMapping as unknown as Record<string, Record<string, Record<string, string>>>)['dept_comp_display_labels'];
+      return deptDisplayLabels?.[targetEmployee.department]?.[competencyCode] || competencyCode;
     }
 
+    // Role competencies → display label by job role
     if (competencyCode.startsWith('Role_')) {
-      return (competencyMapping.role_comp_labels as Record<string, Record<string, string>>)[targetEmployee.jobRole]?.[competencyCode] || competencyCode;
+      const roleDisplayLabels = (competencyMapping as unknown as Record<string, Record<string, Record<string, string>>>)['role_comp_display_labels'];
+      return roleDisplayLabels?.[targetEmployee.jobRole]?.[competencyCode] || competencyCode;
     }
 
     return competencyCode;

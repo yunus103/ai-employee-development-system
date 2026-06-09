@@ -11,7 +11,8 @@ import {
   Play,
   ClipboardList,
   AlertCircle,
-  BookOpen
+  BookOpen,
+  ExternalLink
 } from 'lucide-react';
 
 export default function EmployeePlanPage() {
@@ -183,6 +184,26 @@ export default function EmployeePlanPage() {
                   </div>
                   <p className="text-xs text-muted leading-relaxed">{task.description}</p>
                   
+                  {/* Resource Link */}
+                  {task.resource && (
+                    <div className="flex items-center space-x-2 rounded-lg bg-primary/5 border border-primary/10 px-3 py-2">
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-primary" />
+                      <div className="min-w-0 flex-1">
+                        {task.deliveryType && (
+                          <span className="block text-[9px] font-bold uppercase tracking-wider text-muted mb-0.5">{task.deliveryType}</span>
+                        )}
+                        <a
+                          href={task.resource.startsWith('http') ? task.resource : `https://${task.resource}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-semibold text-primary hover:underline truncate block"
+                        >
+                          {task.resource}
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Action row */}
                   <div className="border-t border-card-border pt-4 flex items-center justify-between">
                     <span className="text-[10px] text-muted font-medium">Atayan: {task.assignedByUserName}</span>
@@ -225,6 +246,26 @@ export default function EmployeePlanPage() {
                   </div>
                   <p className="text-xs text-muted leading-relaxed">{task.description}</p>
                   
+                  {/* Resource Link */}
+                  {task.resource && (
+                    <div className="flex items-center space-x-2 rounded-lg bg-primary/5 border border-primary/10 px-3 py-2">
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-primary" />
+                      <div className="min-w-0 flex-1">
+                        {task.deliveryType && (
+                          <span className="block text-[9px] font-bold uppercase tracking-wider text-muted mb-0.5">{task.deliveryType}</span>
+                        )}
+                        <a
+                          href={task.resource.startsWith('http') ? task.resource : `https://${task.resource}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-semibold text-primary hover:underline truncate block"
+                        >
+                          {task.resource}
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Action row */}
                   <div className="border-t border-card-border pt-4 flex items-center justify-between">
                     <span className="text-[10px] text-muted font-medium">Atayan: {task.assignedByUserName}</span>
@@ -266,6 +307,21 @@ export default function EmployeePlanPage() {
                     {renderPriorityBadge(task.priority)}
                   </div>
                   <p className="text-xs text-muted leading-relaxed">{task.description}</p>
+                  
+                  {/* Resource Link */}
+                  {task.resource && (
+                    <div className="flex items-center space-x-2 rounded-lg bg-primary/5 border border-primary/10 px-3 py-2 opacity-60">
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-primary" />
+                      <a
+                        href={task.resource.startsWith('http') ? task.resource : `https://${task.resource}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-semibold text-primary hover:underline truncate block"
+                      >
+                        {task.resource}
+                      </a>
+                    </div>
+                  )}
                   
                   {/* Action row */}
                   <div className="border-t border-card-border pt-4 flex items-center justify-between">

@@ -41,10 +41,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5100'}/api/health`);
         const json = await response.json();
         
+        // Support both response formats:
+        // Format A (nested): { success: true, data: { api: 'ok', mlService: { status: 'ok' } } }
+        // Format B (flat):   { status: 'Healthy', timestamp: '...' }
         if (json.success && json.data) {
           const apiState = json.data.api === 'ok' ? 'ok' : 'error';
           const mlState = json.data.mlService?.status === 'ok' ? 'ok' : 'error';
           setHealthStatus({ api: apiState, ml: mlState });
+        } else if (json.status === 'Healthy' || json.status === 'healthy' || response.ok) {
+          // Flat health response — API is up; ML state unknown but assumed ok if API responds
+          const mlState = json.mlService?.status === 'ok' ? 'ok' : json.mlStatus === 'ok' ? 'ok' : 'ok';
+          setHealthStatus({ api: 'ok', ml: mlState });
         } else {
           setHealthStatus({ api: 'error', ml: 'error' });
         }

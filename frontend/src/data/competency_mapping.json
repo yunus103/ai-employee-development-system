@@ -19,6 +19,16 @@
     "Core_Accountability": "Sorumluluk sahipliği, hatayı üstlenme.",
     "Core_LearningAgility": "Öğrenme çevikliği ve kendini geliştirme isteği."
   },
+  "core_labels": {
+    "Core_Communication": "İletişim",
+    "Core_Teamwork": "Takım Çalışması",
+    "Core_ProblemSolving": "Problem Çözme",
+    "Core_Adaptability": "Uyum Yeteneği",
+    "Core_TimeManagement": "Zaman Yönetimi",
+    "Core_Initiative": "İnisiyatif",
+    "Core_Accountability": "Sorumluluk",
+    "Core_LearningAgility": "Öğrenme Çevikliği"
+  },
   "dept_comp_columns": [
     "Dept_Comp1",
     "Dept_Comp2",
@@ -49,6 +59,33 @@
       "Dept_Comp1": "Ops_OperationsPlanning",
       "Dept_Comp2": "Ops_LogisticsCoordination",
       "Dept_Comp3": "Ops_ProcessOptimization"
+    }
+  },
+  "dept_comp_display_labels": {
+    "Human Resources": {
+      "Dept_Comp1": "İşe Alım",
+      "Dept_Comp2": "İş Hukuku & Politika",
+      "Dept_Comp3": "Çalışan İlişkileri"
+    },
+    "Technology": {
+      "Dept_Comp1": "Kod Kalitesi",
+      "Dept_Comp2": "Sistem Tasarımı",
+      "Dept_Comp3": "Test & Kalite Güvence"
+    },
+    "Sales & Marketing": {
+      "Dept_Comp1": "Satış Becerisi",
+      "Dept_Comp2": "Müzakere",
+      "Dept_Comp3": "Müşteri İlişkileri"
+    },
+    "Finance & Accounting": {
+      "Dept_Comp1": "Finansal Analiz",
+      "Dept_Comp2": "Muhasebe Doğruluğu",
+      "Dept_Comp3": "Bordro Bilgisi"
+    },
+    "Operations": {
+      "Dept_Comp1": "Operasyon Planlaması",
+      "Dept_Comp2": "Lojistik Koordinasyonu",
+      "Dept_Comp3": "Süreç Optimizasyonu"
     }
   },
   "role_comp_columns": [
@@ -151,6 +188,104 @@
     "Operations Manager": {
       "Role_Comp1": "OpsMgr_OperationalPlanning",
       "Role_Comp2": "OpsMgr_PerformanceMonitoring"
+    }
+  },
+  "role_comp_display_labels": {
+    "HR Specialist": {
+      "Role_Comp1": "Dokümantasyon Kalitesi",
+      "Role_Comp2": "İç Destek"
+    },
+    "Recruiter": {
+      "Role_Comp1": "Mülakat Becerisi",
+      "Role_Comp2": "Aday Bulma"
+    },
+    "HR Manager": {
+      "Role_Comp1": "Stratejik İK Yönetimi",
+      "Role_Comp2": "Değişim Yönetimi"
+    },
+    "Software Engineer": {
+      "Role_Comp1": "Hata Ayıklama Derinliği",
+      "Role_Comp2": "Problem Ayrıştırma"
+    },
+    "Senior Software Engineer": {
+      "Role_Comp1": "Mimari Sahipliği",
+      "Role_Comp2": "Mentorluk"
+    },
+    "Data Scientist": {
+      "Role_Comp1": "Özellik Mühendisliği",
+      "Role_Comp2": "Model Yorumlama"
+    },
+    "Machine Learning Engineer": {
+      "Role_Comp1": "Model Dağıtımı",
+      "Role_Comp2": "ML Sistem Tasarımı"
+    },
+    "QA Engineer": {
+      "Role_Comp1": "Test Senaryosu Tasarımı",
+      "Role_Comp2": "Hata Tespit Hassasiyeti"
+    },
+    "DevOps Engineer": {
+      "Role_Comp1": "CI/CD Pipeline",
+      "Role_Comp2": "Altyapı Otomasyonu"
+    },
+    "Technical Support Engineer": {
+      "Role_Comp1": "Sorun Çözüm Hızı",
+      "Role_Comp2": "Müşteri İletişimi"
+    },
+    "Engineering Manager": {
+      "Role_Comp1": "Takım Liderliği",
+      "Role_Comp2": "Teknik Karar Alma"
+    },
+    "Sales Executive": {
+      "Role_Comp1": "Anlaşma Kapama",
+      "Role_Comp2": "Pipeline Yönetimi"
+    },
+    "Sales Representative": {
+      "Role_Comp1": "Ürün Bilgisi",
+      "Role_Comp2": "İtiraz Yönetimi"
+    },
+    "Account Manager": {
+      "Role_Comp1": "Müşteri Tutma",
+      "Role_Comp2": "Çapraz Satış"
+    },
+    "Marketing Specialist": {
+      "Role_Comp1": "Kampanya Planlama",
+      "Role_Comp2": "Dijital Analitik"
+    },
+    "Accountant": {
+      "Role_Comp1": "Muhasebe Doğruluğu",
+      "Role_Comp2": "Mevzuat Uyumu"
+    },
+    "Financial Analyst": {
+      "Role_Comp1": "Tahmin Doğruluğu",
+      "Role_Comp2": "KPI Analizi"
+    },
+    "Payroll Specialist": {
+      "Role_Comp1": "Bordro Doğruluğu",
+      "Role_Comp2": "Sorun Çözümü"
+    },
+    "Finance Manager": {
+      "Role_Comp1": "Bütçe Sahipliği",
+      "Role_Comp2": "Finansal Strateji"
+    },
+    "Operations Specialist": {
+      "Role_Comp1": "Süreç Yürütme",
+      "Role_Comp2": "Kaynak Koordinasyonu"
+    },
+    "Logistics Coordinator": {
+      "Role_Comp1": "Rota Planlama",
+      "Role_Comp2": "Zamanında Teslimat"
+    },
+    "Production Engineer": {
+      "Role_Comp1": "Kalite Kontrol",
+      "Role_Comp2": "Süreç İyileştirme"
+    },
+    "Field Supervisor": {
+      "Role_Comp1": "Saha Liderliği",
+      "Role_Comp2": "İş Güvenliği Uyumu"
+    },
+    "Operations Manager": {
+      "Role_Comp1": "Operasyonel Planlama",
+      "Role_Comp2": "Performans İzleme"
     }
   }
 }
