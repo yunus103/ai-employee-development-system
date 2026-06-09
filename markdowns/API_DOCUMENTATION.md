@@ -1,47 +1,29 @@
-# Bitirme Backend — API Dokümantasyonu
+# Bitirme Projesi — Backend API Dökümanı
 
-> Frontend geliştiricileri için kapsamlı entegrasyon rehberi.  
-> Son güncelleme: 2026-05-30
+> **Base URL:** `https://<host>/api`  
+> **Format:** JSON (`Content-Type: application/json`)  
+> **Kimlik Doğrulama:** JWT Bearer Token (`Authorization: Bearer <accessToken>`)
 
 ---
 
 ## İçindekiler
 
 1. [Genel Bilgiler](#1-genel-bilgiler)
-2. [Authentication](#2-authentication)
-3. [Kullanıcı Rolleri ve Yetki Tablosu](#3-kullanıcı-rolleri-ve-yetki-tablosu)
-4. [Employee Endpointleri](#4-employee-endpointleri)
-5. [Assessment Endpointleri](#5-assessment-endpointleri)
-6. [Action Plan Endpointleri](#6-action-plan-endpointleri)
-7. [Employee Task Endpointleri](#7-employee-task-endpointleri)
-8. [Health Endpoint](#8-health-endpoint)
-9. [Hata Yönetimi](#9-hata-yönetimi)
-10. [Demo Kullanıcıları](#10-demo-kullanıcıları)
-11. [Tipik Frontend Akışları](#11-tipik-frontend-akışları)
-12. [Pagination](#12-pagination)
+2. [Auth — Kimlik Doğrulama](#2-auth--kimlik-doğrulama)
+3. [Employees — Çalışanlar](#3-employees--çalışanlar)
+4. [Assessments — Değerlendirmeler](#4-assessments--değerlendirmeler)
+5. [Action Plans — Aksiyon Planları](#5-action-plans--aksiyon-planları)
+6. [Tasks — Görevler](#6-tasks--görevler)
+7. [Health — Sistem Durumu](#7-health--sistem-durumu)
+8. [Ortak Tipler & Enum Değerleri](#8-ortak-tipler--enum-değerleri)
 
 ---
 
 ## 1. Genel Bilgiler
 
-### Base URL
+### Yanıt Formatı
 
-| Ortam | URL |
-|-------|-----|
-| Development | `http://localhost:5100` |
-| Frontend (CORS) | `http://localhost:3000` |
-
-### Ortak Kurallar
-
-- Tüm istek ve yanıtlar `Content-Type: application/json` kullanır.
-- Korumalı endpointler `Authorization: Bearer {accessToken}` header'ı gerektirir.
-- Tarih/saat alanları ISO 8601 UTC formatındadır: `"2024-10-15T08:30:00Z"`
-
----
-
-### ApiResponse Şeması
-
-Tekil veri döndüren tüm endpointler bu formatı kullanır:
+Tüm başarılı yanıtlar aşağıdaki zarfla döner:
 
 ```json
 {
@@ -51,269 +33,155 @@ Tekil veri döndüren tüm endpointler bu formatı kullanır:
 }
 ```
 
-Hata durumunda:
+Hatalarda:
 
 ```json
 {
   "success": false,
-  "message": "Hata açıklaması",
-  "data": null
+  "message": "Hata açıklaması"
 }
 ```
 
-| Alan | Tip | Açıklama |
-|------|-----|----------|
-| `success` | boolean | İşlemin başarılı olup olmadığı |
-| `message` | string \| null | Bilgi veya hata mesajı |
-| `data` | object \| null | Yanıt verisi |
+### Sayfalanmış Yanıt Formatı
 
----
-
-### PagedResponse Şeması
-
-Listeleme endpointleri bu formatı kullanır:
+Liste dönen endpoint'ler (sayfalama desteği olanlar):
 
 ```json
 {
   "success": true,
   "data": [ ... ],
-  "totalCount": 50,
+  "totalCount": 42,
   "pageNumber": 1,
   "pageSize": 20,
   "totalPages": 3
 }
 ```
 
-| Alan | Tip | Açıklama |
-|------|-----|----------|
-| `success` | boolean | Her zaman `true` |
-| `data` | array | Sayfalanmış veri listesi |
-| `totalCount` | integer | Toplam kayıt sayısı |
-| `pageNumber` | integer | Mevcut sayfa (1'den başlar) |
-| `pageSize` | integer | Sayfa başına kayıt sayısı |
-| `totalPages` | integer | Toplam sayfa sayısı (hesaplanan) |
+### Yetki Politikaları
+
+| Politika | Kimler Erişir |
+|---|---|
+| `Authenticated` | Giriş yapmış her kullanıcı |
+| `EmployeeOnly` | Sadece `Employee` rolü |
+| `HrOrManager` | `HR`, `Manager`, `Admin` rolleri |
+| `AdminOnly` | Sadece `Admin` rolü |
+
+> **Manager kısıtlaması:** `HrOrManager` gerektiren endpoint'lerde, `Manager` rolündeki kullanıcılar yalnızca kendi ekiplerindeki çalışanlara erişebilir.
 
 ---
 
-## 2. Authentication
+## 2. Auth — Kimlik Doğrulama
 
-JWT Bearer Token kullanılır. Access token süresi **60 dakikadır**. Refresh token süresi **7 gündür**.
+### POST `/api/auth/login`
 
-### Token Kullanımı
+Kullanıcı girişi. Token çifti döner.
 
-Tüm korumalı isteklerde aşağıdaki header eklenmelidir:
-
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
----
-
-### POST /api/auth/login
-
-Kullanıcı girişi yapar ve token çifti döndürür.
-
-**Yetki:** Herkese açık (anonim)
+**Yetki:** Herkese açık
 
 **Request Body:**
-
 ```json
 {
-  "email": "hr@demo.com",
-  "password": "Hr1234!"
+  "email": "kullanici@ornek.com",
+  "password": "Sifre1234!"
 }
 ```
 
-| Alan | Tip | Zorunlu | Açıklama |
-|------|-----|---------|----------|
-| `email` | string | ✅ | Kullanıcı e-posta adresi |
-| `password` | string | ✅ | Kullanıcı şifresi |
-
-**Response (200 OK):**
-
+**Response `data`:**
 ```json
 {
-  "success": true,
-  "message": null,
-  "data": {
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "refreshToken": "d4f8a2b1c9e7...",
-    "accessTokenExpiresAt": "2024-10-15T09:30:00Z",
-    "userId": 2,
-    "fullName": "HR User",
-    "email": "hr@demo.com",
-    "role": "HR",
-    "employeeId": null
-  }
+  "accessToken": "eyJhbGci...",
+  "refreshToken": "a1b2c3d4...",
+  "accessTokenExpiresAt": "2026-06-07T12:00:00Z",
+  "userId": 1,
+  "fullName": "Ahmet Yılmaz",
+  "email": "kullanici@ornek.com",
+  "role": "HR",
+  "employeeId": 3
 }
 ```
 
-| Alan | Açıklama |
-|------|----------|
-| `accessToken` | Korumalı endpointlerde kullanılan JWT token |
-| `refreshToken` | Token yenilemede kullanılan opak token |
-| `accessTokenExpiresAt` | Access token'ın sona ereceği UTC zaman |
-| `userId` | Kullanıcının sistem ID'si |
-| `role` | `Admin`, `HR`, `Manager`, `Employee` |
-| `employeeId` | Çalışan rolü için bağlı Employee ID'si; Admin ve HR için `null` |
+> `employeeId` sadece `Employee`, `Manager` rollerinde dolu gelir; `HR`/`Admin` için `null` olabilir.
 
 ---
 
-### POST /api/auth/refresh
+### POST `/api/auth/refresh`
 
-Süresi dolmuş (veya dolmak üzere olan) access token'ı yenilemek için kullanılır.
+Access token yenileme.
 
-**Yetki:** Herkese açık (anonim)
+**Yetki:** Herkese açık
 
 **Request Body:**
-
 ```json
 {
-  "refreshToken": "d4f8a2b1c9e7..."
+  "refreshToken": "a1b2c3d4..."
 }
 ```
 
-| Alan | Tip | Zorunlu | Açıklama |
-|------|-----|---------|----------|
-| `refreshToken` | string | ✅ | Daha önce login/refresh'ten alınan refresh token |
-
-**Response (200 OK):**
-
+**Response `data`:**
 ```json
 {
-  "success": true,
-  "message": null,
-  "data": {
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "refreshToken": "e5g9c3d2a8f1...",
-    "accessTokenExpiresAt": "2024-10-15T10:30:00Z"
-  }
+  "accessToken": "eyJhbGci...",
+  "refreshToken": "e5f6g7h8...",
+  "accessTokenExpiresAt": "2026-06-07T13:00:00Z"
 }
 ```
 
-> **Önemli:** Her refresh işleminde eski refresh token geçersiz hale gelir ve yeni bir refresh token döner (token rotation). Yeni refresh token'ı saklayın.
+> Token rotation uygulanır — eski refresh token geçersiz hale gelir, yenisi kullanılmalıdır.
 
 ---
 
-### POST /api/auth/logout
+### POST `/api/auth/logout`
 
-Kullanıcı oturumu kapatır ve refresh token'ı iptal eder.
+Çıkış. Refresh token'ı iptal eder.
 
-**Yetki:** Giriş yapmış tüm kullanıcılar
+**Yetki:** `Authenticated`
 
 **Request Body:**
-
 ```json
 {
-  "refreshToken": "d4f8a2b1c9e7..."
+  "refreshToken": "a1b2c3d4..."
 }
 ```
 
-**Response (200 OK):**
-
-```json
-{
-  "success": true,
-  "message": "Çıkış başarılı.",
-  "data": {}
-}
-```
+**Response `data`:** `{}`
 
 ---
 
-### GET /api/auth/me
+### GET `/api/auth/me`
 
-Giriş yapmış kullanıcının bilgilerini döndürür.
+Oturum açık kullanıcının bilgilerini döner.
 
-**Yetki:** Giriş yapmış tüm kullanıcılar
+**Yetki:** `Authenticated`
 
-**Request Body:** Yok
-
-**Response (200 OK):**
-
+**Response `data`:**
 ```json
 {
-  "success": true,
-  "message": null,
-  "data": {
-    "userId": 2,
-    "fullName": "HR User",
-    "email": "hr@demo.com",
-    "role": "HR",
-    "employeeId": null,
-    "isActive": true
-  }
+  "userId": 1,
+  "fullName": "Ahmet Yılmaz",
+  "email": "kullanici@ornek.com",
+  "role": "HR",
+  "employeeId": null
 }
 ```
 
 ---
 
-## 3. Kullanıcı Rolleri ve Yetki Tablosu
+## 3. Employees — Çalışanlar
 
-Sistemde 4 rol mevcuttur:
+### GET `/api/employees`
 
-| Rol | Açıklama |
-|-----|----------|
-| `Admin` | Tam sistem erişimi |
-| `HR` | İK yönetimi, tüm çalışanlara erişim |
-| `Manager` | Ekip yönetimi, **sadece kendi ekibini** görebilir |
-| `Employee` | Standart çalışan erişimi, sadece kendi görevleri |
+Çalışan listesi (sayfalanmış).
 
-### Endpoint Yetki Tablosu
+**Yetki:** `HrOrManager`
 
-| Endpoint | Admin | HR | Manager | Employee |
-|----------|-------|----|---------|----------|
-| POST /api/auth/login | ✅ | ✅ | ✅ | ✅ |
-| POST /api/auth/refresh | ✅ | ✅ | ✅ | ✅ |
-| POST /api/auth/logout | ✅ | ✅ | ✅ | ✅ |
-| GET /api/auth/me | ✅ | ✅ | ✅ | ✅ |
-| GET /api/employees | ❌ | ✅ | ✅ * | ❌ |
-| GET /api/employees/{id} | ❌ | ✅ | ✅ * | ❌ |
-| POST /api/employees | ✅ | ❌ | ❌ | ❌ |
-| PUT /api/employees/{id} | ❌ | ✅ | ✅ | ❌ |
-| GET /api/employees/{id}/features | ❌ | ✅ | ✅ * | ❌ |
-| GET /api/employees/{id}/assessments | ❌ | ✅ | ✅ * | ❌ |
-| GET /api/employees/{id}/action-plans | ❌ | ✅ | ✅ * | ❌ |
-| GET /api/assessments/{id} | ❌ | ✅ | ✅ | ❌ |
-| POST /api/assessments | ❌ | ✅ | ✅ | ❌ |
-| PUT /api/assessments/{id}/complete | ❌ | ✅ | ✅ | ❌ |
-| GET /api/assessments/{id}/scores | ❌ | ✅ | ✅ | ❌ |
-| POST /api/assessments/{id}/scores | ❌ | ✅ | ✅ | ❌ |
-| PUT /api/assessments/{id}/scores/{scoreId} | ❌ | ✅ | ✅ | ❌ |
-| POST /api/action-plans/generate | ❌ | ✅ | ✅ | ❌ |
-| GET /api/action-plans/{id} | ❌ | ✅ | ✅ | ❌ |
-| PUT /api/action-plans/{id}/items/{itemId} | ❌ | ✅ | ✅ | ❌ |
-| POST /api/action-plans/{id}/items | ❌ | ✅ | ✅ | ❌ |
-| DELETE /api/action-plans/{id}/items/{itemId} | ❌ | ✅ | ✅ | ❌ |
-| POST /api/action-plans/{id}/approve | ❌ | ✅ | ✅ | ❌ |
-| POST /api/action-plans/{id}/send | ❌ | ✅ | ✅ | ❌ |
-| GET /api/action-plans/{id}/export-pdf | ❌ | ✅ | ✅ | ❌ |
-| GET /api/tasks/my | ✅ | ✅ | ✅ | ✅ |
-| GET /api/tasks/{id} | ✅ | ✅ | ✅ | ✅ ** |
-| PUT /api/tasks/{id}/status | ❌ | ❌ | ❌ | ✅ |
-| GET /api/health | ✅ | ✅ | ✅ | ✅ |
-
-> **\*** Manager kısıtı: Yalnızca kendi ekibindeki çalışanları (ManagerId == kendi EmployeeId'si) görebilir.  
-> **\*\*** Employee kısıtı: Yalnızca kendi görevine erişebilir.
-
----
-
-## 4. Employee Endpointleri
-
-### GET /api/employees
-
-Çalışan listesini sayfalı döndürür.
-
-**Yetki:** HR, Manager (Manager kendi ekibini görür)
-
-**Query Parameters:**
+**Query Params:**
 
 | Parametre | Tip | Varsayılan | Açıklama |
-|-----------|-----|-----------|----------|
-| `pageNumber` | integer | 1 | Sayfa numarası (min: 1) |
-| `pageSize` | integer | 20 | Sayfa boyutu (1-100) |
+|---|---|---|---|
+| `pageNumber` | int | 1 | Sayfa numarası (min: 1) |
+| `pageSize` | int | 20 | Sayfa boyutu (1–100) |
 
-**Response (200 OK):**
+**Response:** `PagedResponse<EmployeeListItemDto>`
 
 ```json
 {
@@ -322,234 +190,185 @@ Sistemde 4 rol mevcuttur:
     {
       "id": 1,
       "employeeCode": "EMP001",
-      "fullName": "Ayşe Kaya",
-      "email": "employee@demo.com",
-      "department": "Sales",
-      "jobRole": "Sales Executive",
-      "managerId": 2,
+      "fullName": "Ahmet Yılmaz",
+      "email": "ahmet@ornek.com",
+      "department": "Yazılım",
+      "jobRole": "Backend Developer",
+      "managerId": 5,
       "isActive": true
     }
   ],
-  "totalCount": 3,
+  "totalCount": 42,
   "pageNumber": 1,
   "pageSize": 20,
-  "totalPages": 1
+  "totalPages": 3
 }
 ```
 
 ---
 
-### GET /api/employees/{id}
+### GET `/api/employees/{id}`
 
-Belirtilen çalışanın detaylı bilgilerini döndürür.
+Tek çalışan detayı.
 
-**Yetki:** HR, Manager (kendi ekibindeki çalışan)
+**Yetki:** `HrOrManager`
 
-**Path Parameters:** `id` — Çalışan ID'si
-
-**Response (200 OK):**
-
+**Response `data`:**
 ```json
 {
-  "success": true,
-  "message": null,
-  "data": {
-    "id": 1,
-    "employeeCode": "EMP001",
-    "fullName": "Ayşe Kaya",
-    "email": "employee@demo.com",
-    "age": 32,
-    "gender": "Female",
-    "departmentId": 1,
-    "department": "Sales",
-    "jobRoleId": 1,
-    "jobRole": "Sales Executive",
-    "managerId": 2,
-    "managerName": "Mehmet Yılmaz",
-    "education": "3",
-    "educationField": "Life Sciences",
-    "businessTravel": "Travel_Rarely",
-    "maritalStatus": "Single",
-    "distanceFromHome": 5,
-    "environmentSatisfaction": 3,
-    "jobSatisfaction": 4,
-    "workLifeBalance": 3,
-    "totalWorkingYears": 8,
-    "yearsAtCompany": 5,
-    "yearsInCurrentRole": 3,
-    "yearsWithCurrManager": 2,
-    "performanceScore": 3.5,
-    "attrition": "No",
-    "isActive": true
-  }
-}
-```
-
----
-
-### POST /api/employees
-
-Yeni çalışan oluşturur.
-
-**Yetki:** Yalnızca Admin
-
-**Request Body:**
-
-```json
-{
-  "employeeCode": "EMP010",
-  "fullName": "Fatma Çelik",
-  "email": "fatma.celik@sirket.com",
-  "age": 29,
-  "gender": "Female",
+  "id": 1,
+  "employeeCode": "EMP001",
+  "fullName": "Ahmet Yılmaz",
+  "email": "ahmet@ornek.com",
+  "age": 30,
+  "gender": "Male",
   "departmentId": 2,
+  "department": "Yazılım",
   "jobRoleId": 3,
-  "managerId": 2,
-  "education": "4",
+  "jobRole": "Backend Developer",
+  "managerId": 5,
+  "managerName": "Zeynep Arslan",
+  "education": "3",
   "educationField": "Computer Science",
   "businessTravel": "Travel_Rarely",
   "maritalStatus": "Single",
-  "distanceFromHome": 8,
-  "environmentSatisfaction": 4,
+  "distanceFromHome": 10,
+  "environmentSatisfaction": 3,
+  "jobSatisfaction": 4,
+  "workLifeBalance": 3,
+  "totalWorkingYears": 8,
+  "yearsAtCompany": 3,
+  "yearsInCurrentRole": 2,
+  "yearsWithCurrManager": 1,
+  "performanceScore": 3.5,
+  "attrition": "No",
+  "isActive": true
+}
+```
+
+---
+
+### POST `/api/employees`
+
+Yeni çalışan oluştur.
+
+**Yetki:** `AdminOnly`
+
+**Request Body:**
+```json
+{
+  "employeeCode": "EMP099",
+  "fullName": "Ali Demir",
+  "email": "ali@ornek.com",
+  "age": 28,
+  "gender": "Male",
+  "departmentId": 2,
+  "jobRoleId": 3,
+  "managerId": 5,
+  "education": "3",
+  "educationField": "Computer Science",
+  "businessTravel": "Travel_Rarely",
+  "maritalStatus": "Single",
+  "distanceFromHome": 5,
+  "environmentSatisfaction": 3,
   "jobSatisfaction": 4,
   "workLifeBalance": 3,
   "totalWorkingYears": 5,
   "yearsAtCompany": 2,
   "yearsInCurrentRole": 1,
   "yearsWithCurrManager": 1,
-  "performanceScore": 3.8,
+  "performanceScore": 3.0,
   "attrition": "No"
 }
 ```
 
-| Alan | Tip | Zorunlu | Açıklama |
-|------|-----|---------|----------|
-| `employeeCode` | string | ✅ | Benzersiz çalışan kodu |
-| `fullName` | string | ✅ | Ad soyad |
-| `email` | string | ✅ | E-posta |
-| `age` | integer | ✅ | Yaş |
-| `gender` | string | ✅ | `Male` veya `Female` |
-| `departmentId` | integer | ✅ | Departman ID'si |
-| `jobRoleId` | integer | ✅ | Pozisyon ID'si |
-| `managerId` | integer | ❌ | Yönetici Employee ID'si |
-| `education` | string | ✅ | Eğitim seviyesi (1-5) |
-| `educationField` | string | ✅ | Eğitim alanı |
-| `businessTravel` | string | ✅ | `Non-Travel`, `Travel_Rarely`, `Travel_Frequently` |
-| `maritalStatus` | string | ✅ | `Single`, `Married`, `Divorced` |
-| `distanceFromHome` | integer | ✅ | Eve uzaklık (km) |
-| `environmentSatisfaction` | integer | ✅ | 1-4 arası |
-| `jobSatisfaction` | integer | ✅ | 1-4 arası |
-| `workLifeBalance` | integer | ✅ | 1-4 arası |
-| `totalWorkingYears` | integer | ✅ | Toplam çalışma yılı |
-| `yearsAtCompany` | integer | ✅ | Şirketteki yıl |
-| `yearsInCurrentRole` | integer | ✅ | Mevcut roldeki yıl |
-| `yearsWithCurrManager` | integer | ✅ | Mevcut yöneticiyle yıl |
-| `performanceScore` | double | ✅ | Performans skoru |
-| `attrition` | string | ❌ | `Yes` veya `No` (varsayılan: `No`) |
-
-**Response (201 Created):** `EmployeeDetailDto` — aynı format GET /{id} ile aynı
+**HTTP 201 Created** — `data`: `EmployeeDetailDto`
 
 ---
 
-### PUT /api/employees/{id}
+### PUT `/api/employees/{id}`
 
-Çalışan bilgilerini günceller.
+Çalışan güncelle.
 
-**Yetki:** HR, Manager
+**Yetki:** `HrOrManager`
 
-**Path Parameters:** `id` — Çalışan ID'si
+**Request Body:** `CreateEmployeeRequest` ile aynı alanlar + `"isActive": true`
 
-**Request Body:** POST ile aynı alanlar, ancak `employeeCode` yok ve `isActive` eklendi:
-
-```json
-{
-  "fullName": "Ayşe Kaya",
-  "email": "ayse.kaya@sirket.com",
-  "age": 33,
-  "gender": "Female",
-  "departmentId": 1,
-  "jobRoleId": 1,
-  "managerId": 2,
-  "education": "3",
-  "educationField": "Life Sciences",
-  "businessTravel": "Travel_Rarely",
-  "maritalStatus": "Married",
-  "distanceFromHome": 5,
-  "environmentSatisfaction": 3,
-  "jobSatisfaction": 4,
-  "workLifeBalance": 3,
-  "totalWorkingYears": 9,
-  "yearsAtCompany": 6,
-  "yearsInCurrentRole": 4,
-  "yearsWithCurrManager": 3,
-  "performanceScore": 3.7,
-  "attrition": "No",
-  "isActive": true
-}
-```
-
-**Response (200 OK):** Güncellenmiş `EmployeeDetailDto`
+**Response `data`:** `EmployeeDetailDto`
 
 ---
 
-### GET /api/employees/{id}/features
+### GET `/api/employees/{id}/assessments`
 
-Çalışanın belirtilen değerlendirmesindeki ML feature vektörünü döndürür. Aksiyon planı oluşturmadan önce ön kontrol için kullanılabilir.
+Çalışana ait değerlendirme listesi.
 
-**Yetki:** HR, Manager
+**Yetki:** `HrOrManager`
 
-**Path Parameters:** `id` — Çalışan ID'si
+**Query Params:** `pageNumber`, `pageSize`
 
-**Query Parameters:**
+**Response:** `PagedResponse<AssessmentDetailDto>`
+
+---
+
+### GET `/api/employees/{id}/action-plans`
+
+Çalışana ait tüm aksiyon planları.
+
+**Yetki:** `HrOrManager`
+
+**Response `data`:** `ActionPlanDetailDto[]`
+
+---
+
+### GET `/api/employees/{id}/features?assessmentId={assessmentId}`
+
+Çalışanın ML özellik vektörünü döner. Aksiyon planı oluşturmadan önce doğrulama için kullanılabilir.
+
+**Yetki:** `HrOrManager`
+
+**Query Params:**
 
 | Parametre | Tip | Zorunlu | Açıklama |
-|-----------|-----|---------|----------|
-| `assessmentId` | integer | ✅ | Değerlendirme ID'si |
+|---|---|---|---|
+| `assessmentId` | int | ✅ | Hangi değerlendirmeye göre hesaplanacağı |
 
-**Response (200 OK):**
-
+**Başarı Response `data`:**
 ```json
 {
-  "success": true,
-  "message": null,
-  "data": {
-    "age": 32,
-    "attrition": "No",
-    "businessTravel": "Travel_Rarely",
-    "department": "Sales",
-    "distanceFromHome": 5,
-    "education": "3",
-    "educationField": "Life Sciences",
-    "environmentSatisfaction": 3,
-    "gender": "Female",
-    "jobRole": "Sales Executive",
-    "jobSatisfaction": 4,
-    "maritalStatus": "Single",
-    "workLifeBalance": 3,
-    "totalWorkingYears": 8,
-    "yearsAtCompany": 5,
-    "yearsInCurrentRole": 3,
-    "yearsWithCurrManager": 2,
-    "performanceScore": 3.5,
-    "core_Communication": 3.2,
-    "core_Teamwork": 3.7,
-    "core_ProblemSolving": 3.5,
-    "core_Adaptability": 3.1,
-    "core_Initiative": 3.0,
-    "core_Accountability": 3.8,
-    "core_LearningAgility": 3.4,
-    "core_TimeManagement": 2.9,
-    "dept_Comp1": 3.5,
-    "dept_Comp2": 3.0,
-    "dept_Comp3": 3.6,
-    "role_Comp1": 3.4,
-    "role_Comp2": 3.1
-  }
+  "age": 30,
+  "attrition": "No",
+  "businessTravel": "Travel_Rarely",
+  "department": "Yazılım",
+  "education": "3",
+  "educationField": "Computer Science",
+  "environmentSatisfaction": 3,
+  "gender": "Male",
+  "jobRole": "Backend Developer",
+  "jobSatisfaction": 4,
+  "maritalStatus": "Single",
+  "workLifeBalance": 3,
+  "totalWorkingYears": 8,
+  "yearsAtCompany": 3,
+  "yearsInCurrentRole": 2,
+  "yearsWithCurrManager": 1,
+  "performanceScore": 3.5,
+  "core_Communication": 3.8,
+  "core_Teamwork": 4.0,
+  "core_ProblemSolving": 3.5,
+  "core_Adaptability": 3.2,
+  "core_Initiative": 3.9,
+  "core_Accountability": 4.1,
+  "core_LearningAgility": 3.7,
+  "core_TimeManagement": 3.6,
+  "dept_Comp1": 3.4,
+  "dept_Comp2": 3.8,
+  "dept_Comp3": 3.5,
+  "role_Comp1": 4.0,
+  "role_Comp2": 3.9
 }
 ```
 
-**Hata (400 Bad Request) — eksik feature:**
-
+**Hata — eksik özellik (HTTP 400):**
 ```json
 {
   "success": false,
@@ -558,891 +377,564 @@ Yeni çalışan oluşturur.
 }
 ```
 
-> Eksik feature varsa ML servisine gidilmez; önce tüm competency skorları girilmelidir.
-
 ---
 
-### GET /api/employees/{id}/assessments
+## 4. Assessments — Değerlendirmeler
 
-Çalışanın değerlendirme geçmişini sayfalı döndürür.
+### GET `/api/assessments/{id}`
 
-**Yetki:** HR, Manager
+Değerlendirme detayı.
 
-**Query Parameters:** `pageNumber`, `pageSize` (pagination bkz. Bölüm 12)
+**Yetki:** `HrOrManager`
 
-**Response (200 OK):** `PagedResponse<AssessmentDetailDto>` — bkz. Assessment Endpointleri
-
----
-
-### GET /api/employees/{id}/action-plans
-
-Çalışanın tüm aksiyon planlarını listeler.
-
-**Yetki:** HR, Manager
-
-**Response (200 OK):**
-
+**Response `data`:**
 ```json
 {
-  "success": true,
-  "message": null,
-  "data": [
-    {
-      "id": 1,
-      "assessmentId": 1,
-      "employeeId": 1,
-      "employeeName": "Ayşe Kaya",
-      "createdByUserId": 2,
-      "createdByUserName": "HR User",
-      "status": "Sent",
-      "approvedAt": "2024-10-16T10:00:00Z",
-      "sentAt": "2024-10-16T11:00:00Z",
-      "createdAt": "2024-10-15T09:00:00Z",
-      "updatedAt": "2024-10-16T11:00:00Z",
-      "items": [ ... ]
-    }
-  ]
+  "id": 10,
+  "employeeId": 1,
+  "employeeName": "Ahmet Yılmaz",
+  "cycleId": 2,
+  "cycleName": "2025 Q4",
+  "overallScore": 3.8,
+  "status": "InProgress",
+  "createdByUserId": 3,
+  "createdByUserName": "İnsan Kaynakları",
+  "createdAt": "2026-01-15T09:00:00Z",
+  "updatedAt": "2026-01-20T11:30:00Z"
 }
 ```
 
-> **Not:** `items` listesindeki her bir gelişim planı kaleminde `taskStatus` alanı bulunur ve kalemler tamamlananlar en sonda olacak şekilde sıralanmış olarak gelir (Bkz. `GET /api/action-plans/{id}`).
+**`status` değerleri:** `InProgress` | `Completed`
 
 ---
 
-## 5. Assessment Endpointleri
+### POST `/api/assessments`
 
-### POST /api/assessments
+Yeni değerlendirme oluştur.
 
-Yeni değerlendirme oluşturur.
+**Yetki:** `HrOrManager`
 
-**Yetki:** HR, Manager
+> Self ataması otomatik eklenir — çalışan kendi değerlendirmesini doldurabilir.
 
 **Request Body:**
-
 ```json
 {
   "employeeId": 1,
-  "cycleId": 1
+  "cycleId": 2
 }
 ```
 
-| Alan | Tip | Zorunlu | Açıklama |
-|------|-----|---------|----------|
-| `employeeId` | integer | ✅ | Değerlendirilecek çalışan ID'si |
-| `cycleId` | integer | ✅ | Değerlendirme dönemi ID'si |
+**HTTP 201 Created** — `data`: `AssessmentDetailDto`
 
-**Validation & Constraints:**
-- **Aktif Plan Kontrolü:** Eğer çalışanın `Completed` veya `Cancelled` statüsünde olmayan (devam eden) aktif bir gelişim planı varsa, yeni bir değerlendirme süreci başlatılamaz. Bu durumda API `400 Bad Request` hatası döndürür.
+---
 
-**Hata Yanıtı (400 Bad Request):**
+### PUT `/api/assessments/{id}/complete`
+
+Değerlendirmeyi manuel tamamla.
+
+**Yetki:** `HrOrManager`
+
+> Normalde tüm atamalar tamamlandığında otomatik tamamlanır. Bu endpoint zorla tamamlama içindir.
+
+**Response `data`:** `AssessmentDetailDto`
+
+---
+
+### GET `/api/assessments/{id}/scores`
+
+Değerlendirmeye ait tüm skorlar.
+
+**Yetki:** `HrOrManager`
+
+**Response `data`:** `AssessmentScoreDto[]`
 
 ```json
-{
-  "success": false,
-  "message": "Çalışanın devam eden tamamlanmamış bir gelişim planı bulunmaktadır. Yeni bir değerlendirme süreci başlatılamaz.",
-  "data": null
-}
-```
-
-**Response (201 Created):**
-
-```json
-{
-  "success": true,
-  "message": null,
-  "data": {
-    "id": 2,
-    "employeeId": 1,
-    "employeeName": "Ayşe Kaya",
-    "cycleId": 1,
-    "cycleName": "2024 Q4 Değerlendirmesi",
-    "overallScore": null,
-    "status": "Draft",
-    "createdByUserId": 2,
-    "createdByUserName": "HR User",
-    "createdAt": "2024-10-15T08:30:00Z",
-    "updatedAt": null
+[
+  {
+    "id": 55,
+    "assessmentId": 10,
+    "competencyId": 1,
+    "competencyCode": "Core_Communication",
+    "competencyName": "İletişim",
+    "evaluatorEmployeeId": 1,
+    "evaluatorType": "Self",
+    "score": 4.0
   }
+]
+```
+
+---
+
+### POST `/api/assessments/{id}/scores`
+
+Tek skor ekle / güncelle (upsert).
+
+**Yetki:** `HrOrManager`
+
+**Request Body:**
+```json
+{
+  "competencyId": 1,
+  "evaluatorEmployeeId": 1,
+  "evaluatorType": "Self",
+  "score": 4.0
 }
 ```
 
-**Assessment Status Değerleri:**
+**`evaluatorType` değerleri:** `Self` | `Manager` | `Peer` | `Subordinate`
 
-| Değer | Açıklama |
-|-------|----------|
-| `Draft` | Oluşturuldu, skorlar girilmedi |
-| `Completed` | Tüm skorlar girildi ve tamamlandı |
-| `Analyzed` | ML analizi yapıldı |
-| `ActionPlanGenerated` | Aksiyon planı oluşturuldu |
-| `Approved` | Aksiyon planı onaylandı |
-| `SentToEmployee` | Çalışana gönderildi |
+**Response `data`:** `AssessmentScoreDto`
 
 ---
 
-### GET /api/assessments/{id}
+### POST `/api/assessments/{id}/scores/bulk`
 
-Değerlendirme detayını döndürür.
+Bir değerlendiricinin tüm skorlarını tek istekte gönder.
 
-**Yetki:** HR, Manager
+**Yetki:** `Authenticated`
 
-**Response (200 OK):** `AssessmentDetailDto` — POST ile aynı format
+> Çalışanın 360° anket doldurması için kullanılan endpoint.
 
----
-
-### PUT /api/assessments/{id}/complete
-
-Değerlendirmeyi tamamlandı olarak işaretler. Tüm competency skorları girilmiş olmalıdır.
-
-**Yetki:** HR, Manager
-
-**Request Body:** Yok
-
-**Response (200 OK):** Güncellenmiş `AssessmentDetailDto`
-
----
-
-### GET /api/assessments/{id}/scores
-
-Değerlendirmenin tüm competency skorlarını listeler.
-
-**Yetki:** HR, Manager
-
-**Response (200 OK):**
-
+**Request Body:**
 ```json
 {
-  "success": true,
-  "message": null,
-  "data": [
-    {
-      "id": 1,
-      "assessmentId": 1,
-      "competencyId": 1,
-      "competencyCode": "Core_Communication",
-      "competencyName": "İletişim",
-      "evaluatorType": "Manager",
-      "score": 3.2
-    }
+  "evaluatorEmployeeId": 4,
+  "scores": [
+    { "competencyId": 1, "score": 4.0 },
+    { "competencyId": 2, "score": 3.5 },
+    { "competencyId": 3, "score": 4.5 }
   ]
 }
 ```
 
+> 13 yetkinliğin tamamı gönderildiğinde ilgili atama (`AssessmentAssignment`) otomatik olarak `IsCompleted=true` olur. Tüm atamalar tamamlanınca assessment da otomatik `Completed` olur.
+
+**Response `data`:** `AssessmentScoreDto[]`
+
 ---
 
-### POST /api/assessments/{id}/scores
+### PUT `/api/assessments/{id}/scores/{scoreId}`
 
-Değerlendirmeye competency skoru ekler veya günceller (upsert).
+Var olan skoru güncelle.
 
-**Yetki:** HR, Manager
+**Yetki:** `HrOrManager`
+
+**Request Body:** `UpsertAssessmentScoreRequest` ile aynı
+
+**Not:** `scoreId` rota parametresi yönlendirme içindir; güncelleme `assessmentId + competencyId + evaluatorEmployeeId` üçlüsü ile yapılır.
+
+---
+
+### POST `/api/assessments/{id}/assignments`
+
+360° değerlendirici ata.
+
+**Yetki:** `HrOrManager`
 
 **Request Body:**
-
 ```json
 {
-  "competencyId": 1,
-  "evaluatorType": "Manager",
-  "score": 3.5
+  "evaluatorEmployeeId": 7,
+  "evaluatorType": "Peer"
 }
 ```
 
-| Alan | Tip | Zorunlu | Açıklama |
-|------|-----|---------|----------|
-| `competencyId` | integer | ✅ | Yetkinlik ID'si |
-| `evaluatorType` | string | ✅ | `Self`, `Manager`, `Peer`, `Subordinate` |
-| `score` | double | ✅ | 0.0 ile 5.0 arasında |
+> `Self` ve `Manager` her assessment için birden fazla eklenemez.
 
-**Response (200 OK):** Eklenen/güncellenen `AssessmentScoreDto`
-
----
-
-### PUT /api/assessments/{id}/scores/{scoreId}
-
-Mevcut bir skoru günceller (scoreId URL'de routing amaçlı, asıl eşleştirme assessmentId + competencyId + evaluatorType üzerinden yapılır).
-
-**Yetki:** HR, Manager
-
-**Request Body:** POST ile aynı
-
-**Validation:** Skor 0.0–5.0 aralığı dışındaysa 400 Bad Request döner.
-
-**Response (200 OK):** Güncellenmiş `AssessmentScoreDto`
-
----
-
-## 6. Action Plan Endpointleri
-
-### Aksiyon Planı Yaşam Döngüsü
-
-```
-Assessment (Completed)
-       ↓
-POST /generate        → Draft
-       ↓
-PUT /items/{itemId}   → Edited (düzenleme)
-POST /items           → Edited (manuel ekle)
-DELETE /items/{id}    → Edited (sil)
-       ↓
-POST /approve         → Approved
-       ↓
-POST /send            → Sent   (Employee görevleri oluşturulur)
-       ↓
-GET /export-pdf       → PDF indir
-```
-
----
-
-### POST /api/action-plans/generate
-
-ML servisi kullanarak taslak aksiyon planı oluşturur. Değerlendirme `Completed` veya daha ileri bir statüde olmalıdır.
-
-**Yetki:** HR, Manager
-
-**Request Body:**
+**Response `data`:** `AssessmentAssignmentDto`
 
 ```json
 {
-  "assessmentId": 1,
+  "id": 12,
+  "assessmentId": 10,
+  "evaluatorEmployeeId": 7,
+  "evaluatorEmployeeName": "Mehmet Kaya",
+  "evaluatorType": "Peer",
+  "isCompleted": false,
+  "completedAt": null
+}
+```
+
+---
+
+### GET `/api/assessments/{id}/assignments`
+
+Değerlendirmeye ait tüm atamaları listele.
+
+**Yetki:** `HrOrManager`
+
+**Response `data`:** `AssessmentAssignmentDto[]`
+
+---
+
+## 5. Action Plans — Aksiyon Planları
+
+### POST `/api/action-plans/generate`
+
+ML servisi aracılığıyla taslak aksiyon planı oluştur.
+
+**Yetki:** `HrOrManager`
+
+**Request Body:**
+```json
+{
+  "assessmentId": 10,
   "topK": 13
 }
 ```
 
-| Alan | Tip | Zorunlu | Açıklama |
-|------|-----|---------|----------|
-| `assessmentId` | integer | ✅ | Tamamlanmış değerlendirme ID'si |
-| `topK` | integer | ❌ | Önerilen aksiyon sayısı (varsayılan: 13) |
+> `topK`: kaç aksiyon önerisi alınacağı (varsayılan 13).  
+> ML servisi erişilemez durumdaysa circuit breaker devreye girer ve 503 döner.
 
-**Validation & Constraints:**
-- **Aktif Plan Kontrolü:** Eğer çalışanın `Completed` veya `Cancelled` statüsünde olmayan (devam eden) aktif bir gelişim planı varsa, yeni bir gelişim planı oluşturulamaz. Bu durumda API `400 Bad Request` hatası döndürür.
-
-**Hata Yanıtı (400 Bad Request):**
+**HTTP 201 Created** — `data`: `ActionPlanDetailDto`
 
 ```json
 {
-  "success": false,
-  "message": "Çalışanın devam eden tamamlanmamış bir gelişim planı bulunmaktadır. Yeni bir plan oluşturulamaz.",
-  "data": null
+  "id": 5,
+  "assessmentId": 10,
+  "employeeId": 1,
+  "employeeName": "Ahmet Yılmaz",
+  "createdByUserId": 3,
+  "createdByUserName": "HR Kullanıcısı",
+  "status": "Draft",
+  "approvedAt": null,
+  "sentAt": null,
+  "createdAt": "2026-06-07T10:00:00Z",
+  "updatedAt": null,
+  "items": [
+    {
+      "id": 20,
+      "actionPlanId": 5,
+      "actionCatalogId": "COMM_001",
+      "aiPredictedActionId": 101,
+      "title": "Sunum Teknikleri Eğitimi",
+      "description": "Etkili iletişim için sunum becerilerini geliştir.",
+      "resource": "Coursera",
+      "deliveryType": "Online",
+      "priority": "High",
+      "dueDate": null,
+      "source": "AI",
+      "orderNo": 1,
+      "taskStatus": null
+    }
+  ]
 }
 ```
 
-**Response (201 Created):**
+**`status` değerleri:** `Draft` | `Approved` | `Sent` | `Cancelled`
 
-```json
-{
-  "success": true,
-  "message": null,
-  "data": {
-    "actionPlanId": 1,
-    "status": "Draft",
-    "itemCount": 13,
-    "createdAt": "2024-10-15T09:00:00Z"
-  }
-}
-```
+**`source` değerleri:** `AI` | `Manual`
 
-**Olası Hatalar:**
-- `503 Service Unavailable` — ML servisi erişilemiyor (circuit breaker açık)
-- `400 Bad Request` — Feature eksik (missingFeatures listesi döner)
+**`priority` değerleri:** `Low` | `Medium` | `High`
 
 ---
 
-### GET /api/action-plans/{id}
+### GET `/api/action-plans/{id}`
 
-Aksiyon planı detayını tüm kalemlerle birlikte döndürür.
+Aksiyon planı detayı.
 
-**Yetki:** HR, Manager
+**Yetki:** `HrOrManager`
 
-**Response (200 OK):**
-
-```json
-{
-  "success": true,
-  "message": null,
-  "data": {
-    "id": 1,
-    "assessmentId": 1,
-    "employeeId": 1,
-    "employeeName": "Ayşe Kaya",
-    "createdByUserId": 2,
-    "createdByUserName": "HR User",
-    "status": "Draft",
-    "approvedAt": null,
-    "sentAt": null,
-    "createdAt": "2024-10-15T09:00:00Z",
-    "updatedAt": null,
-    "items": [
-      {
-        "id": 1,
-        "actionPlanId": 1,
-        "actionCatalogId": 1,
-        "aiPredictedActionId": 1,
-        "title": "Departman Yetkinliği 1 Geliştirme Planı",
-        "description": "Departmana özgü birincil yetkinliği orta seviyeye taşımak için yapılandırılmış öğrenme programına katılım.",
-        "priority": "High",
-        "dueDate": null,
-        "source": "AI",
-        "orderNo": 1,
-        "taskStatus": "Assigned"
-      }
-    ]
-  }
-}
-```
-
-**ActionPlanItem `priority` değerleri:** `Low`, `Medium`, `High`
-
-**ActionPlanItem `source` değerleri:** `AI` (ML önerisi) veya `Manual` (manuel eklendi)
-
-**ActionPlanItem `taskStatus` değerleri:** `Assigned`, `InProgress`, `Completed`, `Cancelled` veya `null` (plan henüz çalışana gönderilmemişse `null` döner)
-
-**Sıralama (Sorting) Kuralları:**
-Gelişim planı detaylarındaki (`items`) veya PDF çıktısındaki tüm kalemler şu öncelik sırasına göre sıralanarak döndürülür:
-1. **Tamamlanma Durumu:** Henüz tamamlanmamış kalemler (görev durumu `Completed` olmayanlar) önce gösterilir. Tamamlanan görevler (`Completed` olanlar) listenin en sonuna atılır.
-2. **Öncelik Derecesi:** Kendi içinde azalan öncelik sırasına göre sıralanır (`High` -> `Medium` -> `Low`).
-3. **Sıra Numarası (`OrderNo`):** Son olarak orijinal sıra numarasına (`OrderNo`) göre artan şekilde sıralanır.
-
-**ActionPlan `status` değerleri:**
-
-| Değer | Açıklama |
-|-------|----------|
-| `Draft` | Oluşturuldu, düzenleme bekliyor |
-| `Edited` | En az bir değişiklik yapıldı |
-| `Approved` | Onaylandı |
-| `Sent` | Çalışana gönderildi, görevler oluşturuldu |
-| `Completed` | Tamamlandı |
-| `Cancelled` | İptal edildi |
+**Response `data`:** `ActionPlanDetailDto`
 
 ---
 
-### PUT /api/action-plans/{id}/items/{itemId}
+### PUT `/api/action-plans/{id}/items/{itemId}`
 
-Var olan bir aksiyon planı kalemini günceller.
+Plan maddesini düzenle.
 
-**Yetki:** HR, Manager
+**Yetki:** `HrOrManager`
 
 **Request Body:**
-
 ```json
 {
   "title": "Güncellenmiş Başlık",
   "description": "Güncellenmiş açıklama.",
   "priority": "High",
-  "dueDate": "2024-12-31T00:00:00Z",
-  "orderNo": 1
+  "dueDate": "2026-09-01T00:00:00Z",
+  "orderNo": 2
 }
 ```
 
-| Alan | Tip | Zorunlu | Açıklama |
-|------|-----|---------|----------|
-| `title` | string | ✅ | Kalem başlığı |
-| `description` | string | ✅ | Kalem açıklaması |
-| `priority` | string | ✅ | `Low`, `Medium`, `High` |
-| `dueDate` | datetime | ❌ | Tamamlanma tarihi (ISO 8601) |
-| `orderNo` | integer | ✅ | Sıralama numarası |
-
-**Response (200 OK):** Güncellenmiş `ActionPlanItemDto`
+**Response `data`:** `ActionPlanDetailDto`
 
 ---
 
-### POST /api/action-plans/{id}/items
+### POST `/api/action-plans/{id}/items`
 
-Aksiyon planına manuel kalem ekler.
+Plana manuel madde ekle.
 
-**Yetki:** HR, Manager
+**Yetki:** `HrOrManager`
 
 **Request Body:**
-
 ```json
 {
-  "title": "Manuel Eğitim",
-  "description": "Şirket içi eğitime katılım.",
+  "title": "Mentorluk Programı",
+  "description": "Kıdemli bir meslektaşla düzenli görüşmeler.",
   "priority": "Medium",
-  "dueDate": "2024-12-15T00:00:00Z",
+  "dueDate": "2026-12-01T00:00:00Z",
   "actionCatalogId": null
 }
 ```
 
-| Alan | Tip | Zorunlu | Açıklama |
-|------|-----|---------|----------|
-| `title` | string | ✅ | Kalem başlığı |
-| `description` | string | ✅ | Kalem açıklaması |
-| `priority` | string | ❌ | `Low`, `Medium`, `High` (varsayılan: `Medium`) |
-| `dueDate` | datetime | ❌ | Tamamlanma tarihi |
-| `actionCatalogId` | integer | ❌ | Katalogdan seçilmişse katalog ID'si |
-
-**Response (200 OK):** Eklenen `ActionPlanItemDto`
+**Response `data`:** `ActionPlanDetailDto`
 
 ---
 
-### DELETE /api/action-plans/{id}/items/{itemId}
+### DELETE `/api/action-plans/{id}/items/{itemId}`
 
-Aksiyon planından kalem kaldırır (soft delete).
+Plan maddesini sil (soft delete).
 
-**Yetki:** HR, Manager
+**Yetki:** `HrOrManager`
 
-**Response:** `204 No Content`
-
----
-
-### POST /api/action-plans/{id}/approve
-
-Aksiyon planını onaylar. Plan `Draft` veya `Edited` statüsünde olmalıdır.
-
-**Yetki:** HR, Manager
-
-**Request Body:** Yok
-
-**Response (200 OK):** Güncellenmiş `ActionPlanDetailDto` (status: `Approved`)
+**HTTP 204 No Content**
 
 ---
 
-### POST /api/action-plans/{id}/send
+### POST `/api/action-plans/{id}/approve`
 
-Aksiyon planını çalışana gönderir; plan kalemleri EmployeeTask olarak oluşturulur.
+Aksiyon planını onayla (`Draft` → `Approved`).
 
-**Yetki:** HR, Manager
+**Yetki:** `HrOrManager`
 
-**Request Body:** Yok
-
-> **Idempotent:** Aynı plan birden fazla gönderilirse mükerrer görev oluşturulmaz.
-
-**Response (200 OK):** Güncellenmiş `ActionPlanDetailDto` (status: `Sent`)
+**Response `data`:** `ActionPlanDetailDto`
 
 ---
 
-### GET /api/action-plans/{id}/export-pdf
+### POST `/api/action-plans/{id}/send`
 
-Aksiyon planını PDF olarak indirir. PDF anlık üretilir; dosya sisteminde saklanmaz.
+Onaylı planı çalışana gönder (`Approved` → `Sent`). Her plan maddesi için `EmployeeTask` oluşturur.
 
-**Yetki:** HR, Manager
+**Yetki:** `HrOrManager`
 
-**Response:**
+> İdempotent: aynı plan ikinci kez gönderilirse duplicate görev oluşturmaz.
 
-```
-HTTP 200 OK
-Content-Type: application/pdf
-Content-Disposition: attachment; filename="aksiyon-plani-1.pdf"
-
-[binary PDF data]
-```
-
-> `fetch` kullanıyorsanız `response.blob()` ile alın ve `URL.createObjectURL` ile indirme tetikleyin.
+**Response `data`:** `ActionPlanDetailDto`
 
 ---
 
-## 7. Employee Task Endpointleri
+### POST `/api/action-plans/{id}/cancel`
 
-### GET /api/tasks/my
+Aksiyon planını iptal et (`Draft`/`Approved` → `Cancelled`).
 
-Giriş yapmış çalışanın kendi görev listesini sayfalı döndürür.
+**Yetki:** `HrOrManager`
 
-**Yetki:** Tüm giriş yapmış kullanıcılar (çalışan olmayan kullanıcılar için `employeeId` olmadığından 400 döner)
+**Response `data`:** `ActionPlanDetailDto`
 
-**Query Parameters:** `pageNumber`, `pageSize`
+---
 
-**Response (200 OK):**
+### GET `/api/action-plans/{id}/export-pdf`
+
+Aksiyon planını PDF olarak indir.
+
+**Yetki:** `HrOrManager`
+
+**Response:** `application/pdf` — dosya adı `aksiyon-plani-{id}.pdf`
+
+> PDF her istekte anlık üretilir; sunucuda saklanmaz.
+
+---
+
+## 6. Tasks — Görevler
+
+### GET `/api/tasks/my`
+
+Giriş yapan çalışanın görev listesi (sayfalanmış).
+
+**Yetki:** `Authenticated` (çalışan kaydı olan kullanıcılar)
+
+**Query Params:** `pageNumber`, `pageSize`
+
+**Response:** `PagedResponse<EmployeeTaskDto>`
 
 ```json
 {
   "success": true,
   "data": [
     {
-      "id": 1,
-      "actionPlanItemId": 1,
-      "title": "Departman Yetkinliği 1 Geliştirme Planı",
-      "description": "Departmana özgü birincil yetkinliği orta seviyeye taşımak için yapılandırılmış öğrenme programına katılım.",
+      "id": 101,
+      "actionPlanItemId": 20,
+      "title": "Sunum Teknikleri Eğitimi",
+      "description": "Etkili iletişim için sunum becerilerini geliştir.",
       "priority": "High",
       "employeeId": 1,
-      "employeeName": "Ayşe Kaya",
-      "assignedByUserId": 2,
-      "assignedByUserName": "HR User",
-      "status": "Assigned",
-      "assignedAt": "2024-10-16T11:00:00Z",
+      "employeeName": "Ahmet Yılmaz",
+      "assignedByUserId": 3,
+      "assignedByUserName": "HR Kullanıcısı",
+      "status": "Pending",
+      "assignedAt": "2026-06-07T10:30:00Z",
       "dueDate": null,
       "completedAt": null
     }
   ],
-  "totalCount": 13,
+  "totalCount": 5,
   "pageNumber": 1,
   "pageSize": 20,
   "totalPages": 1
 }
 ```
 
----
-
-### GET /api/tasks/{id}
-
-Görev detayını döndürür.
-
-**Yetki:** Tüm giriş yapmış kullanıcılar (Employee yalnızca kendi görevi)
-
-**Response (200 OK):** `ApiResponse<EmployeeTaskDto>` — aynı format
+**`status` değerleri:** `Pending` | `InProgress` | `Completed` | `Cancelled`
 
 ---
 
-### PUT /api/tasks/{id}/status
+### GET `/api/tasks/my-surveys`
 
-Görev durumunu günceller. Yalnızca göreve atanan çalışan kullanabilir.
+Giriş yapan çalışanın doldurması gereken bekleyen 360° anketleri listeler.
 
-**Yetki:** Yalnızca Employee rolü
+**Yetki:** `Authenticated` (çalışan kaydı olan kullanıcılar)
+
+**Response `data`:** `MySurveyDto[]`
+
+```json
+[
+  {
+    "assignmentId": 12,
+    "assessmentId": 10,
+    "employeeId": 1,
+    "employeeName": "Ahmet Yılmaz",
+    "cycleId": 2,
+    "cycleName": "2025 Q4",
+    "evaluatorType": "Peer",
+    "competencyCount": 13
+  }
+]
+```
+
+> Bu listedeki her anket için `POST /api/assessments/{assessmentId}/scores/bulk` çağrısı yapılmalıdır.
+
+---
+
+### GET `/api/tasks/{id}`
+
+Görev detayı.
+
+**Yetki:** `Authenticated`
+
+> `Employee` rolü sadece kendi görevlerini görebilir.
+
+**Response `data`:** `EmployeeTaskDto`
+
+---
+
+### PUT `/api/tasks/{id}/status`
+
+Görev durumunu güncelle. Sadece görevin sahibi çalışan yapabilir.
+
+**Yetki:** `EmployeeOnly`
 
 **Request Body:**
-
 ```json
 {
   "newStatus": "InProgress"
 }
 ```
 
-| Alan | Tip | Zorunlu | Açıklama |
-|------|-----|---------|----------|
-| `newStatus` | string | ✅ | Yeni durum değeri |
+**`newStatus` değerleri:** `Pending` | `InProgress` | `Completed` | `Cancelled`
 
-**Geçerli Status Geçişleri:**
-
-```
-Assigned → InProgress → Completed
-Assigned → Cancelled
-InProgress → Cancelled
-```
-
-**EmployeeTask Status Değerleri:**
-
-| Değer | Açıklama |
-|-------|----------|
-| `Assigned` | Görev atandı, henüz başlanmadı |
-| `InProgress` | Görev üzerinde çalışılıyor |
-| `Completed` | Görev tamamlandı |
-| `Cancelled` | Görev iptal edildi |
-
-**Response (200 OK):** Güncellenmiş `EmployeeTaskDto`
-
-**Hata (400 Bad Request):** Geçersiz status string veya izin verilmeyen geçiş
-
-**Otomatik Plan Tamamlama Tetikleyicisi:**
-Bir çalışanın aktif gelişim planına bağlı **tüm** görevler `Completed` (Tamamlandı) durumuna getirildiğinde, sistem otomatik olarak ilgili gelişim planının statüsünü de `Completed` (5) olarak günceller ve planın güncelleme tarihini (`updatedAt`) yeniler.
+**Response `data`:** `EmployeeTaskDto`
 
 ---
 
-## 8. Health Endpoint
+## 7. Health — Sistem Durumu
 
-### GET /api/health
-
-Sistemin sağlık durumunu döndürür. ML servisinin durumunu da içerir.
+### GET `/api/health`
 
 **Yetki:** Herkese açık
 
-**Response (200 OK):**
-
+**Response:**
 ```json
 {
-  "success": true,
-  "message": null,
-  "data": {
-    "api": "ok",
-    "mlService": {
-      "status": "ok",
-      "modelLoaded": true,
-      "encoderLoaded": true,
-      "featureColumnsLoaded": true,
-      "labelNamesLoaded": true
-    }
-  }
-}
-```
-
-> ML servisi erişilemez durumdaysa `mlService` alanında hata detayı yer alır.
-
----
-
-## 9. Hata Yönetimi
-
-### Standart Hata Response Formatı
-
-```json
-{
-  "success": false,
-  "message": "Hata açıklaması",
-  "errors": ["Alan 1 zorunludur.", "Email geçersiz."],
-  "correlationId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-}
-```
-
-| Alan | Açıklama |
-|------|----------|
-| `success` | Her zaman `false` |
-| `message` | Genel hata mesajı |
-| `errors` | Ayrıntılı hata listesi (validation hatalarında dolu) |
-| `correlationId` | Hata izleme ID'si (loglama için backend'e bildirin) |
-
----
-
-### HTTP Status Kodları
-
-| Kod | Anlam | Ne Zaman |
-|-----|-------|----------|
-| `200 OK` | Başarılı | GET, PUT, POST (token refresh, logout) |
-| `201 Created` | Kayıt oluşturuldu | POST employees, assessments, action-plans/generate |
-| `204 No Content` | İçeriksiz başarı | DELETE |
-| `400 Bad Request` | Geçersiz istek | Validation hatası, eksik feature, geçersiz parametreler |
-| `401 Unauthorized` | Kimlik doğrulama başarısız | Token yok, geçersiz veya süresi dolmuş |
-| `403 Forbidden` | Yetki yok | Rol kısıtı (örn. Employee, HR endpointine erişmeye çalışıyor) |
-| `404 Not Found` | Kayıt bulunamadı | Geçersiz ID |
-| `503 Service Unavailable` | Servis erişilemiyor | ML servisi kapalı veya circuit breaker açık |
-
----
-
-### Validation Hatası Örneği (400 Bad Request)
-
-```json
-{
-  "success": false,
-  "message": "Validation hatası",
-  "errors": [
-    "Email zorunludur.",
-    "Password en az 8 karakter olmalıdır."
-  ],
-  "correlationId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  "status": "Healthy",
+  "timestamp": "2026-06-07T10:00:00Z"
 }
 ```
 
 ---
 
-### 401 Unauthorized — Ne Yapılmalı?
+## 8. Ortak Tipler & Enum Değerleri
 
-Token süresi dolduğunda backend `401` döner. Refresh flow'u tetikleyin:
+### Roller
 
-1. `POST /api/auth/refresh` — mevcut refreshToken ile yeni accessToken al
-2. Başarılıysa isteği tekrarla
-3. Refresh da başarısız olursa (ör. refresh token da süresi dolmuşsa) kullanıcıyı login'e yönlendir
+| Değer | Açıklama |
+|---|---|
+| `Admin` | Tam yetki |
+| `HR` | İK — çalışan/değerlendirme/plan yönetimi |
+| `Manager` | Kendi ekibine kapsamlı erişim |
+| `Employee` | Sadece kendi görev/anketi |
 
----
+### EvaluatorType (360° Değerlendirici Türü)
 
-## 10. Demo Kullanıcıları
+| Değer | Açıklama |
+|---|---|
+| `Self` | Kişinin kendisi |
+| `Manager` | Yönetici |
+| `Peer` | Akran / meslektaş |
+| `Subordinate` | Ast |
 
-> Uygulama development/demo modunda Mock veri kullanır. Tüm veriler uygulama yeniden başlatılınca sıfırlanır.
+### AssessmentStatus
 
-| Rol | E-posta | Şifre | EmployeeId | Açıklama |
-|-----|---------|-------|-----------|----------|
-| Admin | admin@demo.com | Admin1234! | — | Tam sistem erişimi |
-| HR | hr@demo.com | Hr1234! | — | İK yöneticisi |
-| Manager | manager@demo.com | Manager1234! | 2 | Mehmet Yılmaz — Sales ekip yöneticisi |
-| Employee | employee@demo.com | Employee1234! | 1 | Ayşe Kaya — Sales departmanı |
+| Değer | Açıklama |
+|---|---|
+| `InProgress` | Devam ediyor |
+| `Completed` | Tamamlandı |
 
-### Seed Veriler
+### ActionPlanStatus
 
-**Departments:**
+| Değer | Açıklama |
+|---|---|
+| `Draft` | Taslak — düzenlenebilir |
+| `Approved` | Onaylandı — gönderilebilir |
+| `Sent` | Çalışana gönderildi |
+| `Cancelled` | İptal edildi |
 
-| ID | Kod | Ad |
-|----|-----|----|
-| 1 | SALES | Sales |
-| 2 | IT | Information Technology |
-| 3 | HR | Human Resources |
+### EmployeeTaskStatus
 
-**Job Roles:**
+| Değer | Açıklama |
+|---|---|
+| `Pending` | Bekliyor |
+| `InProgress` | Devam ediyor |
+| `Completed` | Tamamlandı |
+| `Cancelled` | İptal edildi |
 
-| ID | Ad | DepartmentId |
-|----|-----|-------------|
-| 1 | Sales Executive | 1 |
-| 2 | Sales Manager | 1 |
-| 3 | Software Engineer | 2 |
+### Priority
 
-**Assessment Cycle:**
-
-| ID | Ad |
-|----|----|
-| 1 | 2024 Q4 Değerlendirmesi |
-
-**Hazır Assessment:** ID=1, EmployeeId=1 (Ayşe Kaya), 13 competency skoru girilmiş, status: `Completed`
-
----
-
-## 11. Tipik Frontend Akışları
-
-### 11.1 Login Akışı
-
-```
-1. Kullanıcı e-posta ve şifre girer
-2. POST /api/auth/login
-3. Yanıttan şunları al:
-   - accessToken  → bellekte sakla (React state, Zustand, vb.)
-   - refreshToken → localStorage'da sakla
-   - role         → route kısıtları için kullan
-   - employeeId   → Employee rolü için task endpointlerinde kullan
-4. Tüm korumalı isteklere:
-   Authorization: Bearer {accessToken}
-   header'ı ekle
-```
-
-> **Güvenlik Notu:** Access token'ı localStorage'a kaydetmeyin — XSS saldırılarına karşı savunmasızdır. Memory'de (state) tutun. Refresh token'ı localStorage'da tutmak kabul edilebilir çünkü sadece token yenilemede kullanılır.
+| Değer | Açıklama |
+|---|---|
+| `Low` | Düşük |
+| `Medium` | Orta |
+| `High` | Yüksek |
 
 ---
 
-### 11.2 Token Yenileme Akışı (401 Interceptor)
+## Örnek Akış: Tam Kullanım Senaryosu
 
 ```
-1. Herhangi bir API isteği 401 döndürür
-2. localStorage'dan refreshToken'ı al
-3. POST /api/auth/refresh  { refreshToken: "..." }
-4. Başarılıysa:
-   a. Yeni accessToken'ı memory'de güncelle
-   b. Yeni refreshToken'ı localStorage'da güncelle
-   c. Başarısız olan isteği yeni token ile tekrarla
-5. Refresh başarısız olursa:
-   a. localStorage'ı temizle
-   b. /login sayfasına yönlendir
-```
-
-**Axios Interceptor Örneği:**
-
-```javascript
-axios.interceptors.response.use(
-  response => response,
-  async error => {
-    if (error.response?.status === 401 && !error.config._retry) {
-      error.config._retry = true;
-      const refreshToken = localStorage.getItem('refreshToken');
-      const { data } = await axios.post('/api/auth/refresh', { refreshToken });
-      // memory'deki accessToken'ı güncelle
-      setAccessToken(data.data.accessToken);
-      localStorage.setItem('refreshToken', data.data.refreshToken);
-      error.config.headers.Authorization = `Bearer ${data.data.accessToken}`;
-      return axios(error.config);
-    }
-    return Promise.reject(error);
-  }
-);
+1. POST /api/auth/login               → accessToken, refreshToken al
+2. GET  /api/employees                → çalışan listesini getir
+3. POST /api/assessments              → yeni değerlendirme oluştur (Self ataması otomatik)
+4. POST /api/assessments/{id}/assignments   → Peer/Manager ata
+5. POST /api/assessments/{id}/scores/bulk  → skorları gir (Self veya başka evaluator)
+6. GET  /api/employees/{id}/features?assessmentId=...  → ML özellik vektörünü doğrula
+7. POST /api/action-plans/generate    → ML ile taslak plan oluştur
+8. PUT  /api/action-plans/{id}/items/{itemId}  → gerekirse maddeleri düzenle
+9. POST /api/action-plans/{id}/approve → planı onayla
+10. POST /api/action-plans/{id}/send  → çalışana gönder (görevler oluşur)
+11. GET  /api/tasks/my                → çalışan kendi görevlerini görür
+12. PUT  /api/tasks/{id}/status       → çalışan görev durumunu günceller
+13. GET  /api/action-plans/{id}/export-pdf  → PDF raporu indir
 ```
 
 ---
 
-### 11.3 HR/Manager: AI Aksiyon Planı Oluşturma Akışı
+## Demo Hesapları
 
-```
-Adım 1 — Çalışanı seç
-  GET /api/employees?pageNumber=1&pageSize=20
+| Email | Şifre | Rol | Not |
+|---|---|---|---|
+| `zeynep.arslan@demo.com` | `Employee1234!` | Employee | EmployeeId=4, bekleyen Peer anketi mevcut |
 
-Adım 2 — Değerlendirme oluştur
-  POST /api/assessments
-  { "employeeId": 1, "cycleId": 1 }
-  → assessmentId'yi kaydet
-
-Adım 3 — Competency skorlarını gir (13 adet)
-  POST /api/assessments/{assessmentId}/scores
-  { "competencyId": 1, "evaluatorType": "Manager", "score": 3.5 }
-  → Her yetkinlik için tekrarla
-
-Adım 4 — Değerlendirmeyi tamamla
-  PUT /api/assessments/{assessmentId}/complete
-
-Adım 5 — (İsteğe bağlı) Feature kontrolü
-  GET /api/employees/{employeeId}/features?assessmentId={assessmentId}
-  → missingFeatures varsa eksik skorları gir
-
-Adım 6 — Aksiyon planı oluştur
-  POST /api/action-plans/generate
-  { "assessmentId": 1, "topK": 13 }
-  → actionPlanId'yi kaydet
-
-Adım 7 — Planı incele ve düzenle
-  GET /api/action-plans/{actionPlanId}
-  PUT /api/action-plans/{actionPlanId}/items/{itemId}   (gerekirse)
-  DELETE /api/action-plans/{actionPlanId}/items/{itemId} (gerekirse)
-  POST /api/action-plans/{actionPlanId}/items            (manuel ekle)
-
-Adım 8 — Planı onayla
-  POST /api/action-plans/{actionPlanId}/approve
-
-Adım 9 — Çalışana gönder
-  POST /api/action-plans/{actionPlanId}/send
-  → Çalışanın görevleri oluşturulur
-
-Adım 10 — (İsteğe bağlı) PDF indir
-  GET /api/action-plans/{actionPlanId}/export-pdf
-```
+> Diğer demo hesapları için backend ekibine danışın.
 
 ---
 
-### 11.4 Employee: Görev Takip Akışı
-
-```
-Adım 1 — Görevleri listele
-  GET /api/tasks/my?pageNumber=1&pageSize=20
-
-Adım 2 — Göreve tıkla, detay al
-  GET /api/tasks/{taskId}
-
-Adım 3 — Göreve başla
-  PUT /api/tasks/{taskId}/status
-  { "newStatus": "InProgress" }
-
-Adım 4 — Görevi tamamla
-  PUT /api/tasks/{taskId}/status
-  { "newStatus": "Completed" }
-```
-
----
-
-## 12. Pagination
-
-Listeleme endpointleri `pageNumber` ve `pageSize` query parametrelerini destekler.
-
-### Parametreler
-
-| Parametre | Tip | Varsayılan | Min | Max |
-|-----------|-----|-----------|-----|-----|
-| `pageNumber` | integer | 1 | 1 | — |
-| `pageSize` | integer | 20 | 1 | 100 |
-
-### Örnek İstek
-
-```
-GET /api/employees?pageNumber=2&pageSize=10
-```
-
-### Örnek Yanıt
-
-```json
-{
-  "success": true,
-  "data": [ ... ],
-  "totalCount": 45,
-  "pageNumber": 2,
-  "pageSize": 10,
-  "totalPages": 5
-}
-```
-
-### Sayfalama Hesaplama
-
-```
-totalPages = Math.ceil(totalCount / pageSize)
-hasPreviousPage = pageNumber > 1
-hasNextPage = pageNumber < totalPages
-```
-
-### Sayfalama Bitti mi Kontrolü
-
-```javascript
-const hasMore = response.pageNumber < response.totalPages;
-```
-
----
-
-## 13. Frontend Mock API ve Mock Mode Dokümantasyonu
-
-Uygulamanın frontend katmanında, backend servisinin ayakta olmadığı veya demo sunumu senaryoları için tamamen istemci tarafında çalışan bir Mock API mekanizması ([mockApi.ts](file:///c:/PROJECTS/employee-development-project/frontend/src/services/mockApi.ts)) mevcuttur.
-
-### Genel Kurallar ve Davranışlar
-
-1. **Bellek & LocalStorage Yönetimi:**
-   - Mock API, tüm durumunu ve verilerini tarayıcının `localStorage` alanında ve bellek içinde saklar. 
-   - Sayfa yenilendiğinde veya uygulama yeniden başlatıldığında, `localStorage` üzerindeki `mock_` ile başlayan anahtarlar (`mock_current_user`, `mock_access_token` vb.) ve `mockDb` deposu kullanılır.
-   
-2. **Kullanıcı Girişleri:**
-   - [Demo Kullanıcıları](#10-demo-kullanıcıları) bölümündeki e-posta adresleri kullanılarak giriş yapıldığında, Mock API otomatik olarak ilgili rol için bir JWT token formatında sahte access token ve refresh token üretir ve `localStorage`'da saklar.
-
-3. **Backend Kurallarının Simülasyonu:**
-   - **Devam Eden Plan Kısıtı:** Frontend mock API üzerinde de bir çalışana yeni bir değerlendirme süreci başlatılmak istendiğinde (`mockApi.createAssessment`) veya yeni bir plan oluşturulmak istendiğinde (`mockApi.generateActionPlan`), çalışanın devam eden tamamlanmamış bir gelişim planı olup olmadığı denetlenir ve varsa `400 Bad Request` benzeri hata yanıtı döner.
-   - **Görev Durumu ve Plan Tamamlama:** Bir çalışan kendi görev listesindeki son görevi de `Completed` durumuna getirdiğinde, mock veri tabanındaki parent gelişim planı da otomatik olarak `Completed` durumuna güncellenir.
-   - **TaskStatus Alanı ve Sıralama:** Mock API'den dönen tüm gelişim planı kalemlerine ilgili görevin `taskStatus` değeri eklenir ve bu kalemler completed olanlar sonda olacak şekilde sıralanır.
+*Son güncelleme: 2026-06-07*
