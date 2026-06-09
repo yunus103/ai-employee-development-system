@@ -29,20 +29,26 @@ export default function MySurveysPage() {
   const fetchInitialData = async () => {
     setIsLoading(true);
     try {
-      // Fetch employees to map job roles in the list view
-      try {
-        const empRes = await apiClient.employees.list(1, 100);
-        if (empRes.success) {
-          setEmployees(empRes.data);
+      // Fetch employees to map job roles in the list view (only for HR/Manager/Admin)
+      if (user && user.role !== 'Employee') {
+        try {
+          const empRes = await apiClient.employees.list(1, 100);
+          if (empRes.success) {
+            setEmployees(empRes.data);
+          }
+        } catch (empErr) {
+          console.warn('Could not load employee details (unauthorized or network error):', empErr);
         }
-      } catch (empErr) {
-        console.warn('Could not load employee details (unauthorized or network error):', empErr);
       }
 
-      // Fetch pending surveys for this user
-      const surveyRes = await apiClient.tasks.getMySurveys();
-      if (surveyRes.success) {
-        setSurveys(surveyRes.data);
+      // Fetch pending surveys for this user (only if they have an associated employee profile)
+      if (user && user.employeeId !== null) {
+        const surveyRes = await apiClient.tasks.getMySurveys();
+        if (surveyRes.success) {
+          setSurveys(surveyRes.data);
+        }
+      } else {
+        setSurveys([]);
       }
     } catch (err) {
       console.error('Error fetching surveys', err);
@@ -61,6 +67,7 @@ export default function MySurveysPage() {
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   // Synchronize scores when selected survey changes
@@ -217,7 +224,15 @@ export default function MySurveysPage() {
             <p className="text-xs text-muted mt-0.5">Katılmanız beklenen performans değerlendirme süreçleri.</p>
           </div>
 
-          {surveys.length === 0 ? (
+          {user?.employeeId === null ? (
+            <div className="glass-panel rounded-3xl p-12 text-center border border-card-border max-w-lg mx-auto space-y-4 animate-fadeIn">
+              <CheckCircle className="h-16 w-16 mx-auto text-info/60" />
+              <h4 className="text-lg font-bold text-foreground">Değerlendirme Anketi Bulunmuyor</h4>
+              <p className="text-sm text-muted">
+                Sistem Yöneticisi veya İK yetkilisi hesaplarının doğrudan doldurması gereken bir 360° değerlendirme anketi bulunmamaktadır.
+              </p>
+            </div>
+          ) : surveys.length === 0 ? (
             <div className="glass-panel rounded-3xl p-12 text-center border border-card-border max-w-lg mx-auto space-y-4">
               <CheckCircle className="h-16 w-16 mx-auto text-success animate-pulse" />
               <h4 className="text-lg font-bold text-foreground">Tüm Anketler Dolduruldu</h4>

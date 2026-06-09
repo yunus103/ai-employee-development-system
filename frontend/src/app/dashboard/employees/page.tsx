@@ -31,6 +31,7 @@ export default function EmployeesPage() {
   const [allEmployeesList, setAllEmployeesList] = useState<EmployeeDetail[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('');
+  const [managerDept, setManagerDept] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
@@ -119,6 +120,28 @@ export default function EmployeesPage() {
 
   // Auto-adjust is handled directly in the select dropdown's onChange handler
 
+  // Redirect standard employees
+  useEffect(() => {
+    if (user && user.role === 'Employee') {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
+
+  // Load manager's department profile on mount to enforce visibility restriction
+  useEffect(() => {
+    if (user && user.role === 'Manager' && user.employeeId !== null) {
+      apiClient.employees.get(user.employeeId)
+        .then((res) => {
+          if (res.success && res.data) {
+            setManagerDept(res.data.department);
+          }
+        })
+        .catch((err) => {
+          console.warn('Could not fetch manager profile details:', err);
+        });
+    }
+  }, [user]);
+
   const fetchEmployees = async () => {
     setIsLoading(true);
     try {
@@ -126,6 +149,15 @@ export default function EmployeesPage() {
       if (res.success) {
         let filtered = res.data;
         
+        // Authorization filter for Manager (cannot see other departments or admins)
+        if (user?.role === 'Manager') {
+          if (managerDept) {
+            filtered = filtered.filter((e) => e.department === managerDept && e.email !== 'admin@demo.com');
+          } else {
+            filtered = []; // Return empty until manager profile loads to prevent leakage
+          }
+        }
+
         if (searchTerm) {
           filtered = filtered.filter((e) =>
             e.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -151,6 +183,7 @@ export default function EmployeesPage() {
   // Lookup list fetching is inlined inside useEffect and handleSubmit
 
   useEffect(() => {
+    if (!user || user.role === 'Employee') return;
     let active = true;
     Promise.resolve().then(() => {
       if (active) {
@@ -161,9 +194,10 @@ export default function EmployeesPage() {
       active = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchTerm, selectedDept]);
+  }, [page, searchTerm, selectedDept, managerDept, user]);
 
   useEffect(() => {
+    if (!user || user.role === 'Employee') return;
     let active = true;
     apiClient.employees.list(1, 100)
       .then((res) => {
@@ -177,7 +211,7 @@ export default function EmployeesPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [user]);
 
   const handleStartAssessment = async (empId: number) => {
     useConfirmStore.getState().showConfirm({
@@ -304,6 +338,13 @@ export default function EmployeesPage() {
     'Operations'
   ];
 
+  const visibleDepartments = departments.filter(dept => {
+    if (user?.role === 'Manager') {
+      return managerDept ? dept === managerDept : false;
+    }
+    return true;
+  });
+
   return (
     <div className="space-y-6 animate-fadeIn relative">
       <style>{`
@@ -354,15 +395,16 @@ export default function EmployeesPage() {
         <div className="relative w-full md:w-64">
           <Filter className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-muted" />
           <select
-            value={selectedDept}
+            value={user?.role === 'Manager' ? managerDept || '' : selectedDept}
+            disabled={user?.role === 'Manager'}
             onChange={(e) => {
               setSelectedDept(e.target.value);
               setPage(1);
             }}
-            className="w-full rounded-xl bg-card border border-card-border py-3 pr-4 pl-12 text-sm text-foreground placeholder-muted outline-none appearance-none cursor-pointer focus:border-primary"
+            className="w-full rounded-xl bg-card border border-card-border py-3 pr-4 pl-12 text-sm text-foreground placeholder-muted outline-none appearance-none cursor-pointer focus:border-primary disabled:opacity-80 disabled:cursor-not-allowed"
           >
-            <option value="">Tüm Departmanlar</option>
-            {departments.map((dept) => (
+            {user?.role !== 'Manager' && <option value="">Tüm Departmanlar</option>}
+            {visibleDepartments.map((dept) => (
               <option key={dept} value={dept}>
                 {dept === 'Human Resources' ? 'İnsan Kaynakları' :
                  dept === 'Technology' ? 'Teknoloji' :
