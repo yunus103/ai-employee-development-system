@@ -38,51 +38,53 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return;
       }
 
+      // --- Check Backend API ---
       try {
-        // Build correct URL: if API_URL is '/' or relative, use window.location.origin
-        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || '/').replace(/\/$/, '');
-        const healthUrl = baseUrl ? `${baseUrl}/api/health` : '/api/health';
-
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
-
-        const response = await fetch(healthUrl, { signal: controller.signal });
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const response = await fetch('/api/health', { signal: controller.signal });
         clearTimeout(timeoutId);
 
-        if (!response.ok) {
-          setHealthStatus({ api: 'error', ml: 'error' });
-          return;
-        }
-
-        const json = await response.json();
-
-        // Support both response formats:
-        // Format A (nested): { success: true, data: { api: 'ok', mlService: { status: 'ok' } } }
-        // Format B (flat):   { status: 'Healthy', timestamp: '...' }
-        if (json.success && json.data) {
-          const apiState = json.data.api === 'ok' ? 'ok' : 'error';
-          const mlState = json.data.mlService?.status === 'ok' ? 'ok' : 'not-loaded';
-          setHealthStatus({ api: apiState, ml: mlState });
-        } else if (typeof json.status === 'string') {
-          const apiOk = json.status.toLowerCase() === 'healthy' || json.status.toLowerCase() === 'ok';
-          setHealthStatus({ api: apiOk ? 'ok' : 'error', ml: 'not-loaded' });
+        if (response.ok) {
+          const json = await response.json();
+          // Backend returns: { success: true, data: { status: 'healthy'|'degraded'|..., database: ... } }
+          if (json.success && json.data?.status) {
+            const s = json.data.status.toLowerCase();
+            const apiState = s === 'healthy' || s === 'ok' ? 'ok' : s === 'degraded' ? 'ok' : 'error';
+            setHealthStatus(prev => ({ ...prev, api: apiState }));
+          } else {
+            setHealthStatus(prev => ({ ...prev, api: 'ok' }));
+          }
         } else {
-          // Unexpected format but got a 200 — treat as ok
-          setHealthStatus({ api: 'ok', ml: 'not-loaded' });
+          setHealthStatus(prev => ({ ...prev, api: 'error' }));
         }
-      } catch (err: unknown) {
-        const isAbort = err instanceof Error && err.name === 'AbortError';
-        if (isAbort) {
-          // Timeout — server might be cold starting, show unknown
-          setHealthStatus({ api: 'error', ml: 'not-loaded' });
+      } catch {
+        setHealthStatus(prev => ({ ...prev, api: 'error' }));
+      }
+
+      // --- Check ML Service (via Next.js proxy /ml/* → bitirme-ml.onrender.com) ---
+      try {
+        const controller2 = new AbortController();
+        const timeoutId2 = setTimeout(() => controller2.abort(), 8000);
+        const mlResponse = await fetch('/ml/health', { signal: controller2.signal });
+        clearTimeout(timeoutId2);
+
+        if (mlResponse.ok) {
+          const mlJson = await mlResponse.json();
+          // ML returns: { status: 'ok', model_loaded: true, encoder_loaded: true, ... }
+          const mlOk = mlJson.status === 'ok' && mlJson.model_loaded === true;
+          setHealthStatus(prev => ({ ...prev, ml: mlOk ? 'ok' : 'error' }));
         } else {
-          setHealthStatus({ api: 'error', ml: 'error' });
+          setHealthStatus(prev => ({ ...prev, ml: 'error' }));
         }
+      } catch {
+        // ML might be sleeping — treat as not-loaded (yellow) not a hard error
+        setHealthStatus(prev => ({ ...prev, ml: 'not-loaded' }));
       }
     };
 
     checkSystemHealth();
-    const interval = setInterval(checkSystemHealth, 30000); // Check every 30s
+    const interval = setInterval(checkSystemHealth, 30000);
     return () => clearInterval(interval);
   }, []);
 
