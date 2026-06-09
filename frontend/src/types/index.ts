@@ -117,8 +117,30 @@ export interface AssessmentScore {
   competencyId: number;
   competencyCode: string;
   competencyName: string;
+  evaluatorEmployeeId: number;
   evaluatorType: EvaluatorType;
   score: number;
+}
+
+export interface AssessmentAssignment {
+  id: number;
+  assessmentId: number;
+  evaluatorEmployeeId: number;
+  evaluatorEmployeeName: string;
+  evaluatorType: EvaluatorType;
+  isCompleted: boolean;
+  completedAt: string | null;
+}
+
+export interface MySurvey {
+  assignmentId: number;
+  assessmentId: number;
+  employeeId: number;
+  employeeName: string;
+  cycleId: number;
+  cycleName: string;
+  evaluatorType: EvaluatorType;
+  competencyCount: number;
 }
 
 export type ActionPlanStatus =

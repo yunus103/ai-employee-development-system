@@ -14,13 +14,21 @@ import {
   ArrowRight,
   TrendingUp,
   Play,
-  ExternalLink
+  ExternalLink,
+  Plus,
+  X,
+  UserPlus,
+  UserCheck,
+  Briefcase,
+  GraduationCap,
+  Smile
 } from 'lucide-react';
 
 export default function EmployeesPage() {
   const router = useRouter();
   const { user } = useStore();
   const [employees, setEmployees] = useState<EmployeeDetail[]>([]);
+  const [allEmployeesList, setAllEmployeesList] = useState<EmployeeDetail[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('');
   const [page, setPage] = useState(1);
@@ -29,12 +37,93 @@ export default function EmployeesPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Form Drawer State
+  const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
+  const [activeFormTab, setActiveFormTab] = useState<'basic' | 'job' | 'edu' | 'satis'>('basic');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Department & Job Role Data Mappings
+  const uiDepartments = [
+    { name: 'Technology', label: 'Teknoloji', mockId: 2, realId: 1 },
+    { name: 'Human Resources', label: 'İnsan Kaynakları', mockId: 1, realId: 2 },
+    { name: 'Sales & Marketing', label: 'Satış & Pazarlama', mockId: 3, realId: 3 },
+    { name: 'Finance & Accounting', label: 'Finans & Muhasebe', mockId: 4, realId: 4 },
+    { name: 'Operations', label: 'Operasyon', mockId: 5, realId: 5 }
+  ];
+
+  const uiJobRoles = [
+    // Technology
+    { name: 'Software Engineer', label: 'Yazılım Mühendisi', dept: 'Technology', mockId: 4, realId: 1 },
+    { name: 'Senior Software Engineer', label: 'Kıdemli Yazılım Mühendisi', dept: 'Technology', mockId: 5, realId: 2 },
+    { name: 'Data Scientist', label: 'Veri Bilimci', dept: 'Technology', mockId: 6, realId: 3 },
+    { name: 'Machine Learning Engineer', label: 'Yapay Zeka Mühendisi', dept: 'Technology', mockId: 7, realId: 3 },
+    { name: 'QA Engineer', label: 'Test Mühendisi', dept: 'Technology', mockId: 8, realId: 1 },
+    { name: 'DevOps Engineer', label: 'DevOps Mühendisi', dept: 'Technology', mockId: 9, realId: 1 },
+    { name: 'Technical Support Engineer', label: 'Teknik Destek Mühendisi', dept: 'Technology', mockId: 10, realId: 1 },
+    { name: 'Engineering Manager', label: 'Mühendislik Yöneticisi', dept: 'Technology', mockId: 11, realId: 1 },
+    
+    // Human Resources
+    { name: 'HR Specialist', label: 'İK Uzmanı', dept: 'Human Resources', mockId: 1, realId: 2 },
+    { name: 'Recruiter', label: 'İşe Alım Uzmanı', dept: 'Human Resources', mockId: 2, realId: 2 },
+    { name: 'HR Manager', label: 'İK Yöneticisi', dept: 'Human Resources', mockId: 3, realId: 3 },
+    
+    // Sales & Marketing
+    { name: 'Sales Executive', label: 'Satış Yöneticisi', dept: 'Sales & Marketing', mockId: 12, realId: 4 },
+    { name: 'Sales Representative', label: 'Satış Temsilcisi', dept: 'Sales & Marketing', mockId: 13, realId: 4 },
+    { name: 'Account Manager', label: 'Müşteri Yöneticisi', dept: 'Sales & Marketing', mockId: 14, realId: 4 },
+    { name: 'Marketing Specialist', label: 'Pazarlama Uzmanı', dept: 'Sales & Marketing', mockId: 15, realId: 4 },
+    
+    // Finance & Accounting
+    { name: 'Accountant', label: 'Muhasebeci', dept: 'Finance & Accounting', mockId: 16, realId: 1 },
+    { name: 'Financial Analyst', label: 'Finansal Analist', dept: 'Finance & Accounting', mockId: 17, realId: 1 },
+    { name: 'Payroll Specialist', label: 'Bordro Uzmanı', dept: 'Finance & Accounting', mockId: 18, realId: 1 },
+    { name: 'Finance Manager', label: 'Finans Yöneticisi', dept: 'Finance & Accounting', mockId: 19, realId: 1 },
+    
+    // Operations
+    { name: 'Operations Specialist', label: 'Operasyon Uzmanı', dept: 'Operations', mockId: 20, realId: 1 },
+    { name: 'Logistics Coordinator', label: 'Lojistik Koordinatörü', dept: 'Operations', mockId: 21, realId: 1 },
+    { name: 'Production Engineer', label: 'Üretim Mühendisi', dept: 'Operations', mockId: 22, realId: 1 },
+    { name: 'Field Supervisor', label: 'Saha Sorumlusu', dept: 'Operations', mockId: 23, realId: 1 },
+    { name: 'Operations Manager', label: 'Operasyon Yöneticisi', dept: 'Operations', mockId: 24, realId: 1 }
+  ];
+
+  // Employee Form Fields
+  const [selectedDeptName, setSelectedDeptName] = useState('Technology');
+  const [selectedRoleName, setSelectedRoleName] = useState('Software Engineer');
+  
+  const [formFields, setFormFields] = useState({
+    employeeCode: '',
+    fullName: '',
+    email: '',
+    age: 30,
+    gender: 'Male' as 'Male' | 'Female',
+    managerId: '' as string | number,
+    education: '3',
+    educationField: 'Computer Science',
+    businessTravel: 'Travel_Rarely',
+    maritalStatus: 'Single',
+    distanceFromHome: 5,
+    environmentSatisfaction: 3,
+    jobSatisfaction: 3,
+    workLifeBalance: 3,
+    totalWorkingYears: 5,
+    yearsAtCompany: 2,
+    yearsInCurrentRole: 1,
+    yearsWithCurrManager: 1,
+    performanceScore: 3.0,
+    attrition: 'No' as 'Yes' | 'No'
+  });
+
+  // Filter roles based on selected department
+  const filteredRoles = uiJobRoles.filter(r => r.dept === selectedDeptName);
+
+  // Auto-adjust is handled directly in the select dropdown's onChange handler
+
   const fetchEmployees = async () => {
     setIsLoading(true);
     try {
       const res = await apiClient.employees.list(page, pageSize);
       if (res.success) {
-        // Apply client-side filters for search and department (since backend mock lists all)
         let filtered = res.data;
         
         if (searchTerm) {
@@ -53,11 +142,13 @@ export default function EmployeesPage() {
         setTotalPages(res.totalPages);
       }
     } catch (err) {
-      console.error('Error fetching employees list', err);
+      console.warn('Error fetching employees list:', err);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Lookup list fetching is inlined inside useEffect and handleSubmit
 
   useEffect(() => {
     let active = true;
@@ -71,6 +162,22 @@ export default function EmployeesPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchTerm, selectedDept]);
+
+  useEffect(() => {
+    let active = true;
+    apiClient.employees.list(1, 100)
+      .then((res) => {
+        if (active && res.success) {
+          setAllEmployeesList(res.data);
+        }
+      })
+      .catch((err) => {
+        console.warn('Could not load manager lookup list:', err);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleStartAssessment = async (empId: number) => {
     useConfirmStore.getState().showConfirm({
@@ -88,13 +195,106 @@ export default function EmployeesPage() {
             toast.error(res.message || 'Değerlendirme başlatılamadı.');
           }
         } catch (err) {
-          console.error('Error creating assessment', err);
+          console.warn('Error creating assessment:', err);
           const errMsg = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'İşlem başarısız oldu.';
           toast.error(errMsg);
         }
       }
     });
   };
+
+  const handleInputChange = (field: string, val: string | number) => {
+    setFormFields(prev => ({ ...prev, [field]: val }));
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorList([]);
+
+    // Basic validation
+    if (!formFields.fullName.trim()) {
+      toast.error('Ad Soyad alanı boş bırakılamaz.');
+      return;
+    }
+    if (!formFields.email.trim()) {
+      toast.error('E-posta alanı boş bırakılamaz.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Dynamic ID resolution based on mock setting
+    const deptInfo = uiDepartments.find(d => d.name === selectedDeptName);
+    const roleInfo = uiJobRoles.find(r => r.name === selectedRoleName);
+    
+    const departmentId = apiClient.isMock ? deptInfo?.mockId || 2 : deptInfo?.realId || 1;
+    const jobRoleId = apiClient.isMock ? roleInfo?.mockId || 4 : roleInfo?.realId || 1;
+
+    const payload = {
+      ...formFields,
+      department: selectedDeptName,
+      jobRole: selectedRoleName,
+      departmentId,
+      jobRoleId,
+      managerId: formFields.managerId === '' ? null : Number(formFields.managerId),
+      isActive: true
+    };
+
+    try {
+      const res = await apiClient.employees.create(payload);
+      if (res.success) {
+        toast.success('Yeni çalışan başarıyla kaydedildi.');
+        setIsAddDrawerOpen(false);
+        // Reset form
+        setFormFields({
+          employeeCode: '',
+          fullName: '',
+          email: '',
+          age: 30,
+          gender: 'Male',
+          managerId: '',
+          education: '3',
+          educationField: 'Computer Science',
+          businessTravel: 'Travel_Rarely',
+          maritalStatus: 'Single',
+          distanceFromHome: 5,
+          environmentSatisfaction: 3,
+          jobSatisfaction: 3,
+          workLifeBalance: 3,
+          totalWorkingYears: 5,
+          yearsAtCompany: 2,
+          yearsInCurrentRole: 1,
+          yearsWithCurrManager: 1,
+          performanceScore: 3.0,
+          attrition: 'No'
+        });
+        fetchEmployees();
+        apiClient.employees.list(1, 100)
+          .then((res) => {
+            if (res.success) {
+              setAllEmployeesList(res.data);
+            }
+          })
+          .catch((err) => console.warn('Could not reload manager lookup list:', err));
+      } else {
+        toast.error(res.message || 'Çalışan oluşturulamadı.');
+      }
+    } catch (err: unknown) {
+      console.warn('Error creating employee:', err);
+      const axiosError = err as { response?: { data?: { errors?: string[]; message?: string } } };
+      const errors = axiosError.response?.data?.errors || [];
+      if (errors.length > 0) {
+        setErrorList(errors);
+        toast.error('Doğrulama hatası oluştu. Lütfen form alanlarını kontrol edin.');
+      } else {
+        toast.error(axiosError.response?.data?.message || 'İşlem başarısız oldu.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const [errorList, setErrorList] = useState<string[]>([]);
 
   const departments = [
     'Human Resources',
@@ -105,13 +305,32 @@ export default function EmployeesPage() {
   ];
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6 animate-fadeIn relative">
+      <style>{`
+        @keyframes slideInRight {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+        .animate-slideInRight {
+          animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+      `}</style>
+
       {/* Header section */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h3 className="text-xl font-bold text-foreground">Çalışan Listesi</h3>
           <p className="text-xs text-muted mt-0.5">Yetkinliklerini analiz etmek istediğiniz çalışanı seçin veya değerlendirme başlatın.</p>
         </div>
+        {user?.role === 'Admin' && (
+          <button
+            onClick={() => setIsAddDrawerOpen(true)}
+            className="flex items-center space-x-1.5 rounded-xl bg-primary hover:bg-primary-hover px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/10 transition duration-150"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Yeni Çalışan Ekle</span>
+          </button>
+        )}
       </div>
 
       {/* Filter Row */}
@@ -248,6 +467,459 @@ export default function EmployeesPage() {
             >
               <ArrowRight className="h-4 w-4" />
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Sliding Drawer for Adding Employee */}
+      {isAddDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          {/* Backdrop overlay */}
+          <div
+            onClick={() => setIsAddDrawerOpen(false)}
+            className="absolute inset-0 bg-background/60 backdrop-blur-sm transition-opacity"
+          ></div>
+
+          {/* Panel content */}
+          <div className="relative z-10 w-full max-w-xl h-full bg-card border-l border-card-border shadow-2xl flex flex-col justify-between animate-slideInRight overflow-hidden">
+            {/* Header */}
+            <div className="p-6 border-b border-card-border flex items-center justify-between">
+              <div className="flex items-center space-x-2.5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+                  <UserPlus className="h-5 w-5" />
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-foreground">Yeni Çalışan Kaydet</h4>
+                  <p className="text-[10px] text-muted">Sistem veritabanına yeni çalışan profili ekler.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAddDrawerOpen(false)}
+                className="rounded-lg p-2 text-muted hover:bg-card-border transition"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Tabs Selector */}
+            <div className="px-6 border-b border-card-border flex items-center space-x-4 bg-card/50">
+              <button
+                onClick={() => setActiveFormTab('basic')}
+                className={`py-3 text-xs font-bold border-b-2 flex items-center space-x-1.5 transition ${
+                  activeFormTab === 'basic' ? 'border-primary text-primary' : 'border-transparent text-muted hover:text-foreground'
+                }`}
+              >
+                <UserCheck className="h-3.5 w-3.5" />
+                <span>Kişisel Bilgiler</span>
+              </button>
+              <button
+                onClick={() => setActiveFormTab('job')}
+                className={`py-3 text-xs font-bold border-b-2 flex items-center space-x-1.5 transition ${
+                  activeFormTab === 'job' ? 'border-primary text-primary' : 'border-transparent text-muted hover:text-foreground'
+                }`}
+              >
+                <Briefcase className="h-3.5 w-3.5" />
+                <span>Pozisyon & Görev</span>
+              </button>
+              <button
+                onClick={() => setActiveFormTab('edu')}
+                className={`py-3 text-xs font-bold border-b-2 flex items-center space-x-1.5 transition ${
+                  activeFormTab === 'edu' ? 'border-primary text-primary' : 'border-transparent text-muted hover:text-foreground'
+                }`}
+              >
+                <GraduationCap className="h-3.5 w-3.5" />
+                <span>Eğitim & Performans</span>
+              </button>
+              <button
+                onClick={() => setActiveFormTab('satis')}
+                className={`py-3 text-xs font-bold border-b-2 flex items-center space-x-1.5 transition ${
+                  activeFormTab === 'satis' ? 'border-primary text-primary' : 'border-transparent text-muted hover:text-foreground'
+                }`}
+              >
+                <Smile className="h-3.5 w-3.5" />
+                <span>Memnuniyet & Süre</span>
+              </button>
+            </div>
+
+            {/* Form Fields Wrapper */}
+            <form onSubmit={handleFormSubmit} className="flex-1 flex flex-col justify-between overflow-hidden">
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                
+                {/* Validation Errors Alert */}
+                {errorList.length > 0 && (
+                  <div className="rounded-xl bg-danger/10 border border-danger/20 p-4 text-xs text-danger space-y-1">
+                    <p className="font-bold">Hataları düzeltin:</p>
+                    <ul className="list-disc pl-4 space-y-0.5">
+                      {errorList.map((err, idx) => <li key={idx}>{err}</li>)}
+                    </ul>
+                  </div>
+                )}
+
+                {/* TAB 1: BASIC INFO */}
+                {activeFormTab === 'basic' && (
+                  <div className="space-y-4 animate-fadeIn">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Ad Soyad *</label>
+                        <input
+                          type="text"
+                          required
+                          value={formFields.fullName}
+                          onChange={(e) => handleInputChange('fullName', e.target.value)}
+                          placeholder="Örn: Ali Demir"
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground placeholder-muted outline-none focus:border-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">E-posta Adresi *</label>
+                        <input
+                          type="email"
+                          required
+                          value={formFields.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          placeholder="ali.demir@demo.com"
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground placeholder-muted outline-none focus:border-primary"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Çalışan Kodu</label>
+                        <input
+                          type="text"
+                          value={formFields.employeeCode}
+                          onChange={(e) => handleInputChange('employeeCode', e.target.value)}
+                          placeholder="Boş bırakılırsa oto-üretilir"
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground placeholder-muted outline-none focus:border-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Yaş *</label>
+                        <input
+                          type="number"
+                          required
+                          min={18}
+                          max={70}
+                          value={formFields.age}
+                          onChange={(e) => handleInputChange('age', Number(e.target.value))}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none focus:border-primary"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Cinsiyet</label>
+                        <select
+                          value={formFields.gender}
+                          onChange={(e) => handleInputChange('gender', e.target.value)}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none focus:border-primary"
+                        >
+                          <option value="Male">Erkek</option>
+                          <option value="Female">Kadın</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Medeni Durum</label>
+                        <select
+                          value={formFields.maritalStatus}
+                          onChange={(e) => handleInputChange('maritalStatus', e.target.value)}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none focus:border-primary"
+                        >
+                          <option value="Single">Bekar</option>
+                          <option value="Married">Evli</option>
+                          <option value="Divorced">Boşanmış</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 2: JOB INFO */}
+                {activeFormTab === 'job' && (
+                  <div className="space-y-4 animate-fadeIn">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Departman</label>
+                        <select
+                          value={selectedDeptName}
+                          onChange={(e) => {
+                            const newDept = e.target.value;
+                            setSelectedDeptName(newDept);
+                            const rolesForDept = uiJobRoles.filter(r => r.dept === newDept);
+                            if (rolesForDept.length > 0) {
+                              setSelectedRoleName(rolesForDept[0].name);
+                            }
+                          }}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none focus:border-primary"
+                        >
+                          {uiDepartments.map(d => (
+                            <option key={d.name} value={d.name}>{d.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Rol / Pozisyon</label>
+                        <select
+                          value={selectedRoleName}
+                          onChange={(e) => setSelectedRoleName(e.target.value)}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none focus:border-primary"
+                        >
+                          {filteredRoles.map(r => (
+                            <option key={r.name} value={r.name}>{r.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Yönetici</label>
+                        <select
+                          value={formFields.managerId}
+                          onChange={(e) => handleInputChange('managerId', e.target.value)}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none focus:border-primary"
+                        >
+                          <option value="">Yöneticisi Yok</option>
+                          {allEmployeesList.map(e => (
+                            <option key={e.id} value={e.id}>{e.fullName} ({e.jobRole})</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Seyahat Sıklığı</label>
+                        <select
+                          value={formFields.businessTravel}
+                          onChange={(e) => handleInputChange('businessTravel', e.target.value)}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none focus:border-primary"
+                        >
+                          <option value="Travel_Rarely">Seyahat Etmiyor / Nadiren</option>
+                          <option value="Travel_Frequently">Sık Sık Seyahat Ediyor</option>
+                          <option value="Non-Travel">Seyahat Yok</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Evden Uzaklık (km)</label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={100}
+                        value={formFields.distanceFromHome}
+                        onChange={(e) => handleInputChange('distanceFromHome', Number(e.target.value))}
+                        className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none focus:border-primary"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 3: EDUCATION & PERFORMANCE */}
+                {activeFormTab === 'edu' && (
+                  <div className="space-y-4 animate-fadeIn">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Eğitim Seviyesi</label>
+                        <select
+                          value={formFields.education}
+                          onChange={(e) => handleInputChange('education', e.target.value)}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none focus:border-primary"
+                        >
+                          <option value="1">Lise / Ön Lisans</option>
+                          <option value="2">Lisans</option>
+                          <option value="3">Yüksek Lisans</option>
+                          <option value="4">Doktora</option>
+                          <option value="5">İleri Düzey Doktora / Post-Doc</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Eğitim Alanı</label>
+                        <select
+                          value={formFields.educationField}
+                          onChange={(e) => handleInputChange('educationField', e.target.value)}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none focus:border-primary"
+                        >
+                          <option value="Life Sciences">Yaşam Bilimleri (Life Sciences)</option>
+                          <option value="Medical">Tıp/Sağlık (Medical)</option>
+                          <option value="Marketing">Pazarlama (Marketing)</option>
+                          <option value="Technical Degree">Teknik Derece (Technical Degree)</option>
+                          <option value="Human Resources">İnsan Kaynakları (Human Resources)</option>
+                          <option value="Computer Science">Bilgisayar Bilimleri (Computer Science)</option>
+                          <option value="Other">Diğer (Other)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-[10px] font-bold text-muted uppercase">Son Dönem Performans Skoru</label>
+                        <span className="text-xs font-bold text-primary">{formFields.performanceScore.toFixed(1)}</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <span className="text-[10px] text-muted">1.0</span>
+                        <input
+                          type="range"
+                          min="1.0"
+                          max="5.0"
+                          step="0.1"
+                          value={formFields.performanceScore}
+                          onChange={(e) => handleInputChange('performanceScore', parseFloat(e.target.value))}
+                          className="w-full h-1.5 bg-card-border rounded-lg appearance-none cursor-pointer accent-primary"
+                        />
+                        <span className="text-[10px] text-muted">5.0</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Ayrılma Durumu / Riski (Attrition)</label>
+                      <select
+                        value={formFields.attrition}
+                        onChange={(e) => handleInputChange('attrition', e.target.value)}
+                        className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none focus:border-primary"
+                      >
+                        <option value="No">Hayır (Düşük Risk)</option>
+                        <option value="Yes">Evet (Yüksek Risk)</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 4: SATISFACTION & EXPERIENCE */}
+                {activeFormTab === 'satis' && (
+                  <div className="space-y-4 animate-fadeIn">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Ortam Memnuniyeti</label>
+                        <select
+                          value={formFields.environmentSatisfaction}
+                          onChange={(e) => handleInputChange('environmentSatisfaction', Number(e.target.value))}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-2.5 text-xs text-foreground outline-none"
+                        >
+                          <option value="1">1 (Çok Zayıf)</option>
+                          <option value="2">2 (Zayıf)</option>
+                          <option value="3">3 (İyi)</option>
+                          <option value="4">4 (Çok İyi)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">İş Memnuniyeti</label>
+                        <select
+                          value={formFields.jobSatisfaction}
+                          onChange={(e) => handleInputChange('jobSatisfaction', Number(e.target.value))}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-2.5 text-xs text-foreground outline-none"
+                        >
+                          <option value="1">1 (Çok Zayıf)</option>
+                          <option value="2">2 (Zayıf)</option>
+                          <option value="3">3 (İyi)</option>
+                          <option value="4">4 (Çok İyi)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Yaşam Dengesi</label>
+                        <select
+                          value={formFields.workLifeBalance}
+                          onChange={(e) => handleInputChange('workLifeBalance', Number(e.target.value))}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-2.5 text-xs text-foreground outline-none"
+                        >
+                          <option value="1">1 (Çok Zayıf)</option>
+                          <option value="2">2 (Zayıf)</option>
+                          <option value="3">3 (İyi)</option>
+                          <option value="4">4 (Çok İyi)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Toplam Çalışma Süresi (Yıl)</label>
+                        <input
+                          type="number"
+                          min={0}
+                          value={formFields.totalWorkingYears}
+                          onChange={(e) => handleInputChange('totalWorkingYears', Number(e.target.value))}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Şirketteki Yılı</label>
+                        <input
+                          type="number"
+                          min={0}
+                          value={formFields.yearsAtCompany}
+                          onChange={(e) => handleInputChange('yearsAtCompany', Number(e.target.value))}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Mevcut Pozisyon Süresi (Yıl)</label>
+                        <input
+                          type="number"
+                          min={0}
+                          value={formFields.yearsInCurrentRole}
+                          onChange={(e) => handleInputChange('yearsInCurrentRole', Number(e.target.value))}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Mevcut Yöneticiyle Süre (Yıl)</label>
+                        <input
+                          type="number"
+                          min={0}
+                          value={formFields.yearsWithCurrManager}
+                          onChange={(e) => handleInputChange('yearsWithCurrManager', Number(e.target.value))}
+                          className="w-full rounded-xl bg-card/50 border border-card-border p-3 text-xs text-foreground outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              </div>
+
+              {/* Drawer Footer actions */}
+              <div className="p-6 border-t border-card-border bg-card/50 flex items-center justify-between space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setIsAddDrawerOpen(false)}
+                  className="w-1/3 rounded-xl border border-card-border hover:bg-card-border py-3 text-xs font-bold text-muted hover:text-foreground transition"
+                >
+                  İptal
+                </button>
+                {activeFormTab !== 'satis' ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (activeFormTab === 'basic') setActiveFormTab('job');
+                      else if (activeFormTab === 'job') setActiveFormTab('edu');
+                      else if (activeFormTab === 'edu') setActiveFormTab('satis');
+                    }}
+                    className="w-2/3 rounded-xl bg-primary hover:bg-primary-hover py-3 text-xs font-bold text-white transition flex items-center justify-center space-x-1.5"
+                  >
+                    <span>Sonraki Adım</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-2/3 rounded-xl bg-success hover:bg-success-hover py-3 text-xs font-bold text-white transition flex items-center justify-center space-x-1.5 disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                    ) : (
+                      <>
+                        <Plus className="h-4 w-4" />
+                        <span>Kaydı Tamamla</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -58,8 +58,9 @@ export default function LoginPage() {
   };
 
   const demoUsers = [
+    { label: 'Sistem Yöneticisi (Admin)', email: 'admin@demo.com', pass: 'Admin1234!', color: 'border-danger/30 hover:border-danger text-danger' },
     { label: 'İnsan Kaynakları (HR)', email: 'hr@demo.com', pass: 'Hr1234!', color: 'border-primary/30 hover:border-primary text-primary' },
-    { label: 'Yönetici (Manager)', email: 'manager@demo.com', pass: 'Manager1234!', color: 'border-info/30 hover:border-info text-info' },
+    { label: 'Takım Yöneticisi (Manager)', email: 'manager@demo.com', pass: 'Manager1234!', color: 'border-info/30 hover:border-info text-info' },
     { label: 'Çalışan (Employee)', email: 'employee@demo.com', pass: 'Employee1234!', color: 'border-success/30 hover:border-success text-success' }
   ];
 

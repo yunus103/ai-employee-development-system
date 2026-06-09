@@ -16,7 +16,9 @@ import {
   UserRole,
   EvaluatorType,
   ActionPriority,
-  TaskStatus
+  TaskStatus,
+  AssessmentAssignment,
+  MySurvey
 } from '../types';
 
 // Standard Delay to simulate network request
@@ -191,6 +193,76 @@ export const mockApi = {
     return { success: true, message: 'Çalışan güncellendi.', data: employees[idx] };
   },
 
+  createEmployee: async (data: Omit<EmployeeDetail, 'id' | 'managerName'>): Promise<ApiResponse<EmployeeDetail>> => {
+    await delay(300);
+    const employees = mockDb.getEmployees();
+    const newId = employees.length > 0 ? Math.max(...employees.map((e) => e.id)) + 1 : 1;
+    
+    // Auto-generate employeeCode if not provided
+    const employeeCode = data.employeeCode || `EMP${String(newId).padStart(3, '0')}`;
+    
+    // Find manager name if managerId is provided
+    let managerName = null;
+    if (data.managerId) {
+      const manager = employees.find((e) => e.id === data.managerId);
+      if (manager) {
+        managerName = manager.fullName;
+      }
+    }
+
+    // Determine string values for department and jobRole based on departmentId and jobRoleId
+    let department = 'Technology';
+    if (data.departmentId === 1) department = 'Human Resources';
+    else if (data.departmentId === 2) department = 'Technology';
+    else if (data.departmentId === 3) department = 'Sales & Marketing';
+    else if (data.departmentId === 4) department = 'Finance & Accounting';
+    else if (data.departmentId === 5) department = 'Operations';
+
+    // Job Roles list matching IDs
+    const jobRoleMapping: Record<number, string> = {
+      1: 'HR Specialist',
+      2: 'Recruiter',
+      3: 'HR Manager',
+      4: 'Software Engineer',
+      5: 'Senior Software Engineer',
+      6: 'Data Scientist',
+      7: 'Machine Learning Engineer',
+      8: 'QA Engineer',
+      9: 'DevOps Engineer',
+      10: 'Technical Support Engineer',
+      11: 'Engineering Manager',
+      12: 'Sales Executive',
+      13: 'Sales Representative',
+      14: 'Account Manager',
+      15: 'Marketing Specialist',
+      16: 'Accountant',
+      17: 'Financial Analyst',
+      18: 'Payroll Specialist',
+      19: 'Finance Manager',
+      20: 'Operations Specialist',
+      21: 'Logistics Coordinator',
+      22: 'Production Engineer',
+      23: 'Field Supervisor',
+      24: 'Operations Manager'
+    };
+    
+    const jobRole = jobRoleMapping[data.jobRoleId] || 'Software Engineer';
+
+    const newEmployee: EmployeeDetail = {
+      ...data,
+      id: newId,
+      employeeCode,
+      managerName,
+      department,
+      jobRole,
+      isActive: true
+    } as EmployeeDetail;
+
+    employees.push(newEmployee);
+    mockDb.setEmployees(employees);
+    return { success: true, message: 'Çalışan başarıyla oluşturuldu.', data: newEmployee };
+  },
+
   getEmployeeFeatures: async (id: number, assessmentId: number): Promise<ApiResponse<any>> => {
     await delay(200);
     const employees = mockDb.getEmployees();
@@ -295,7 +367,6 @@ export const mockApi = {
     }
     return { success: true, message: null, data: assessment };
   },
-
   createAssessment: async (employeeId: number, cycleId: number): Promise<ApiResponse<Assessment>> => {
     await delay(300);
     // Check if there is an active incomplete plan
@@ -335,6 +406,38 @@ export const mockApi = {
     assessments.push(newAssessment);
     mockDb.setAssessments(assessments);
 
+    // Automatically generate assignments
+    const assignments = mockDb.getAssignments();
+    const nextAssignmentId = () => assignments.length > 0 ? Math.max(...assignments.map((a) => a.id)) + 1 : 1;
+
+    // Self assignment
+    assignments.push({
+      id: nextAssignmentId(),
+      assessmentId: newId,
+      evaluatorEmployeeId: employeeId,
+      evaluatorEmployeeName: emp.fullName,
+      evaluatorType: 'Self',
+      isCompleted: false,
+      completedAt: null
+    });
+
+    // Manager assignment
+    if (emp.managerId) {
+      const mgr = employees.find(e => e.id === emp.managerId);
+      if (mgr) {
+        assignments.push({
+          id: nextAssignmentId(),
+          assessmentId: newId,
+          evaluatorEmployeeId: emp.managerId,
+          evaluatorEmployeeName: mgr.fullName,
+          evaluatorType: 'Manager',
+          isCompleted: false,
+          completedAt: null
+        });
+      }
+    }
+    mockDb.setAssignments(assignments);
+
     return { success: true, message: 'Değerlendirme oluşturuldu.', data: newAssessment };
   },
 
@@ -358,8 +461,15 @@ export const mockApi = {
       };
     }
 
-    // Calculate overall score (average of all scores)
-    const avg = scores.reduce((sum, s) => sum + s.score, 0) / scores.length;
+    // Calculate overall score (average of the 13 competency averages)
+    const metadata = mockDb.getCompetencyMetadata();
+    let compSum = 0;
+    for (const comp of metadata) {
+      const compScores = scores.filter(s => s.competencyId === comp.id);
+      const compAvg = compScores.length > 0 ? compScores.reduce((sum, s) => sum + s.score, 0) / compScores.length : 3.0;
+      compSum += compAvg;
+    }
+    const avg = compSum / metadata.length;
 
     assessments[idx].status = 'Completed';
     assessments[idx].overallScore = parseFloat(avg.toFixed(2));
@@ -368,7 +478,6 @@ export const mockApi = {
 
     return { success: true, message: 'Değerlendirme tamamlandı.', data: assessments[idx] };
   },
-
   getAssessmentScores: async (id: number): Promise<ApiResponse<AssessmentScore[]>> => {
     await delay(150);
     const scores = mockDb.getScores().filter((s) => s.assessmentId === id);
@@ -411,6 +520,7 @@ export const mockApi = {
         competencyId,
         competencyCode: metadata.code,
         competencyName: metadata.name,
+        evaluatorEmployeeId: currentSession?.employeeId || 99,
         evaluatorType,
         score
       };
@@ -419,6 +529,182 @@ export const mockApi = {
 
     mockDb.setScores(allScores);
     return { success: true, message: 'Skor kaydedildi.', data: updatedOrNewScore };
+  },
+
+  submitBulkScores: async (
+    id: number,
+    evaluatorEmployeeId: number,
+    scoresList: { competencyId: number; score: number }[]
+  ): Promise<ApiResponse<AssessmentScore[]>> => {
+    await delay(300);
+    const metadataList = mockDb.getCompetencyMetadata();
+    const allScores = mockDb.getScores();
+    const addedOrUpdated: AssessmentScore[] = [];
+
+    // Find evaluator employee and determine evaluator type
+    const employees = mockDb.getEmployees();
+    const evaluatorEmp = employees.find(e => e.id === evaluatorEmployeeId);
+    const assessment = mockDb.getAssessments().find(a => a.id === id);
+    if (!assessment) {
+      return { success: false, message: 'Değerlendirme bulunamadı.', data: [] };
+    }
+    
+    // Determine type
+    let determinedType: EvaluatorType = 'Peer';
+    if (evaluatorEmployeeId === assessment.employeeId) {
+      determinedType = 'Self';
+    } else if (assessment.employeeId) {
+      const targetEmp = employees.find(e => e.id === assessment.employeeId);
+      if (targetEmp && targetEmp.managerId === evaluatorEmployeeId) {
+        determinedType = 'Manager';
+      } else if (evaluatorEmp && targetEmp && evaluatorEmp.managerId === targetEmp.id) {
+        determinedType = 'Subordinate';
+      } else if (evaluatorEmp && targetEmp && evaluatorEmp.department === targetEmp.department) {
+        determinedType = 'Peer';
+      }
+    }
+
+    for (const scoreEntry of scoresList) {
+      const metadata = metadataList.find(m => m.id === scoreEntry.competencyId);
+      if (!metadata) continue;
+      
+      const existingIdx = allScores.findIndex(
+        s => s.assessmentId === id &&
+             s.competencyId === scoreEntry.competencyId &&
+             s.evaluatorEmployeeId === evaluatorEmployeeId
+      );
+
+      if (existingIdx !== -1) {
+        allScores[existingIdx].score = scoreEntry.score;
+        allScores[existingIdx].evaluatorType = determinedType;
+        addedOrUpdated.push(allScores[existingIdx]);
+      } else {
+        const newId = allScores.length > 0 ? Math.max(...allScores.map(s => s.id)) + 1 : 1;
+        const newScore: AssessmentScore = {
+          id: newId,
+          assessmentId: id,
+          competencyId: scoreEntry.competencyId,
+          competencyCode: metadata.code,
+          competencyName: metadata.name,
+          evaluatorEmployeeId,
+          evaluatorType: determinedType,
+          score: scoreEntry.score
+        };
+        allScores.push(newScore);
+        addedOrUpdated.push(newScore);
+      }
+    }
+
+    mockDb.setScores(allScores);
+
+    // Update assignment status to completed
+    const assignments = mockDb.getAssignments();
+    const assignIdx = assignments.findIndex(
+      a => a.assessmentId === id && a.evaluatorEmployeeId === evaluatorEmployeeId
+    );
+    if (assignIdx !== -1) {
+      assignments[assignIdx].isCompleted = true;
+      assignments[assignIdx].completedAt = new Date().toISOString();
+      mockDb.setAssignments(assignments);
+    }
+
+    // Automatically complete the assessment if all assignments for it are now completed
+    const assessmentAssignments = assignments.filter(a => a.assessmentId === id);
+    const allCompleted = assessmentAssignments.every(a => a.isCompleted);
+    if (allCompleted && assessmentAssignments.length > 0) {
+      // Trigger complete
+      const assessments = mockDb.getAssessments();
+      const assIdx = assessments.findIndex(a => a.id === id);
+      if (assIdx !== -1) {
+        const finalScores = allScores.filter(s => s.assessmentId === id);
+        const metadata = mockDb.getCompetencyMetadata();
+        let compSum = 0;
+        for (const comp of metadata) {
+          const compScores = finalScores.filter(s => s.competencyId === comp.id);
+          const compAvg = compScores.length > 0 ? compScores.reduce((sum, s) => sum + s.score, 0) / compScores.length : 3.0;
+          compSum += compAvg;
+        }
+        const avg = compSum / metadata.length;
+        assessments[assIdx].status = 'Completed';
+        assessments[assIdx].overallScore = parseFloat(avg.toFixed(2));
+        assessments[assIdx].updatedAt = new Date().toISOString();
+        mockDb.setAssessments(assessments);
+      }
+    }
+
+    return { success: true, message: 'Skorlar toplu kaydedildi.', data: addedOrUpdated };
+  },
+
+  addAssignment: async (
+    assessmentId: number,
+    evaluatorEmployeeId: number,
+    evaluatorType: EvaluatorType
+  ): Promise<ApiResponse<AssessmentAssignment>> => {
+    await delay(200);
+    const assignments = mockDb.getAssignments();
+    const employees = mockDb.getEmployees();
+    const evaluator = employees.find(e => e.id === evaluatorEmployeeId);
+    if (!evaluator) {
+      return { success: false, message: 'Çalışan bulunamadı.', data: null as any };
+    }
+
+    // Check if duplicate assignment exists
+    const exists = assignments.some(a => a.assessmentId === assessmentId && a.evaluatorEmployeeId === evaluatorEmployeeId);
+    if (exists) {
+      return { success: false, message: 'Bu çalışan zaten bu değerlendirme için atanmış.', data: null as any };
+    }
+
+    const newId = assignments.length > 0 ? Math.max(...assignments.map(a => a.id)) + 1 : 1;
+    const newAssignment: AssessmentAssignment = {
+      id: newId,
+      assessmentId,
+      evaluatorEmployeeId,
+      evaluatorEmployeeName: evaluator.fullName,
+      evaluatorType,
+      isCompleted: false,
+      completedAt: null
+    };
+
+    assignments.push(newAssignment);
+    mockDb.setAssignments(assignments);
+
+    return { success: true, message: 'Değerlendirici atandı.', data: newAssignment };
+  },
+
+  listAssignments: async (assessmentId: number): Promise<ApiResponse<AssessmentAssignment[]>> => {
+    await delay(150);
+    const assignments = mockDb.getAssignments().filter(a => a.assessmentId === assessmentId);
+    return { success: true, message: null, data: assignments };
+  },
+
+  getMySurveys: async (): Promise<ApiResponse<MySurvey[]>> => {
+    await delay(200);
+    if (!currentSession || currentSession.employeeId === null) {
+      return { success: false, message: 'Çalışan kaydı bulunamadı.', data: [] };
+    }
+
+    const empId = currentSession.employeeId;
+    const assignments = mockDb.getAssignments().filter(a => a.evaluatorEmployeeId === empId && !a.isCompleted);
+    const assessments = mockDb.getAssessments();
+
+    const surveys: MySurvey[] = [];
+    for (const assign of assignments) {
+      const assessment = assessments.find(a => a.id === assign.assessmentId);
+      if (assessment && assessment.status === 'Draft') {
+        surveys.push({
+          assignmentId: assign.id,
+          assessmentId: assign.assessmentId,
+          employeeId: assessment.employeeId,
+          employeeName: assessment.employeeName,
+          cycleId: assessment.cycleId,
+          cycleName: assessment.cycleName,
+          evaluatorType: assign.evaluatorType,
+          competencyCount: 13
+        });
+      }
+    }
+
+    return { success: true, message: null, data: surveys };
   },
 
   // Action Plans & AI Recommendation Logic
@@ -875,6 +1161,29 @@ export const mockApi = {
 
     mockDb.setTasks(tasks);
     return { success: true, message: 'Gelişim planı çalışana iletildi, görevler oluşturuldu.', data: plan };
+  },
+
+  cancelActionPlan: async (id: number): Promise<ApiResponse<ActionPlan>> => {
+    await delay(300);
+    const plans = mockDb.getActionPlans();
+    const idx = plans.findIndex((p) => p.id === id);
+    if (idx === -1) {
+      return { success: false, message: 'Aksiyon planı bulunamadı.', data: null as any };
+    }
+
+    plans[idx].status = 'Cancelled';
+    plans[idx].updatedAt = new Date().toISOString();
+    mockDb.setActionPlans(plans);
+
+    // Update corresponding assessment status
+    const assessments = mockDb.getAssessments();
+    const assIdx = assessments.findIndex((a) => a.id === plans[idx].assessmentId);
+    if (assIdx !== -1) {
+      assessments[assIdx].status = 'Analyzed';
+      mockDb.setAssessments(assessments);
+    }
+
+    return { success: true, message: 'Aksiyon planı iptal edildi.', data: plans[idx] };
   },
 
   // Employee Tasks

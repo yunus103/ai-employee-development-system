@@ -41,15 +41,19 @@ export default function EmployeeDashboard() {
           setTasks(taskRes.data);
         }
 
-        // Fetch plans
-        const planRes = await apiClient.employees.getActionPlans(user.employeeId);
-        if (planRes.success && planRes.data.length > 0) {
-          // Get the latest plan's assessment scores for Radar chart
-          const activePlan = planRes.data[0];
-          const scoreRes = await apiClient.assessments.getScores(activePlan.assessmentId);
-          if (scoreRes.success) {
-            setScores(scoreRes.data);
+        // Fetch plans (requires HrOrManager, might return 403 for standard Employee)
+        try {
+          const planRes = await apiClient.employees.getActionPlans(user.employeeId);
+          if (planRes.success && planRes.data.length > 0) {
+            // Get the latest plan's assessment scores for Radar chart
+            const activePlan = planRes.data[0];
+            const scoreRes = await apiClient.assessments.getScores(activePlan.assessmentId);
+            if (scoreRes.success) {
+              setScores(scoreRes.data);
+            }
           }
+        } catch (planErr) {
+          console.warn('Action plans or scores are restricted for standard employees (403):', planErr);
         }
       } catch (err) {
         console.error('Error fetching employee data', err);

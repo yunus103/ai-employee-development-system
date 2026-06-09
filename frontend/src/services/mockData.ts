@@ -3,7 +3,8 @@ import {
   Assessment,
   AssessmentScore,
   ActionPlan,
-  EmployeeTask
+  EmployeeTask,
+  AssessmentAssignment
 } from '../types';
 
 // Helper to get/set localStorage safely
@@ -153,6 +154,68 @@ const INITIAL_ASSESSMENTS: Assessment[] = [
     createdByUserName: 'HR User',
     createdAt: '2026-05-15T09:00:00Z',
     updatedAt: '2026-05-16T11:00:00Z'
+  },
+  {
+    id: 2,
+    employeeId: 1,
+    employeeName: 'Ayşe Kaya',
+    cycleId: 1,
+    cycleName: '2024 Q4 Değerlendirmesi',
+    overallScore: null,
+    status: 'Draft',
+    createdByUserId: 2,
+    createdByUserName: 'HR User',
+    createdAt: '2026-06-08T09:00:00Z',
+    updatedAt: null
+  }
+];
+
+// Initial Mock Assignments
+const INITIAL_ASSIGNMENTS: AssessmentAssignment[] = [
+  {
+    id: 1,
+    assessmentId: 1,
+    evaluatorEmployeeId: 1,
+    evaluatorEmployeeName: 'Ayşe Kaya',
+    evaluatorType: 'Self',
+    isCompleted: true,
+    completedAt: '2026-05-15T10:00:00Z'
+  },
+  {
+    id: 2,
+    assessmentId: 1,
+    evaluatorEmployeeId: 2,
+    evaluatorEmployeeName: 'Mehmet Yılmaz',
+    evaluatorType: 'Manager',
+    isCompleted: true,
+    completedAt: '2026-05-16T11:00:00Z'
+  },
+  {
+    id: 3,
+    assessmentId: 2,
+    evaluatorEmployeeId: 1,
+    evaluatorEmployeeName: 'Ayşe Kaya',
+    evaluatorType: 'Self',
+    isCompleted: false,
+    completedAt: null
+  },
+  {
+    id: 4,
+    assessmentId: 2,
+    evaluatorEmployeeId: 2,
+    evaluatorEmployeeName: 'Mehmet Yılmaz',
+    evaluatorType: 'Manager',
+    isCompleted: false,
+    completedAt: null
+  },
+  {
+    id: 5,
+    assessmentId: 2,
+    evaluatorEmployeeId: 4,
+    evaluatorEmployeeName: 'Elif Şen',
+    evaluatorType: 'Peer',
+    isCompleted: false,
+    completedAt: null
   }
 ];
 
@@ -175,19 +238,19 @@ const COMPETENCY_METADATA = [
 
 // Initial Assessment Scores for Ayşe Kaya (Assessment ID=1)
 const INITIAL_SCORES: AssessmentScore[] = [
-  { id: 1, assessmentId: 1, competencyId: 1, competencyCode: 'Core_Communication', competencyName: 'İletişim', evaluatorType: 'Manager', score: 3.2 },
-  { id: 2, assessmentId: 1, competencyId: 2, competencyCode: 'Core_Teamwork', competencyName: 'Takım Çalışması', evaluatorType: 'Manager', score: 3.7 },
-  { id: 3, assessmentId: 1, competencyId: 3, competencyCode: 'Core_ProblemSolving', competencyName: 'Problem Çözme', evaluatorType: 'Manager', score: 3.5 },
-  { id: 4, assessmentId: 1, competencyId: 4, competencyCode: 'Core_Adaptability', competencyName: 'Esneklik ve Uyum', evaluatorType: 'Manager', score: 3.1 },
-  { id: 5, assessmentId: 1, competencyId: 5, competencyCode: 'Core_TimeManagement', competencyName: 'Zaman Yönetimi', evaluatorType: 'Manager', score: 2.9 },
-  { id: 6, assessmentId: 1, competencyId: 6, competencyCode: 'Core_Initiative', competencyName: 'İnisiyatif Alma', evaluatorType: 'Manager', score: 3.0 },
-  { id: 7, assessmentId: 1, competencyId: 7, competencyCode: 'Core_Accountability', competencyName: 'Sorumluluk Sahipliği', evaluatorType: 'Manager', score: 3.8 },
-  { id: 8, assessmentId: 1, competencyId: 8, competencyCode: 'Core_LearningAgility', competencyName: 'Öğrenme Çevikliği', evaluatorType: 'Manager', score: 3.4 },
-  { id: 9, assessmentId: 1, competencyId: 9, competencyCode: 'Dept_Comp1', competencyName: 'Sales_SalesSkill', evaluatorType: 'Manager', score: 3.5 },
-  { id: 10, assessmentId: 1, competencyId: 10, competencyCode: 'Dept_Comp2', competencyName: 'Sales_Negotiation', evaluatorType: 'Manager', score: 3.0 },
-  { id: 11, assessmentId: 1, competencyId: 11, competencyCode: 'Dept_Comp3', competencyName: 'Sales_CustomerRelationship', evaluatorType: 'Manager', score: 3.6 },
-  { id: 12, assessmentId: 1, competencyId: 12, competencyCode: 'Role_Comp1', competencyName: 'Sales_ClosingDeals', evaluatorType: 'Manager', score: 3.4 },
-  { id: 13, assessmentId: 1, competencyId: 13, competencyCode: 'Role_Comp2', competencyName: 'Sales_PipelineManagement', evaluatorType: 'Manager', score: 3.1 }
+  { id: 1, assessmentId: 1, competencyId: 1, competencyCode: 'Core_Communication', competencyName: 'İletişim', evaluatorEmployeeId: 2, evaluatorType: 'Manager', score: 3.2 },
+  { id: 2, assessmentId: 1, competencyId: 2, competencyCode: 'Core_Teamwork', competencyName: 'Takım Çalışması', evaluatorEmployeeId: 2, evaluatorType: 'Manager', score: 3.7 },
+  { id: 3, assessmentId: 1, competencyId: 3, competencyCode: 'Core_ProblemSolving', competencyName: 'Problem Çözme', evaluatorEmployeeId: 2, evaluatorType: 'Manager', score: 3.5 },
+  { id: 4, assessmentId: 1, competencyId: 4, competencyCode: 'Core_Adaptability', competencyName: 'Esneklik ve Uyum', evaluatorEmployeeId: 2, evaluatorType: 'Manager', score: 3.1 },
+  { id: 5, assessmentId: 1, competencyId: 5, competencyCode: 'Core_TimeManagement', competencyName: 'Zaman Yönetimi', evaluatorEmployeeId: 2, evaluatorType: 'Manager', score: 2.9 },
+  { id: 6, assessmentId: 1, competencyId: 6, competencyCode: 'Core_Initiative', competencyName: 'İnisiyatif Alma', evaluatorEmployeeId: 2, evaluatorType: 'Manager', score: 3.0 },
+  { id: 7, assessmentId: 1, competencyId: 7, competencyCode: 'Core_Accountability', competencyName: 'Sorumluluk Sahipliği', evaluatorEmployeeId: 2, evaluatorType: 'Manager', score: 3.8 },
+  { id: 8, assessmentId: 1, competencyId: 8, competencyCode: 'Core_LearningAgility', competencyName: 'Öğrenme Çevikliği', evaluatorEmployeeId: 2, evaluatorType: 'Manager', score: 3.4 },
+  { id: 9, assessmentId: 1, competencyId: 9, competencyCode: 'Dept_Comp1', competencyName: 'Sales_SalesSkill', evaluatorEmployeeId: 2, evaluatorType: 'Manager', score: 3.5 },
+  { id: 10, assessmentId: 1, competencyId: 10, competencyCode: 'Dept_Comp2', competencyName: 'Sales_Negotiation', evaluatorEmployeeId: 2, evaluatorType: 'Manager', score: 3.0 },
+  { id: 11, assessmentId: 1, competencyId: 11, competencyCode: 'Dept_Comp3', competencyName: 'Sales_CustomerRelationship', evaluatorEmployeeId: 2, evaluatorType: 'Manager', score: 3.6 },
+  { id: 12, assessmentId: 1, competencyId: 12, competencyCode: 'Role_Comp1', competencyName: 'Sales_ClosingDeals', evaluatorEmployeeId: 2, evaluatorType: 'Manager', score: 3.4 },
+  { id: 13, assessmentId: 1, competencyId: 13, competencyCode: 'Role_Comp2', competencyName: 'Sales_PipelineManagement', evaluatorEmployeeId: 2, evaluatorType: 'Manager', score: 3.1 }
 ];
 
 export const initializeMockDatabase = () => {
@@ -198,6 +261,9 @@ export const initializeMockDatabase = () => {
   }
   if (!localStorage.getItem('mock_assessments')) {
     setLocalStorage('mock_assessments', INITIAL_ASSESSMENTS);
+  }
+  if (!localStorage.getItem('mock_assignments')) {
+    setLocalStorage('mock_assignments', INITIAL_ASSIGNMENTS);
   }
   if (!localStorage.getItem('mock_scores')) {
     setLocalStorage('mock_scores', INITIAL_SCORES);
@@ -217,6 +283,9 @@ export const mockDb = {
   
   getAssessments: () => getLocalStorage<Assessment[]>('mock_assessments', INITIAL_ASSESSMENTS),
   setAssessments: (val: Assessment[]) => setLocalStorage('mock_assessments', val),
+
+  getAssignments: () => getLocalStorage<AssessmentAssignment[]>('mock_assignments', INITIAL_ASSIGNMENTS),
+  setAssignments: (val: AssessmentAssignment[]) => setLocalStorage('mock_assignments', val),
   
   getScores: () => getLocalStorage<AssessmentScore[]>('mock_scores', INITIAL_SCORES),
   setScores: (val: AssessmentScore[]) => setLocalStorage('mock_scores', val),

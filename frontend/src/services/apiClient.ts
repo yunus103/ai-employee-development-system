@@ -15,7 +15,9 @@ import {
   ActionPriority,
   TaskStatus,
   ApiResponse,
-  PagedResponse
+  PagedResponse,
+  AssessmentAssignment,
+  MySurvey
 } from '../types';
 
 // Initialize mock DB data in client-side localStorage
@@ -177,6 +179,11 @@ export const apiClient = {
       const res = await axiosInstance.put<ApiResponse<EmployeeDetail>>(`/api/employees/${id}`, data);
       return res.data;
     },
+    create: async (data: Omit<EmployeeDetail, 'id' | 'managerName'>): Promise<ApiResponse<EmployeeDetail>> => {
+      if (USE_MOCK) return mockApi.createEmployee(data);
+      const res = await axiosInstance.post<ApiResponse<EmployeeDetail>>('/api/employees', data);
+      return res.data;
+    },
     getFeatures: async (id: number, assessmentId: number): Promise<ApiResponse<EmployeeFeatures>> => {
       if (USE_MOCK) return mockApi.getEmployeeFeatures(id, assessmentId);
       const res = await axiosInstance.get<ApiResponse<EmployeeFeatures>>(`/api/employees/${id}/features`, {
@@ -236,6 +243,35 @@ export const apiClient = {
         score
       });
       return res.data;
+    },
+    submitBulkScores: async (
+      id: number,
+      evaluatorEmployeeId: number,
+      scores: { competencyId: number; score: number }[]
+    ): Promise<ApiResponse<AssessmentScore[]>> => {
+      if (USE_MOCK) return mockApi.submitBulkScores(id, evaluatorEmployeeId, scores);
+      const res = await axiosInstance.post<ApiResponse<AssessmentScore[]>>(`/api/assessments/${id}/scores/bulk`, {
+        evaluatorEmployeeId,
+        scores
+      });
+      return res.data;
+    },
+    addAssignment: async (
+      id: number,
+      evaluatorEmployeeId: number,
+      evaluatorType: EvaluatorType
+    ): Promise<ApiResponse<AssessmentAssignment>> => {
+      if (USE_MOCK) return mockApi.addAssignment(id, evaluatorEmployeeId, evaluatorType);
+      const res = await axiosInstance.post<ApiResponse<AssessmentAssignment>>(`/api/assessments/${id}/assignments`, {
+        evaluatorEmployeeId,
+        evaluatorType
+      });
+      return res.data;
+    },
+    listAssignments: async (id: number): Promise<ApiResponse<AssessmentAssignment[]>> => {
+      if (USE_MOCK) return mockApi.listAssignments(id);
+      const res = await axiosInstance.get<ApiResponse<AssessmentAssignment[]>>(`/api/assessments/${id}/assignments`);
+      return res.data;
     }
   },
 
@@ -282,6 +318,11 @@ export const apiClient = {
       const res = await axiosInstance.post<ApiResponse<ActionPlan>>(`/api/action-plans/${id}/send`);
       return res.data;
     },
+    cancel: async (id: number): Promise<ApiResponse<ActionPlan>> => {
+      if (USE_MOCK) return mockApi.cancelActionPlan(id);
+      const res = await axiosInstance.post<ApiResponse<ActionPlan>>(`/api/action-plans/${id}/cancel`);
+      return res.data;
+    },
     exportPdf: async (id: number): Promise<Blob> => {
       if (USE_MOCK) {
         // Return dummy PDF blob for mock
@@ -301,6 +342,11 @@ export const apiClient = {
       const res = await axiosInstance.get<PagedResponse<EmployeeTask>>('/api/tasks/my', {
         params: { pageNumber, pageSize }
       });
+      return res.data;
+    },
+    getMySurveys: async (): Promise<ApiResponse<MySurvey[]>> => {
+      if (USE_MOCK) return mockApi.getMySurveys();
+      const res = await axiosInstance.get<ApiResponse<MySurvey[]>>('/api/tasks/my-surveys');
       return res.data;
     },
     get: async (id: number): Promise<ApiResponse<EmployeeTask>> => {

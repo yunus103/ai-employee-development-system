@@ -12,7 +12,8 @@ import {
   AssessmentScore,
   ActionPlan,
   ActionPriority,
-  EvaluatorType
+  EvaluatorType,
+  AssessmentAssignment
 } from '../../../../types';
 import competencyMapping from '../../../../data/competency_mapping.json';
 import {
@@ -45,6 +46,13 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const [scores, setScores] = useState<AssessmentScore[]>([]);
   const [actionPlan, setActionPlan] = useState<ActionPlan | null>(null);
   
+  // Assignment states
+  const [assignments, setAssignments] = useState<AssessmentAssignment[]>([]);
+  const [allEmployees, setAllEmployees] = useState<EmployeeDetail[]>([]);
+  const [selectedEvaluatorId, setSelectedEvaluatorId] = useState<number>(0);
+  const [selectedEvaluatorType, setSelectedEvaluatorType] = useState<EvaluatorType>('Peer');
+  const [isAssigning, setIsAssigning] = useState(false);
+
   // Scoring mode state
   const [scorecardInput, setScorecardInput] = useState<Record<number, number>>({});
   const [scorecardEvaluator, setScorecardEvaluator] = useState<EvaluatorType>('Manager');
@@ -67,19 +75,39 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     setIsLoading(true);
     try {
       // 1. Fetch Employee Details
-      const empRes = await apiClient.employees.get(employeeId);
       let targetEmp = null;
-      if (empRes.success) {
-        setEmployee(empRes.data);
-        targetEmp = empRes.data;
+      try {
+        const empRes = await apiClient.employees.get(employeeId);
+        if (empRes.success) {
+          setEmployee(empRes.data);
+          targetEmp = empRes.data;
+        }
+      } catch (empErr) {
+        console.warn('Could not fetch target employee detailed profile (possibly unauthorized):', empErr);
+      }
+
+      // Fetch all employees for assignment option dropdown
+      if (user && (user.role === 'HR' || user.role === 'Admin')) {
+        try {
+          const allEmpRes = await apiClient.employees.list(1, 100);
+          if (allEmpRes.success) {
+            setAllEmployees(allEmpRes.data.filter(e => e.id !== employeeId));
+          }
+        } catch (listErr) {
+          console.warn('Could not load employee directory for assignments dropdown:', listErr);
+        }
       }
 
       // 1b. Fetch Logged-in User Employee Details if not HR/Admin
       let userEmp = null;
       if (user && user.employeeId !== null) {
-        const userEmpRes = await apiClient.employees.get(user.employeeId);
-        if (userEmpRes.success) {
-          userEmp = userEmpRes.data;
+        try {
+          const userEmpRes = await apiClient.employees.get(user.employeeId);
+          if (userEmpRes.success) {
+            userEmp = userEmpRes.data;
+          }
+        } catch (userEmpErr) {
+          console.warn('Could not fetch logged-in user employee details:', userEmpErr);
         }
       }
 
@@ -103,52 +131,103 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       setScorecardEvaluator(determinedType);
 
       // 2. Fetch Employee Assessments
-      const assRes = await apiClient.employees.getAssessments(employeeId, 1, 100);
-      if (assRes.success) {
-        const active = assRes.data[0]; // latest assessment
-        if (active) {
-          setActiveAssessment(active);
-          
-          // 3. Fetch Assessment Scores
-          const scoreRes = await apiClient.assessments.getScores(active.id);
-          let loadedScores: AssessmentScore[] = [];
-          if (scoreRes.success) {
-            setScores(scoreRes.data);
-            loadedScores = scoreRes.data;
-          }
-
-          // Initialize scorecardInput with 13 defaults or existing draft scores
-          if (active.status === 'Draft') {
-            const initial: Record<number, number> = {};
-            for (let i = 1; i <= 13; i++) {
-              initial[i] = 3.0;
-            }
-            const evaluatorScores = loadedScores.filter(s => s.evaluatorType === determinedType);
-            for (const s of evaluatorScores) {
-              initial[s.competencyId] = s.score;
-            }
-            setScorecardInput(initial);
-          }
-
-          // 4. Fetch Action Plan if exists
-          const planRes = await apiClient.employees.getActionPlans(employeeId);
-          if (planRes.success && planRes.data.length > 0) {
-            // Find plan matching this assessment
-            const matchedPlan = planRes.data.find(p => p.assessmentId === active.id);
-            if (matchedPlan) {
-              const fullPlanRes = await apiClient.actionPlans.get(matchedPlan.id);
-              if (fullPlanRes.success) {
-                setActionPlan(fullPlanRes.data);
-                setActiveTab('plan'); // route to plan tab if plan exists
+      try {
+        const assRes = await apiClient.employees.getAssessments(employeeId, 1, 100);
+        if (assRes.success) {
+          const active = assRes.data[0]; // latest assessment
+          if (active) {
+            setActiveAssessment(active);
+            
+            // Fetch assignments list
+            try {
+              const assignRes = await apiClient.assessments.listAssignments(active.id);
+              if (assignRes.success) {
+                setAssignments(assignRes.data);
               }
+            } catch (assignErr) {
+              console.warn('Could not fetch assignments (possibly unauthorized):', assignErr);
+            }
+            
+            // 3. Fetch Assessment Scores
+            let loadedScores: AssessmentScore[] = [];
+            try {
+              const scoreRes = await apiClient.assessments.getScores(active.id);
+              if (scoreRes.success) {
+                setScores(scoreRes.data);
+                loadedScores = scoreRes.data;
+              }
+            } catch (scoreErr) {
+              console.warn('Could not fetch assessment scores (possibly unauthorized):', scoreErr);
+            }
+
+            // Initialize scorecardInput with 13 defaults or existing draft scores
+            if (active.status === 'Draft') {
+              const initial: Record<number, number> = {};
+              for (let i = 1; i <= 13; i++) {
+                initial[i] = 3.0;
+              }
+              const evaluatorScores = loadedScores.filter(s => s.evaluatorType === determinedType);
+              for (const s of evaluatorScores) {
+                initial[s.competencyId] = s.score;
+              }
+              setScorecardInput(initial);
+            }
+
+            // 4. Fetch Action Plan if exists
+            try {
+              const planRes = await apiClient.employees.getActionPlans(employeeId);
+              if (planRes.success && planRes.data.length > 0) {
+                // Find plan matching this assessment
+                const matchedPlan = planRes.data.find(p => p.assessmentId === active.id);
+                if (matchedPlan) {
+                  const fullPlanRes = await apiClient.actionPlans.get(matchedPlan.id);
+                  if (fullPlanRes.success) {
+                    setActionPlan(fullPlanRes.data);
+                    setActiveTab('plan'); // route to plan tab if plan exists
+                  }
+                }
+              }
+            } catch (planErr) {
+              console.warn('Could not fetch action plans (possibly unauthorized):', planErr);
             }
           }
         }
+      } catch (assErr) {
+        console.warn('Could not fetch employee assessments:', assErr);
       }
     } catch (err) {
-      console.error('Error fetching employee detailed profile', err);
+      console.warn('Error fetching employee detailed profile:', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleAddAssignment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeAssessment || !selectedEvaluatorId) return;
+    setIsAssigning(true);
+    try {
+      const res = await apiClient.assessments.addAssignment(
+        activeAssessment.id,
+        selectedEvaluatorId,
+        selectedEvaluatorType
+      );
+      if (res.success) {
+        toast.success('Değerlendirici başarıyla atandı.');
+        setSelectedEvaluatorId(0);
+        // Refresh assignments list
+        const assignRes = await apiClient.assessments.listAssignments(activeAssessment.id);
+        if (assignRes.success) {
+          setAssignments(assignRes.data);
+        }
+      } else {
+        toast.error(res.message || 'Değerlendirici atanamadı.');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('İşlem sırasında bir hata oluştu.');
+    } finally {
+      setIsAssigning(false);
     }
   };
 
@@ -343,6 +422,33 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     } finally {
       setIsActionLoading(false);
     }
+  };
+
+  const handleCancelPlan = async () => {
+    if (!actionPlan) return;
+    useConfirmStore.getState().showConfirm({
+      title: 'Planı İptal Et',
+      message: 'Bu gelişim planını iptal etmek istediğinize emin misiniz? Bu işlem geri alınamaz.',
+      confirmLabel: 'İptal Et',
+      cancelLabel: 'Vazgeç',
+      onConfirm: async () => {
+        setIsActionLoading(true);
+        try {
+          const res = await apiClient.actionPlans.cancel(actionPlan.id);
+          if (res.success) {
+            toast.success('Gelişim planı iptal edildi.');
+            setActionPlan(res.data);
+          } else {
+            toast.error(res.message || 'Plan iptal edilemedi.');
+          }
+        } catch (e) {
+          console.warn('Error canceling plan:', e);
+          toast.error('Plan iptal edilirken bir hata oluştu.');
+        } finally {
+          setIsActionLoading(false);
+        }
+      }
+    });
   };
 
   const handleDownloadPDF = async () => {
@@ -836,6 +942,81 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
+            {/* 360° Evaluator Assignments Panel */}
+            {activeAssessment && (
+              <div className="glass-panel rounded-2xl p-6 border border-card-border space-y-4">
+                <h4 className="text-base font-bold text-foreground">360° Değerlendiriciler</h4>
+                
+                {/* Assignments List */}
+                <div className="space-y-2.5 max-h-48 overflow-y-auto pr-1">
+                  {assignments.length === 0 ? (
+                    <p className="text-xs text-muted">Atanmış değerlendirici bulunmuyor.</p>
+                  ) : (
+                    assignments.map((assign) => (
+                      <div key={assign.id} className="flex items-center justify-between rounded-xl bg-card/40 border border-card-border/60 p-3 text-xs">
+                        <div>
+                          <p className="font-bold text-foreground">{assign.evaluatorEmployeeName}</p>
+                          <p className="text-[10px] text-muted mt-0.5">
+                            İlişki: {assign.evaluatorType === 'Self' ? 'Kendi' : assign.evaluatorType === 'Manager' ? 'Yönetici' : assign.evaluatorType === 'Peer' ? 'Meslektaş' : 'Ast'}
+                          </p>
+                        </div>
+                        <span className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${
+                          assign.isCompleted
+                            ? 'bg-success/10 border-success/20 text-success'
+                            : 'bg-warning/10 border-warning/20 text-warning'
+                        }`}>
+                          {assign.isCompleted ? 'Tamamladı' : 'Bekliyor'}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Assignment Form for HR/Admin - only during draft */}
+                {activeAssessment.status === 'Draft' && (user?.role === 'HR' || user?.role === 'Admin') && (
+                  <form onSubmit={handleAddAssignment} className="border-t border-card-border/60 pt-4 space-y-3">
+                    <p className="text-xs font-semibold text-foreground">Yeni Değerlendirici Ekle</p>
+                    
+                    <div className="grid grid-cols-1 gap-2.5">
+                      <select
+                        required
+                        value={selectedEvaluatorId || ''}
+                        onChange={(e) => setSelectedEvaluatorId(Number(e.target.value))}
+                        className="w-full rounded-xl bg-card border border-card-border py-2.5 px-3.5 text-xs text-foreground outline-none cursor-pointer focus:border-primary"
+                      >
+                        <option value="">Çalışan Seçin...</option>
+                        {allEmployees.map((emp) => (
+                          <option key={emp.id} value={emp.id}>
+                            {emp.fullName} ({emp.jobRole})
+                          </option>
+                        ))}
+                      </select>
+
+                      <div className="flex space-x-2">
+                        <select
+                          value={selectedEvaluatorType}
+                          onChange={(e) => setSelectedEvaluatorType(e.target.value as EvaluatorType)}
+                          className="flex-1 rounded-xl bg-card border border-card-border py-2.5 px-3 text-xs text-foreground outline-none cursor-pointer focus:border-primary"
+                        >
+                          <option value="Peer">Meslektaş (Peer)</option>
+                          <option value="Subordinate">Ast (Subordinate)</option>
+                          <option value="Manager">Yönetici (Manager)</option>
+                        </select>
+
+                        <button
+                          type="submit"
+                          disabled={isAssigning || !selectedEvaluatorId}
+                          className="rounded-xl bg-primary hover:bg-primary-hover px-4 text-xs font-semibold text-white transition disabled:opacity-50"
+                        >
+                          {isAssigning ? '...' : 'Ekle'}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
+
             {/* AI Generator Panel */}
             {activeAssessment && activeAssessment.status === 'Completed' && (
               <div className="glass-panel rounded-2xl p-6 border border-primary/20 bg-gradient-to-br from-primary/10 to-transparent space-y-4">
@@ -873,11 +1054,14 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                     ? 'bg-success/10 border-success/20 text-success'
                     : actionPlan.status === 'Approved'
                     ? 'bg-info/10 border-info/20 text-info'
+                    : actionPlan.status === 'Cancelled'
+                    ? 'bg-danger/10 border-danger/20 text-danger'
                     : 'bg-warning/10 border-warning/20 text-warning'
                 }`}>
                   {actionPlan.status === 'Draft' ? 'Taslak' :
                    actionPlan.status === 'Edited' ? 'Düzenlendi' :
-                   actionPlan.status === 'Approved' ? 'Onaylandı' : 'İletildi (Aktif)'}
+                   actionPlan.status === 'Approved' ? 'Onaylandı' :
+                   actionPlan.status === 'Cancelled' ? 'İptal Edildi' : 'İletildi (Aktif)'}
                 </span>
               </div>
               <p className="text-xs text-muted mt-1">
@@ -925,6 +1109,17 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                   className="rounded-xl bg-primary hover:bg-primary-hover py-2.5 px-4 text-xs font-semibold text-white shadow-md transition shadow-primary/10"
                 >
                   Çalışana İlet
+                </button>
+              )}
+
+              {/* Cancel Plan */}
+              {(actionPlan.status === 'Draft' || actionPlan.status === 'Edited' || actionPlan.status === 'Approved') && (user?.role === 'HR' || user?.role === 'Manager' || user?.role === 'Admin') && (
+                <button
+                  onClick={handleCancelPlan}
+                  disabled={isActionLoading}
+                  className="rounded-xl bg-danger/10 border border-danger/20 hover:bg-danger/20 py-2.5 px-4 text-xs font-semibold text-danger transition"
+                >
+                  Planı İptal Et
                 </button>
               )}
             </div>
