@@ -16,7 +16,8 @@ import {
   CheckCircle,
   XCircle,
   Database,
-  User
+  User,
+  Loader2
 } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -26,9 +27,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   
   // Health states
   const [healthStatus, setHealthStatus] = useState<{
-    api: 'ok' | 'error';
-    ml: 'ok' | 'error' | 'not-loaded';
-  }>({ api: 'ok', ml: 'ok' });
+    api: 'checking' | 'ok' | 'error';
+    ml: 'checking' | 'ok' | 'error' | 'not-loaded';
+  }>({ api: 'checking', ml: 'checking' });
 
   useEffect(() => {
     const checkSystemHealth = async () => {
@@ -38,25 +39,45 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5100'}/api/health`);
+        // Build correct URL: if API_URL is '/' or relative, use window.location.origin
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || '/').replace(/\/$/, '');
+        const healthUrl = baseUrl ? `${baseUrl}/api/health` : '/api/health';
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
+        const response = await fetch(healthUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          setHealthStatus({ api: 'error', ml: 'error' });
+          return;
+        }
+
         const json = await response.json();
-        
+
         // Support both response formats:
         // Format A (nested): { success: true, data: { api: 'ok', mlService: { status: 'ok' } } }
         // Format B (flat):   { status: 'Healthy', timestamp: '...' }
         if (json.success && json.data) {
           const apiState = json.data.api === 'ok' ? 'ok' : 'error';
-          const mlState = json.data.mlService?.status === 'ok' ? 'ok' : 'error';
+          const mlState = json.data.mlService?.status === 'ok' ? 'ok' : 'not-loaded';
           setHealthStatus({ api: apiState, ml: mlState });
-        } else if (json.status === 'Healthy' || json.status === 'healthy' || response.ok) {
-          // Flat health response — API is up; ML state unknown but assumed ok if API responds
-          const mlState = json.mlService?.status === 'ok' ? 'ok' : json.mlStatus === 'ok' ? 'ok' : 'ok';
-          setHealthStatus({ api: 'ok', ml: mlState });
+        } else if (typeof json.status === 'string') {
+          const apiOk = json.status.toLowerCase() === 'healthy' || json.status.toLowerCase() === 'ok';
+          setHealthStatus({ api: apiOk ? 'ok' : 'error', ml: 'not-loaded' });
+        } else {
+          // Unexpected format but got a 200 — treat as ok
+          setHealthStatus({ api: 'ok', ml: 'not-loaded' });
+        }
+      } catch (err: unknown) {
+        const isAbort = err instanceof Error && err.name === 'AbortError';
+        if (isAbort) {
+          // Timeout — server might be cold starting, show unknown
+          setHealthStatus({ api: 'error', ml: 'not-loaded' });
         } else {
           setHealthStatus({ api: 'error', ml: 'error' });
         }
-      } catch {
-        setHealthStatus({ api: 'error', ml: 'error' });
       }
     };
 
@@ -203,10 +224,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                     {/* API Status badge */}
                     <span className={`flex items-center space-x-1 font-semibold ${
-                      healthStatus.api === 'ok' ? 'text-success' : 'text-danger'
+                      healthStatus.api === 'ok' ? 'text-success' : 
+                      healthStatus.api === 'checking' ? 'text-warning' : 'text-danger'
                     }`}>
                       {healthStatus.api === 'ok' ? (
                         <CheckCircle className="h-3.5 w-3.5" />
+                      ) : healthStatus.api === 'checking' ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
                       ) : (
                         <XCircle className="h-3.5 w-3.5" />
                       )}
@@ -215,10 +239,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                     {/* ML Status badge */}
                     <span className={`flex items-center space-x-1 font-semibold ${
-                      healthStatus.ml === 'ok' ? 'text-success' : 'text-danger'
+                      healthStatus.ml === 'ok' ? 'text-success' : 
+                      healthStatus.ml === 'checking' ? 'text-warning' :
+                      healthStatus.ml === 'not-loaded' ? 'text-warning' : 'text-danger'
                     }`}>
                       {healthStatus.ml === 'ok' ? (
                         <CheckCircle className="h-3.5 w-3.5" />
+                      ) : healthStatus.ml === 'checking' ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : healthStatus.ml === 'not-loaded' ? (
+                        <XCircle className="h-3.5 w-3.5 opacity-50" />
                       ) : (
                         <XCircle className="h-3.5 w-3.5" />
                       )}
