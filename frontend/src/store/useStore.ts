@@ -100,7 +100,6 @@ export const useStore = create<AuthState>((set) => ({
       set({ isAuthenticated: false, user: null, accessToken: null, isLoading: false });
       return false;
     } catch (err) {
-      console.error('Auth verification failed', err);
       // Wait to see if refresh is successful, but for initial check, assume false
       set({ isAuthenticated: false, user: null, accessToken: null, isLoading: false });
       return false;
