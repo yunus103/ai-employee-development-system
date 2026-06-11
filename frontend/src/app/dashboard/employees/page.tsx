@@ -231,7 +231,29 @@ export default function EmployeesPage() {
           }
         } catch (err) {
           console.warn('Error creating assessment:', err);
-          const errMsg = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'İşlem başarısız oldu.';
+          const axiosError = err as {
+            message?: string;
+            response?: {
+              status?: number;
+              data?: {
+                message?: string;
+              };
+            };
+          };
+          const statusCode = axiosError.response?.status;
+          let errMsg = 'İşlem sırasında beklenmedik bir hata oluştu.';
+          
+          if (statusCode === 500) {
+            errMsg = 'Sunucu hatası oluştu (500). Lütfen veritabanı veya sunucu durumunu kontrol edin.';
+          } else if (statusCode === 403) {
+            errMsg = 'Değerlendirme başlatmak için yetkiniz bulunmuyor (403).';
+          } else if (statusCode === 404) {
+            errMsg = 'Belirtilen çalışan veya değerlendirme dönemi bulunamadı (404).';
+          } else if (statusCode === 401) {
+            errMsg = 'Oturum süreniz doldu, lütfen tekrar giriş yapın (401).';
+          } else {
+            errMsg = axiosError.response?.data?.message || axiosError.message || errMsg;
+          }
           toast.error(errMsg);
         }
       }
