@@ -369,6 +369,19 @@ export const mockApi = {
   },
   createAssessment: async (employeeId: number, cycleId: number): Promise<ApiResponse<Assessment>> => {
     await delay(300);
+    
+    // Check if there is an active incomplete assessment
+    const activeAss = mockDb.getAssessments().find(
+      (a) => a.employeeId === employeeId && a.status !== 'Completed'
+    );
+    if (activeAss) {
+      return {
+        success: false,
+        message: 'Çalışanın devam eden aktif bir değerlendirme süreci bulunmaktadır. Yeni bir değerlendirme süreci başlatılamaz.',
+        data: null as any
+      };
+    }
+
     // Check if there is an active incomplete plan
     const activePlan = mockDb.getActionPlans().find(
       (p) => p.employeeId === employeeId && p.status !== 'Completed' && p.status !== 'Cancelled'
@@ -488,7 +501,8 @@ export const mockApi = {
     assessmentId: number,
     competencyId: number,
     evaluatorType: EvaluatorType,
-    score: number
+    score: number,
+    evaluatorEmployeeId?: number | null
   ): Promise<ApiResponse<AssessmentScore>> => {
     await delay(100);
     if (score < 0 || score > 5.0) {
@@ -500,12 +514,15 @@ export const mockApi = {
       return { success: false, message: 'Yetkinlik bulunamadı.', data: null as any };
     }
 
+    const targetEvaluatorId = evaluatorEmployeeId ?? (currentSession?.employeeId || 99);
+
     const allScores = mockDb.getScores();
     const existingIdx = allScores.findIndex(
       (s) =>
         s.assessmentId === assessmentId &&
         s.competencyId === competencyId &&
-        s.evaluatorType === evaluatorType
+        s.evaluatorType === evaluatorType &&
+        s.evaluatorEmployeeId === targetEvaluatorId
     );
 
     let updatedOrNewScore: AssessmentScore;
@@ -520,7 +537,7 @@ export const mockApi = {
         competencyId,
         competencyCode: metadata.code,
         competencyName: metadata.name,
-        evaluatorEmployeeId: currentSession?.employeeId || 99,
+        evaluatorEmployeeId: targetEvaluatorId,
         evaluatorType,
         score
       };

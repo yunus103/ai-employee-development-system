@@ -249,17 +249,38 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     setScorecardInput(prev => ({ ...prev, [competencyId]: score }));
   };
 
+  const getEvaluatorEmployeeId = (): number | null => {
+    if (user?.role !== 'HR' && user?.role !== 'Admin') {
+      return user?.employeeId || null;
+    }
+    if (scorecardEvaluator === 'Self') {
+      return employeeId;
+    }
+    if (scorecardEvaluator === 'Manager' && employee?.managerId) {
+      return employee.managerId;
+    }
+    const matchingAssignment = assignments.find(
+      a => a.evaluatorType === scorecardEvaluator
+    );
+    if (matchingAssignment) {
+      return matchingAssignment.evaluatorEmployeeId;
+    }
+    return user?.employeeId || null;
+  };
+
   const handleSaveScores = async () => {
     if (!activeAssessment) return;
     setIsActionLoading(true);
     try {
+      const evaluatorEmpId = getEvaluatorEmployeeId();
       for (const compId of Object.keys(scorecardInput).map(Number)) {
         const val = scorecardInput[compId];
         await apiClient.assessments.upsertScore(
           activeAssessment.id,
           compId,
           scorecardEvaluator,
-          val
+          val,
+          evaluatorEmpId
         );
       }
       toast.success('Puanlar başarıyla kaydedildi.');
@@ -282,6 +303,20 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       onConfirm: async () => {
         setIsActionLoading(true);
         try {
+          // 1. Auto-save current scorecard input scores first
+          const evaluatorEmpId = getEvaluatorEmployeeId();
+          for (const compId of Object.keys(scorecardInput).map(Number)) {
+            const val = scorecardInput[compId];
+            await apiClient.assessments.upsertScore(
+              activeAssessment.id,
+              compId,
+              scorecardEvaluator,
+              val,
+              evaluatorEmpId
+            );
+          }
+
+          // 2. Complete the assessment
           const res = await apiClient.assessments.complete(activeAssessment.id);
           if (res.success) {
             toast.success('Değerlendirme başarıyla tamamlandı. Artık AI planı üretebilirsiniz.');

@@ -234,13 +234,15 @@ export const apiClient = {
       assessmentId: number,
       competencyId: number,
       evaluatorType: EvaluatorType,
-      score: number
+      score: number,
+      evaluatorEmployeeId?: number | null
     ): Promise<ApiResponse<AssessmentScore>> => {
-      if (USE_MOCK) return mockApi.upsertAssessmentScore(assessmentId, competencyId, evaluatorType, score);
+      if (USE_MOCK) return mockApi.upsertAssessmentScore(assessmentId, competencyId, evaluatorType, score, evaluatorEmployeeId);
       const res = await axiosInstance.post<ApiResponse<AssessmentScore>>(`/api/assessments/${assessmentId}/scores`, {
         competencyId,
         evaluatorType,
-        score
+        score,
+        evaluatorEmployeeId: evaluatorEmployeeId || null
       });
       return res.data;
     },
