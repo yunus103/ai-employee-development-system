@@ -95,7 +95,7 @@ axiosInstance.interceptors.response.use(
         isRefreshing = false;
         // Redirect to login if no refresh token
         if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+          window.location.href = '/login?expired=true';
         }
         return Promise.reject(error);
       }
@@ -119,7 +119,7 @@ axiosInstance.interceptors.response.use(
         isRefreshing = false;
         localStorage.clear();
         if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-          window.location.href = '/login';
+          window.location.href = '/login?expired=true';
         }
         return Promise.reject(refreshError);
       }

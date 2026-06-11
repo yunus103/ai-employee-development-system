@@ -153,9 +153,10 @@ export default function EmployeesPage() {
         if (user?.role === 'Manager') {
           if (managerDept) {
             filtered = filtered.filter((e) => e.department === managerDept && e.email !== 'admin@demo.com');
-          } else {
-            filtered = []; // Return empty until manager profile loads to prevent leakage
+          } else if (apiClient.isMock) {
+            filtered = []; // Return empty until manager profile loads to prevent leakage in mock mode
           }
+          // In real mode, if managerDept failed to load, we don't clear the list to support API fallback.
         }
 
         if (searchTerm) {
