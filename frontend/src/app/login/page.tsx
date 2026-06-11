@@ -3,7 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '../../store/useStore';
-import { Shield, Mail, Lock, AlertCircle, ArrowRight, User } from 'lucide-react';
+import { Shield, Mail, Lock, AlertCircle, ArrowRight, User, X, Building2, Key, HelpCircle, Users } from 'lucide-react';
+import demoUsersRaw from '../../data/demo_users.json';
+
+interface DemoUser {
+  id: number;
+  fullName: string;
+  email: string;
+  department: string;
+  jobRole: string;
+  managerId: number | null;
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,6 +22,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('System');
 
   // Check authentication on mount
   useEffect(() => {
@@ -45,6 +57,7 @@ export default function LoginPage() {
   };
 
   const handleQuickLogin = async (demoEmail: string, demoPass: string) => {
+    setIsModalOpen(false);
     setError(null);
     setFormLoading(true);
     const res = await login(demoEmail, demoPass);
@@ -57,12 +70,32 @@ export default function LoginPage() {
     }
   };
 
-  const demoUsers = [
-    { label: 'Sistem Yöneticisi (Admin)', email: 'admin@demo.com', pass: 'Admin1234!', color: 'border-danger/30 hover:border-danger text-danger' },
-    { label: 'İnsan Kaynakları (HR)', email: 'hr@demo.com', pass: 'Hr1234!', color: 'border-primary/30 hover:border-primary text-primary' },
-    { label: 'Takım Yöneticisi (Manager)', email: 'manager@demo.com', pass: 'Manager1234!', color: 'border-info/30 hover:border-info text-info' },
-    { label: 'Çalışan (Employee)', email: 'employee@demo.com', pass: 'Employee1234!', color: 'border-success/30 hover:border-success text-success' }
+  const systemUsers = [
+    { 
+      label: 'Sistem Yöneticisi (Admin)', 
+      email: 'admin@demo.com', 
+      pass: 'Admin1234!', 
+      color: 'border-danger/30 hover:border-danger text-danger',
+      desc: 'Veritabanındaki tüm verileri silip, 20 kişilik simüle şirket verilerini (tohum verilerini) yeniden yükleme yetkisine sahiptir.' 
+    },
+    { 
+      label: 'İnsan Kaynakları (HR)', 
+      email: 'hr@demo.com', 
+      pass: 'Hr1234!', 
+      color: 'border-primary/30 hover:border-primary text-primary',
+      desc: 'Şirket genelindeki tüm çalışan değerlendirmelerini, gelişim planlarını yönetebilir ve yeni değerlendirme süreçleri başlatabilir.' 
+    }
   ];
+
+  const demoEmployees: DemoUser[] = demoUsersRaw as DemoUser[];
+
+  // Dynamic departments list
+  const departments = ['System', 'All', ...Array.from(new Set(demoEmployees.map(u => u.department)))];
+
+  // Filtered employees based on active tab
+  const filteredEmployees = activeTab === 'All' 
+    ? demoEmployees 
+    : demoEmployees.filter(u => u.department === activeTab);
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
@@ -148,32 +181,140 @@ export default function LoginPage() {
           </form>
 
           {/* Quick Login Section */}
-          <div className="mt-8">
-            <div className="relative flex py-2 items-center">
+          <div className="mt-8 text-center">
+            <div className="relative flex py-2 items-center mb-4">
               <div className="flex-grow border-t border-card-border"></div>
-              <span className="flex-shrink mx-4 text-xs text-muted uppercase tracking-wider">Hızlı Demo Girişi</span>
+              <span className="flex-shrink mx-4 text-xs text-muted uppercase tracking-wider">Test & Demo</span>
               <div className="flex-grow border-t border-card-border"></div>
             </div>
 
-            <div className="mt-4 space-y-2">
-              {demoUsers.map((user) => (
-                <button
-                  key={user.email}
-                  onClick={() => handleQuickLogin(user.email, user.pass)}
-                  disabled={formLoading || isLoading}
-                  className={`flex w-full items-center justify-between rounded-xl border bg-card/50 py-3 px-4 text-left text-xs font-medium transition duration-150 ${user.color}`}
-                >
-                  <span className="flex items-center">
-                    <User className="mr-2 h-4 w-4 shrink-0" />
-                    {user.label}
-                  </span>
-                  <span className="opacity-60">{user.email}</span>
-                </button>
-              ))}
-            </div>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              disabled={formLoading || isLoading}
+              className="flex w-full items-center justify-center space-x-2 rounded-xl border border-primary/30 hover:border-primary hover:bg-primary/5 py-3 px-4 text-sm font-semibold text-primary transition duration-150"
+            >
+              <Users className="h-4 w-4 shrink-0" />
+              <span>Hızlı Demo Girişi</span>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Demo Users Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <div className="glass-panel w-full max-w-3xl max-h-[85vh] rounded-3xl flex flex-col shadow-2xl border border-card-border overflow-hidden animate-scaleIn">
+            
+            {/* Modal Header */}
+            <div className="p-6 border-b border-card-border flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-foreground">Hızlı Demo Girişi</h3>
+                <p className="text-xs text-muted mt-1">İstediğiniz rol veya çalışan kartına tıklayarak şifresiz giriş yapabilirsiniz.</p>
+              </div>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="h-9 w-9 rounded-xl bg-card border border-card-border flex items-center justify-center text-muted hover:text-foreground transition"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Modal Navigation Tabs */}
+            <div className="px-6 py-3 bg-card/30 border-b border-card-border flex flex-wrap gap-2">
+              {departments.map((dept) => (
+                <button
+                  key={dept}
+                  onClick={() => setActiveTab(dept)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                    activeTab === dept
+                      ? 'bg-primary text-white'
+                      : 'text-muted hover:text-foreground hover:bg-card border border-card-border'
+                  }`}
+                >
+                  {dept === 'System' ? 'Sistem Rolleri' : dept === 'All' ? 'Tüm Çalışanlar' : dept}
+                </button>
+              ))}
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 flex-1 overflow-y-auto min-h-[300px]">
+              {activeTab === 'System' ? (
+                <div className="space-y-4">
+                  {systemUsers.map((user) => (
+                    <div 
+                      key={user.email}
+                      onClick={() => handleQuickLogin(user.email, user.pass)}
+                      className="group cursor-pointer rounded-2xl border border-card-border bg-card/30 p-5 hover:border-primary hover:bg-primary/5 transition flex items-start gap-4"
+                    >
+                      <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20">
+                        <Key className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition">{user.label}</h4>
+                          <span className="text-xs text-muted font-mono">{user.email}</span>
+                        </div>
+                        <p className="text-xs text-muted mt-2 bg-card p-3 rounded-lg border border-card-border leading-relaxed flex items-start gap-2">
+                          <HelpCircle className="h-4 w-4 text-warning shrink-0 mt-0.5" />
+                          <span>{user.desc}</span>
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {filteredEmployees.map((emp) => {
+                    const isManager = emp.managerId === null;
+                    return (
+                      <div
+                        key={emp.email}
+                        onClick={() => handleQuickLogin(emp.email, 'Demo1234!')}
+                        className="group cursor-pointer rounded-xl border border-card-border bg-card/30 p-4 hover:border-primary hover:bg-primary/5 transition flex items-center justify-between gap-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`h-9 w-9 rounded-lg flex items-center justify-center shrink-0 ${
+                            isManager ? 'bg-info/10 text-info border border-info/20' : 'bg-primary/10 text-primary border border-primary/20'
+                          }`}>
+                            <User className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-bold text-foreground group-hover:text-primary transition">{emp.fullName}</h4>
+                            <p className="text-[10px] text-muted mt-0.5">{emp.jobRole}</p>
+                            <p className="text-[9px] text-muted font-mono mt-1">{emp.email}</p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end shrink-0">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                            isManager 
+                              ? 'bg-info/15 text-info' 
+                              : 'bg-card border border-card-border text-muted'
+                          }`}>
+                            {isManager ? 'Manager' : 'Employee'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-card/20 border-t border-card-border flex items-center justify-between text-[11px] text-muted">
+              <span className="flex items-center gap-1.5">
+                <Building2 className="h-3.5 w-3.5" />
+                Dinamik departman ve çalışan yönetimi etkindir.
+              </span>
+              <span>
+                Şifre: <span className="font-mono bg-card px-1.5 py-0.5 rounded text-foreground font-bold">Demo1234!</span>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
