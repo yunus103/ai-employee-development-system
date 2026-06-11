@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useStore } from '../store/useStore';
 import { apiClient } from '../services/apiClient';
 import { EmployeeTask, AssessmentScore, ActionPriority } from '../types';
+import competencyMapping from '../data/competency_mapping.json';
 import {
   BookOpen,
   CheckCircle,
@@ -29,6 +30,46 @@ export default function EmployeeDashboard() {
   const [tasks, setTasks] = useState<EmployeeTask[]>([]);
   const [scores, setScores] = useState<AssessmentScore[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const resolveCompetencyName = (code: string, name: string): string => {
+    if (!code) return '';
+
+    // 1. Core Competency mapping → short Turkish label
+    if (code.startsWith('Core_')) {
+      const coreLabels = (competencyMapping as any).core_labels;
+      return coreLabels?.[code] || name || code;
+    }
+
+    // 2. Search in department mapping by resolved C# name or code
+    const deptLabelsAll = (competencyMapping as any).dept_comp_labels;
+    const deptDisplayAll = (competencyMapping as any).dept_comp_display_labels;
+
+    for (const dept of Object.keys(deptLabelsAll)) {
+      const deptLabels = deptLabelsAll[dept];
+      const matchingKey = Object.keys(deptLabels).find(
+        key => deptLabels[key] === name || deptLabels[key] === code
+      );
+      if (matchingKey && deptDisplayAll[dept]) {
+        return deptDisplayAll[dept][matchingKey] || name || code;
+      }
+    }
+
+    // 3. Search in role mapping by resolved C# name or code
+    const roleLabelsAll = (competencyMapping as any).role_comp_labels;
+    const roleDisplayAll = (competencyMapping as any).role_comp_display_labels;
+
+    for (const role of Object.keys(roleLabelsAll)) {
+      const roleLabels = roleLabelsAll[role];
+      const matchingKey = Object.keys(roleLabels).find(
+        key => roleLabels[key] === name || roleLabels[key] === code
+      );
+      if (matchingKey && roleDisplayAll[role]) {
+        return roleDisplayAll[role][matchingKey] || name || code;
+      }
+    }
+
+    return name || code;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,12 +128,10 @@ export default function EmployeeDashboard() {
         const matching = scores.filter(s => s.competencyCode === code);
         const name = scores.find(s => s.competencyCode === code)?.competencyName || code;
         const avgScore = matching.reduce((sum, s) => sum + s.score, 0) / matching.length;
-        
-        // Clean display names for mapping (remove prefixes like Sales_, Tech_ etc)
-        const cleanName = name.replace(/^(HR_|Tech_|Sales_|Fin_|Ops_|DS_|MLE_|QA_|DevOps_|Support_|EngMgr_|AM_|Mkt_|Acc_|FA_|Payroll_|FinMgr_|OpsSpec_|LogCoord_|ProdEng_|FieldSup_|OpsMgr_)/, '');
+        const displayName = resolveCompetencyName(code, name);
         
         return {
-          subject: cleanName,
+          subject: displayName,
           score: parseFloat(avgScore.toFixed(2)),
           fullMark: 5.0
         };
