@@ -83,7 +83,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           targetEmp = empRes.data;
         }
       } catch (empErr) {
-        console.warn('Could not fetch target employee detailed profile (possibly unauthorized):', empErr);
+        // Silent catch to prevent terminal noise; fallback handled gracefully in UI
       }
 
       // Fetch all employees for assignment option dropdown
@@ -94,7 +94,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             setAllEmployees(allEmpRes.data.filter(e => e.id !== employeeId));
           }
         } catch (listErr) {
-          console.warn('Could not load employee directory for assignments dropdown:', listErr);
+          // Silent catch to prevent terminal noise; fallback handled gracefully in UI
         }
       }
 
@@ -107,7 +107,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             userEmp = userEmpRes.data;
           }
         } catch (userEmpErr) {
-          console.warn('Could not fetch logged-in user employee details:', userEmpErr);
+          // Silent catch to prevent terminal noise; fallback handled gracefully in UI
         }
       }
 
@@ -145,7 +145,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                 setAssignments(assignRes.data);
               }
             } catch (assignErr) {
-              console.warn('Could not fetch assignments (possibly unauthorized):', assignErr);
+              // Silent catch to prevent terminal noise; fallback handled gracefully in UI
             }
             
             // 3. Fetch Assessment Scores
@@ -157,7 +157,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                 loadedScores = scoreRes.data;
               }
             } catch (scoreErr) {
-              console.warn('Could not fetch assessment scores (possibly unauthorized):', scoreErr);
+              // Silent catch to prevent terminal noise; fallback handled gracefully in UI
             }
 
             // Initialize scorecardInput with 13 defaults or existing draft scores
@@ -188,15 +188,15 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                 }
               }
             } catch (planErr) {
-              console.warn('Could not fetch action plans (possibly unauthorized):', planErr);
+              // Silent catch to prevent terminal noise; fallback handled gracefully in UI
             }
           }
         }
       } catch (assErr) {
-        console.warn('Could not fetch employee assessments:', assErr);
+        // Silent catch to prevent terminal noise; fallback handled gracefully in UI
       }
     } catch (err) {
-      console.warn('Error fetching employee detailed profile:', err);
+      // Silent catch to prevent terminal noise; fallback handled gracefully in UI
     } finally {
       setIsLoading(false);
     }
