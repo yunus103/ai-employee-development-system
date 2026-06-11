@@ -5,6 +5,7 @@ import { useStore } from '../../../store/useStore';
 import { apiClient } from '../../../services/apiClient';
 import { MySurvey, EvaluatorType, EmployeeDetail } from '../../../types';
 import competencyMapping from '../../../data/competency_mapping.json';
+import demoUsers from '../../../data/demo_users.json';
 import { toast } from '../../../store/useToastStore';
 import {
   ClipboardList,
@@ -118,6 +119,12 @@ export default function MySurveysPage() {
     if (existing) {
       setTargetEmployee(existing);
     } else {
+      // Use demoUsers fallback if employee list is inaccessible
+      const fallbackEmp = (demoUsers as EmployeeDetail[]).find(e => e.id === survey.employeeId);
+      if (fallbackEmp) {
+        setTargetEmployee(fallbackEmp);
+      }
+
       try {
         const empRes = await apiClient.employees.get(survey.employeeId);
         if (empRes.success) {
@@ -173,6 +180,8 @@ export default function MySurveysPage() {
   };
 
   const getCompetencyLabel = (competencyCode: string): string => {
+    if (!competencyCode) return '';
+
     // Core competencies → short Turkish label
     if (competencyCode.startsWith('Core_')) {
       const coreLabels = (competencyMapping as unknown as Record<string, Record<string, string>>)['core_labels'];
@@ -187,10 +196,30 @@ export default function MySurveysPage() {
       return deptDisplayLabels?.[targetEmployee.department]?.[competencyCode] || competencyCode;
     }
 
+    // Try finding by C# code key for department competencies
+    const deptLabels = (competencyMapping as any).dept_comp_labels[targetEmployee.department];
+    if (deptLabels) {
+      const matchingKey = Object.keys(deptLabels).find(key => deptLabels[key] === competencyCode);
+      if (matchingKey) {
+        const deptDisplayLabels = (competencyMapping as any).dept_comp_display_labels[targetEmployee.department];
+        return deptDisplayLabels?.[matchingKey] || competencyCode;
+      }
+    }
+
     // Role competencies → display label by job role
     if (competencyCode.startsWith('Role_')) {
       const roleDisplayLabels = (competencyMapping as unknown as Record<string, Record<string, Record<string, string>>>)['role_comp_display_labels'];
       return roleDisplayLabels?.[targetEmployee.jobRole]?.[competencyCode] || competencyCode;
+    }
+
+    // Try finding by C# code key for role competencies
+    const roleLabels = (competencyMapping as any).role_comp_labels[targetEmployee.jobRole];
+    if (roleLabels) {
+      const matchingKey = Object.keys(roleLabels).find(key => roleLabels[key] === competencyCode);
+      if (matchingKey) {
+        const roleDisplayLabels = (competencyMapping as any).role_comp_display_labels[targetEmployee.jobRole];
+        return roleDisplayLabels?.[matchingKey] || competencyCode;
+      }
     }
 
     return competencyCode;

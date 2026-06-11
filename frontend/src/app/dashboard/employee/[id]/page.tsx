@@ -730,15 +730,51 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
   // Get dynamic descriptions depending on mapped titles
   const getCompetencyName = (competencyCode: string) => {
+    if (!competencyCode) return '';
+
+    // 1. Core Competency mapping → short Turkish label
     if (competencyCode.startsWith('Core_')) {
-      return (competencyMapping.core_descriptions as Record<string, string>)[competencyCode] || competencyCode;
+      return (competencyMapping.core_labels as Record<string, string>)[competencyCode] || competencyCode;
     }
-    if (competencyCode.startsWith('Dept_')) {
-      return (competencyMapping.dept_comp_labels as Record<string, Record<string, string>>)[employee.department]?.[competencyCode] || competencyCode;
+
+    // 2. Department Competency mapping
+    if (employee?.department) {
+      const deptDisplay = (competencyMapping.dept_comp_display_labels as Record<string, Record<string, string>>)[employee.department];
+      if (deptDisplay) {
+        if (competencyCode.startsWith('Dept_')) {
+          return deptDisplay[competencyCode] || competencyCode;
+        }
+        
+        // Fallback search for C# code like "Tech_CodingQuality"
+        const deptLabels = (competencyMapping.dept_comp_labels as Record<string, Record<string, string>>)[employee.department];
+        if (deptLabels) {
+          const matchingKey = Object.keys(deptLabels).find(key => deptLabels[key] === competencyCode);
+          if (matchingKey) {
+            return deptDisplay[matchingKey] || competencyCode;
+          }
+        }
+      }
     }
-    if (competencyCode.startsWith('Role_')) {
-      return (competencyMapping.role_comp_labels as Record<string, Record<string, string>>)[employee.jobRole]?.[competencyCode] || competencyCode;
+
+    // 3. Role Competency mapping
+    if (employee?.jobRole) {
+      const roleDisplay = (competencyMapping.role_comp_display_labels as Record<string, Record<string, string>>)[employee.jobRole];
+      if (roleDisplay) {
+        if (competencyCode.startsWith('Role_')) {
+          return roleDisplay[competencyCode] || competencyCode;
+        }
+
+        // Fallback search for C# code like "Tech_DebuggingDepth"
+        const roleLabels = (competencyMapping.role_comp_labels as Record<string, Record<string, string>>)[employee.jobRole];
+        if (roleLabels) {
+          const matchingKey = Object.keys(roleLabels).find(key => roleLabels[key] === competencyCode);
+          if (matchingKey) {
+            return roleDisplay[matchingKey] || competencyCode;
+          }
+        }
+      }
     }
+
     return competencyCode;
   };
 
