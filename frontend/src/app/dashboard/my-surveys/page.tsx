@@ -5,7 +5,6 @@ import { useStore } from '../../../store/useStore';
 import { apiClient } from '../../../services/apiClient';
 import { MySurvey, EvaluatorType, EmployeeDetail } from '../../../types';
 import competencyMapping from '../../../data/competency_mapping.json';
-import demoUsers from '../../../data/demo_users.json';
 import { toast } from '../../../store/useToastStore';
 import {
   ClipboardList,
@@ -119,12 +118,6 @@ export default function MySurveysPage() {
     if (existing) {
       setTargetEmployee(existing);
     } else {
-      // Use demoUsers fallback if employee list is inaccessible
-      const fallbackEmp = (demoUsers as EmployeeDetail[]).find(e => e.id === survey.employeeId);
-      if (fallbackEmp) {
-        setTargetEmployee(fallbackEmp);
-      }
-
       try {
         const empRes = await apiClient.employees.get(survey.employeeId);
         if (empRes.success) {
