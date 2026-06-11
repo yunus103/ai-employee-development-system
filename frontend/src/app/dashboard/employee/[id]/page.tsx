@@ -291,6 +291,8 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           }
         } catch (err) {
           console.error('Error completing assessment', err);
+          const errMsg = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Değerlendirme tamamlanırken bir hata oluştu.';
+          toast.error(errMsg);
         } finally {
           setIsActionLoading(false);
         }
@@ -347,6 +349,8 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       }
     } catch (e) {
       console.error(e);
+      const errMsg = (e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Görev güncellenirken hata oluştu.';
+      toast.error(errMsg);
     }
   };
 
@@ -362,9 +366,13 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           const res = await apiClient.actionPlans.deleteItem(actionPlan.id, itemId);
           if (res.success) {
             setActionPlan({ ...actionPlan, items: actionPlan.items.filter(i => i.id !== itemId) });
+          } else {
+            toast.error(res.message || 'Görev silinemedi.');
           }
         } catch (e) {
           console.error(e);
+          const errMsg = (e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Görev silinirken hata oluştu.';
+          toast.error(errMsg);
         }
       }
     });
@@ -385,9 +393,13 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         setActionPlan({ ...actionPlan, items: [...actionPlan.items, res.data] });
         setIsAddModalOpen(false);
         setNewItem({ title: '', description: '', priority: 'Medium', dueDate: '' });
+      } else {
+        toast.error(res.message || 'Görev eklenemedi.');
       }
     } catch (e) {
       console.error(e);
+      const errMsg = (e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Yeni görev eklenirken hata oluştu.';
+      toast.error(errMsg);
     }
   };
 
@@ -400,9 +412,13 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       if (res.success) {
         toast.success('Gelişim planı onaylandı.');
         setActionPlan(res.data);
+      } else {
+        toast.error(res.message || 'Gelişim planı onaylanamadı.');
       }
     } catch (e) {
       console.error(e);
+      const errMsg = (e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Gelişim planı onaylanırken hata oluştu.';
+      toast.error(errMsg);
     } finally {
       setIsActionLoading(false);
     }
@@ -416,9 +432,13 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       if (res.success) {
         toast.success('Gelişim planı çalışana gönderildi ve panosuna görev olarak eklendi!');
         setActionPlan(res.data);
+      } else {
+        toast.error(res.message || 'Gelişim planı gönderilemedi.');
       }
     } catch (e) {
       console.error(e);
+      const errMsg = (e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Gelişim planı gönderilirken hata oluştu.';
+      toast.error(errMsg);
     } finally {
       setIsActionLoading(false);
     }
