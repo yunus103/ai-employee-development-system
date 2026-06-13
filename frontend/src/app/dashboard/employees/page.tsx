@@ -136,8 +136,8 @@ export default function EmployeesPage() {
             setManagerDept(res.data.department);
           }
         })
-        .catch((err) => {
-          console.warn('Could not fetch manager profile details:', err);
+        .catch((err: any) => {
+          console.warn('Could not fetch manager profile details:', err.message || err);
         });
     }
   }, [user]);
@@ -174,8 +174,8 @@ export default function EmployeesPage() {
         setTotalCount(res.totalCount);
         setTotalPages(res.totalPages);
       }
-    } catch (err) {
-      console.warn('Error fetching employees list:', err);
+    } catch (err: any) {
+      console.warn('Error fetching employees list:', err.message || err);
     } finally {
       setIsLoading(false);
     }
@@ -206,8 +206,8 @@ export default function EmployeesPage() {
           setAllEmployeesList(res.data);
         }
       })
-      .catch((err) => {
-        console.warn('Could not load manager lookup list:', err);
+      .catch((err: any) => {
+        console.warn('Could not load manager lookup list:', err.message || err);
       });
     return () => {
       active = false;
@@ -229,8 +229,8 @@ export default function EmployeesPage() {
           } else {
             toast.error(res.message || 'Değerlendirme başlatılamadı.');
           }
-        } catch (err) {
-          console.warn('Error creating assessment:', err);
+        } catch (err: any) {
+          console.warn('Error creating assessment:', err.message || err);
           const axiosError = err as {
             message?: string;
             response?: {
@@ -334,12 +334,12 @@ export default function EmployeesPage() {
               setAllEmployeesList(res.data);
             }
           })
-          .catch((err) => console.warn('Could not reload manager lookup list:', err));
+          .catch((err: any) => console.warn('Could not reload manager lookup list:', err.message || err));
       } else {
         toast.error(res.message || 'Çalışan oluşturulamadı.');
       }
-    } catch (err: unknown) {
-      console.warn('Error creating employee:', err);
+    } catch (err: any) {
+      console.warn('Error creating employee:', err.message || err);
       const axiosError = err as { response?: { data?: { errors?: string[]; message?: string } } };
       const errors = axiosError.response?.data?.errors || [];
       if (errors.length > 0) {

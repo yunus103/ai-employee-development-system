@@ -96,8 +96,8 @@ export default function EmployeeDashboard() {
         } catch (planErr) {
           console.warn('Action plans or scores are restricted for standard employees (403):', planErr);
         }
-      } catch (err) {
-        console.error('Error fetching employee data', err);
+      } catch (err: any) {
+        console.error('Error fetching employee data:', err.message || err);
       } finally {
         setIsLoading(false);
       }

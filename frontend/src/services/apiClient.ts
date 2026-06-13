@@ -75,6 +75,25 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Standardize error message extraction from backend response
+    let serverMessage = '';
+    if (error.response?.data) {
+      const data = error.response.data;
+      if (typeof data === 'object') {
+        serverMessage = data.message || (data.errors ? (Array.isArray(data.errors) ? data.errors.join(', ') : typeof data.errors === 'object' ? Object.values(data.errors).flat().join(', ') : '') : '') || data.title || '';
+      }
+    }
+    const errMsg = serverMessage || error.message || 'Bir bağlantı hatası oluştu.';
+
+    // Create a clean, simplified Error object without circular references or massive axios config structures
+    const cleanError = new Error(errMsg);
+    (cleanError as any).status = error.response?.status;
+    (cleanError as any).response = {
+      status: error.response?.status,
+      data: error.response?.data,
+      statusText: error.response?.statusText
+    };
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -97,7 +116,7 @@ axiosInstance.interceptors.response.use(
         if (typeof window !== 'undefined') {
           window.location.href = '/login?expired=true';
         }
-        return Promise.reject(error);
+        return Promise.reject(cleanError);
       }
 
       try {
@@ -114,18 +133,25 @@ axiosInstance.interceptors.response.use(
         isRefreshing = false;
         
         return axiosInstance(originalRequest);
-      } catch (refreshError) {
+      } catch (refreshError: any) {
         processQueue(refreshError, null);
         isRefreshing = false;
         localStorage.clear();
         if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
           window.location.href = '/login?expired=true';
         }
-        return Promise.reject(refreshError);
+        
+        const cleanRefreshError = new Error(refreshError.response?.data?.message || refreshError.message || 'Oturum yenilenirken hata oluştu.');
+        (cleanRefreshError as any).status = refreshError.response?.status;
+        (cleanRefreshError as any).response = {
+          status: refreshError.response?.status,
+          data: refreshError.response?.data
+        };
+        return Promise.reject(cleanRefreshError);
       }
     }
 
-    return Promise.reject(error);
+    return Promise.reject(cleanError);
   }
 );
 

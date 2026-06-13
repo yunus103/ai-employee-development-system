@@ -49,8 +49,8 @@ export default function ManagerDashboard() {
           setAssessments(allAssessments);
           setPlans(allPlans);
         }
-      } catch (err) {
-        console.error('Error fetching manager dashboard data', err);
+      } catch (err: any) {
+        console.error('Error fetching manager dashboard data:', err.message || err);
       } finally {
         setIsLoading(false);
       }

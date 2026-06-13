@@ -223,9 +223,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       } else {
         toast.error(res.message || 'Değerlendirici atanamadı.');
       }
-    } catch (err) {
-      console.error(err);
-      toast.error('İşlem sırasında bir hata oluştu.');
+    } catch (err: any) {
+      console.error('Error adding assignment:', err.message || err);
+      toast.error(err.response?.data?.message || err.message || 'İşlem sırasında bir hata oluştu.');
     } finally {
       setIsAssigning(false);
     }
@@ -285,9 +285,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       }
       toast.success('Puanlar başarıyla kaydedildi.');
       fetchData();
-    } catch (err) {
-      console.error('Error upserting scores', err);
-      toast.error('Puanlar kaydedilirken hata oluştu.');
+    } catch (err: any) {
+      console.error('Error upserting scores:', err.message || err);
+      toast.error(err.response?.data?.message || err.message || 'Puanlar kaydedilirken hata oluştu.');
     } finally {
       setIsActionLoading(false);
     }
@@ -324,9 +324,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           } else {
             toast.error(res.message || 'Hata oluştu.');
           }
-        } catch (err) {
-          console.error('Error completing assessment', err);
-          const errMsg = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Değerlendirme tamamlanırken bir hata oluştu.';
+        } catch (err: any) {
+          console.error('Error completing assessment:', err.message || err);
+          const errMsg = err.response?.data?.message || 'Değerlendirme tamamlanırken bir hata oluştu.';
           toast.error(errMsg);
         } finally {
           setIsActionLoading(false);
@@ -348,9 +348,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       } else {
         toast.error(res.message || 'Gelişim planı oluşturulamadı.');
       }
-    } catch (err) {
-      console.error('Error generating AI plan', err);
-      const errMsg = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'AI planlama servisiyle bağlantı kurulamadı.';
+    } catch (err: any) {
+      console.error('Error generating AI plan:', err.message || err);
+      const errMsg = err.response?.data?.message || 'AI planlama servisiyle bağlantı kurulamadı.';
       toast.error(errMsg);
     } finally {
       setIsActionLoading(false);
@@ -382,9 +382,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         const updatedItems = actionPlan.items.map(i => i.id === itemId ? res.data : i);
         setActionPlan({ ...actionPlan, items: updatedItems });
       }
-    } catch (e) {
-      console.error(e);
-      const errMsg = (e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Görev güncellenirken hata oluştu.';
+    } catch (e: any) {
+      console.error('Error updating item:', e.message || e);
+      const errMsg = e.response?.data?.message || 'Görev güncellenirken hata oluştu.';
       toast.error(errMsg);
     }
   };
@@ -404,9 +404,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           } else {
             toast.error(res.message || 'Görev silinemedi.');
           }
-        } catch (e) {
-          console.error(e);
-          const errMsg = (e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Görev silinirken hata oluştu.';
+        } catch (e: any) {
+          console.error('Error deleting item:', e.message || e);
+          const errMsg = e.response?.data?.message || 'Görev silinirken hata oluştu.';
           toast.error(errMsg);
         }
       }
@@ -431,9 +431,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       } else {
         toast.error(res.message || 'Görev eklenemedi.');
       }
-    } catch (e) {
-      console.error(e);
-      const errMsg = (e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Yeni görev eklenirken hata oluştu.';
+    } catch (e: any) {
+      console.error('Error adding manual item:', e.message || e);
+      const errMsg = e.response?.data?.message || 'Yeni görev eklenirken hata oluştu.';
       toast.error(errMsg);
     }
   };
@@ -450,9 +450,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       } else {
         toast.error(res.message || 'Gelişim planı onaylanamadı.');
       }
-    } catch (e) {
-      console.error(e);
-      const errMsg = (e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Gelişim planı onaylanırken hata oluştu.';
+    } catch (e: any) {
+      console.error('Error approving plan:', e.message || e);
+      const errMsg = e.response?.data?.message || 'Gelişim planı onaylanırken hata oluştu.';
       toast.error(errMsg);
     } finally {
       setIsActionLoading(false);
@@ -470,9 +470,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       } else {
         toast.error(res.message || 'Gelişim planı gönderilemedi.');
       }
-    } catch (e) {
-      console.error(e);
-      const errMsg = (e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Gelişim planı gönderilirken hata oluştu.';
+    } catch (e: any) {
+      console.error('Error sending plan:', e.message || e);
+      const errMsg = e.response?.data?.message || 'Gelişim planı gönderilirken hata oluştu.';
       toast.error(errMsg);
     } finally {
       setIsActionLoading(false);
@@ -496,9 +496,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           } else {
             toast.error(res.message || 'Plan iptal edilemedi.');
           }
-        } catch (e) {
-          console.warn('Error canceling plan:', e);
-          toast.error('Plan iptal edilirken bir hata oluştu.');
+        } catch (e: any) {
+          console.warn('Error canceling plan:', e.message || e);
+          toast.error(e.response?.data?.message || e.message || 'Plan iptal edilirken bir hata oluştu.');
         } finally {
           setIsActionLoading(false);
         }
@@ -715,8 +715,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    } catch {
-      toast.error('PDF indirilirken hata oluştu.');
+    } catch (err: any) {
+      console.error('Error downloading PDF:', err?.message || err);
+      toast.error(err?.response?.data?.message || err?.message || 'PDF indirilirken hata oluştu.');
     }
   };
 

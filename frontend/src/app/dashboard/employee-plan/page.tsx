@@ -30,9 +30,9 @@ export default function EmployeePlanPage() {
       } else {
         setError('Görevler yüklenemedi.');
       }
-    } catch (err) {
-      console.error('Error fetching tasks', err);
-      setError('Görevler yüklenirken bir hata oluştu.');
+    } catch (err: any) {
+      console.error('Error fetching tasks:', err.message || err);
+      setError(err.response?.data?.message || 'Görevler yüklenirken bir hata oluştu.');
     } finally {
       setIsLoading(false);
     }
@@ -59,9 +59,9 @@ export default function EmployeePlanPage() {
       } else {
         toast.error(res.message || 'Durum güncellenirken bir hata oluştu.');
       }
-    } catch (err) {
-      console.error('Error updating task status', err);
-      toast.error('İşlem başarısız oldu.');
+    } catch (err: any) {
+      console.error('Error updating task status:', err.message || err);
+      toast.error(err.response?.data?.message || err.message || 'İşlem başarısız oldu.');
     }
   };
 

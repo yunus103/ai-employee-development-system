@@ -26,8 +26,8 @@ export default function HRDashboard() {
         if (empRes.success) {
           setEmployees(empRes.data);
         }
-      } catch (err) {
-        console.error('Error fetching HR stats', err);
+      } catch (err: any) {
+        console.error('Error fetching HR stats:', err.message || err);
       } finally {
         setIsLoading(false);
       }

@@ -56,8 +56,8 @@ export const useStore = create<AuthState>((set) => ({
     set({ isLoading: true });
     try {
       await apiClient.auth.logout();
-    } catch (e) {
-      console.error('Logout error', e);
+    } catch (e: any) {
+      console.error('Logout error:', e.message || e);
     } finally {
       set({
         user: null,
@@ -112,8 +112,8 @@ export const useStore = create<AuthState>((set) => ({
       if (res.success && res.data) {
         set({ user: res.data });
       }
-    } catch (err) {
-      console.error('Failed to refresh user profile', err);
+    } catch (err: any) {
+      console.error('Failed to refresh user profile:', err.message || err);
     }
   }
 }));

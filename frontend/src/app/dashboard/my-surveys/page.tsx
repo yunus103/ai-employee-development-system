@@ -50,8 +50,8 @@ export default function MySurveysPage() {
       } else {
         setSurveys([]);
       }
-    } catch (err) {
-      console.error('Error fetching surveys', err);
+    } catch (err: any) {
+      console.error('Error fetching surveys:', err.message || err);
     } finally {
       setIsLoading(false);
     }
@@ -93,8 +93,8 @@ export default function MySurveysPage() {
           }
           setScores(initialScores);
         }
-      } catch (err) {
-        console.error('Error fetching scores', err);
+      } catch (err: any) {
+        console.error('Error fetching scores:', err.message || err);
         if (active) {
           setScores(initialScores);
         }
@@ -123,8 +123,8 @@ export default function MySurveysPage() {
         if (empRes.success) {
           setTargetEmployee(empRes.data);
         }
-      } catch (e) {
-        console.warn('Could not fetch target employee detailed profile (possibly unauthorized):', e);
+      } catch (e: any) {
+        console.warn('Could not fetch target employee detailed profile:', e.message || e);
       }
     }
   };
@@ -164,9 +164,9 @@ export default function MySurveysPage() {
       } else {
         toast.error(res.message || 'Değerlendirme kaydedilirken bir hata oluştu.');
       }
-    } catch (err) {
-      console.error('Error submitting scores', err);
-      toast.error('Değerlendirme kaydedilirken bir hata oluştu.');
+    } catch (err: any) {
+      console.error('Error submitting scores:', err.message || err);
+      toast.error(err.response?.data?.message || err.message || 'Değerlendirme kaydedilirken bir hata oluştu.');
     } finally {
       setIsSubmitting(false);
     }
