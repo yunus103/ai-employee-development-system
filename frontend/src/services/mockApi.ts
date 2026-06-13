@@ -716,6 +716,7 @@ export const mockApi = {
           assessmentId: assign.assessmentId,
           employeeId: assessment.employeeId,
           employeeName: assessment.employeeName,
+          evaluatorEmployeeId: assign.evaluatorEmployeeId,
           cycleId: assessment.cycleId,
           cycleName: assessment.cycleName,
           evaluatorType: assign.evaluatorType,

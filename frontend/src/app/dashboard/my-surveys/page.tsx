@@ -84,9 +84,11 @@ export default function MySurveysPage() {
       try {
         const scoreRes = await apiClient.assessments.getScores(selectedSurvey.assessmentId);
         if (active && scoreRes.success && scoreRes.data) {
-          // Filter scores entered by the current user
+          // Backend'den gelen evaluatorEmployeeId ile filtrele (kim dolduruyorsa onun skorları)
+          // Fallback: survey'de alan yoksa user.employeeId (Manager/Employee için her zaman eşleşir)
+          const myEvaluatorId = selectedSurvey.evaluatorEmployeeId ?? user?.employeeId;
           const evaluatorScores = scoreRes.data.filter(
-            s => s.evaluatorEmployeeId === user?.employeeId
+            s => s.evaluatorEmployeeId === myEvaluatorId
           );
           for (const s of evaluatorScores) {
             initialScores[s.competencyId] = s.score;
@@ -148,9 +150,18 @@ export default function MySurveysPage() {
         };
       });
 
+      // Backend'den gelen evaluatorEmployeeId'yi kullan — bu assignment'taki gerçek değerlendirici ID'si.
+      // Fallback: backend bu alanı henüz dönmüyorsa user.employeeId (Manager/Employee için eşdeğer).
+      const evaluatorEmployeeId = selectedSurvey.evaluatorEmployeeId ?? user?.employeeId;
+      if (!evaluatorEmployeeId) {
+        toast.error('Değerlendirici kimliği belirlenemiyor. Lütfen tekrar giriş yapın.');
+        setIsSubmitting(false);
+        return;
+      }
+
       const res = await apiClient.assessments.submitBulkScores(
         selectedSurvey.assessmentId,
-        user?.employeeId || 0,
+        evaluatorEmployeeId,
         payload,
         selectedSurvey.evaluatorType
       );

@@ -137,6 +137,7 @@ export interface MySurvey {
   assessmentId: number;
   employeeId: number;
   employeeName: string;
+  evaluatorEmployeeId: number; // anketi dolduracak kişinin ID'si (backend tarafından dönülür)
   cycleId: number;
   cycleName: string;
   evaluatorType: EvaluatorType;
