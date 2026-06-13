@@ -111,9 +111,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         }
       }
 
-      // 1b. Fetch Logged-in User Employee Details if not HR/Admin
+      // 1b. Fetch Logged-in User Employee Details if not HR/Admin/Manager (Employees only)
       let userEmp = null;
-      if (user && user.employeeId !== null) {
+      if (user && user.employeeId !== null && user.role === 'Employee') {
         try {
           const userEmpRes = await apiClient.employees.get(user.employeeId);
           if (userEmpRes.success) {

@@ -69,7 +69,7 @@ export default function EmployeePlanPage() {
   };
 
   const fetchProfile = async () => {
-    if (!user || user.employeeId === null) return;
+    if (!user || user.employeeId === null || user.role !== 'Employee') return;
     try {
       const res = await apiClient.employees.get(user.employeeId);
       if (res.success) {
