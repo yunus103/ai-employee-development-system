@@ -12,7 +12,8 @@ import {
   ClipboardList,
   AlertCircle,
   BookOpen,
-  ExternalLink
+  ExternalLink,
+  AlertTriangle
 } from 'lucide-react';
 
 export default function EmployeePlanPage() {
@@ -20,6 +21,14 @@ export default function EmployeePlanPage() {
   const [tasks, setTasks] = useState<EmployeeTask[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const isTaskOverdue = (dueDateStr: string | null | undefined, statusStr: string | null | undefined): boolean => {
+    if (!dueDateStr || statusStr === 'Completed' || statusStr === 'Cancelled') return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const taskDate = new Date(dueDateStr);
+    return taskDate < today;
+  };
 
   const fetchTasks = async () => {
     setIsLoading(true);
@@ -178,8 +187,16 @@ export default function EmployeePlanPage() {
             <div className="flex-1 space-y-4 max-h-[600px] overflow-y-auto pr-1">
               {todoTasks.map((task) => (
                 <div key={task.id} className="glass-card rounded-xl p-5 border border-card-border space-y-4 transition hover:border-card-border/80">
-                  <div className="flex justify-between items-start">
-                    <h5 className="text-sm font-bold text-foreground leading-snug">{task.title}</h5>
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="space-y-1 min-w-0 flex-1">
+                      {isTaskOverdue(task.dueDate, task.status) && (
+                        <span className="inline-flex items-center space-x-1 rounded bg-danger/10 border border-danger/20 px-1.5 py-0.5 text-[8px] font-bold text-danger uppercase tracking-wider animate-pulse mb-1">
+                          <AlertTriangle className="h-2.5 w-2.5 shrink-0" />
+                          <span>Süresi Geçti</span>
+                        </span>
+                      )}
+                      <h5 className="text-sm font-bold text-foreground leading-snug">{task.title}</h5>
+                    </div>
                     {renderPriorityBadge(task.priority)}
                   </div>
                   <p className="text-xs text-muted leading-relaxed">{task.description}</p>
@@ -240,8 +257,16 @@ export default function EmployeePlanPage() {
             <div className="flex-1 space-y-4 max-h-[600px] overflow-y-auto pr-1">
               {inProgressTasks.map((task) => (
                 <div key={task.id} className="glass-card rounded-xl p-5 border border-card-border space-y-4 transition hover:border-card-border/80">
-                  <div className="flex justify-between items-start">
-                    <h5 className="text-sm font-bold text-foreground leading-snug">{task.title}</h5>
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="space-y-1 min-w-0 flex-1">
+                      {isTaskOverdue(task.dueDate, task.status) && (
+                        <span className="inline-flex items-center space-x-1 rounded bg-danger/10 border border-danger/20 px-1.5 py-0.5 text-[8px] font-bold text-danger uppercase tracking-wider animate-pulse mb-1">
+                          <AlertTriangle className="h-2.5 w-2.5 shrink-0" />
+                          <span>Süresi Geçti</span>
+                        </span>
+                      )}
+                      <h5 className="text-sm font-bold text-foreground leading-snug">{task.title}</h5>
+                    </div>
                     {renderPriorityBadge(task.priority)}
                   </div>
                   <p className="text-xs text-muted leading-relaxed">{task.description}</p>

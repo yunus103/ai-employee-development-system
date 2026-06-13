@@ -234,22 +234,31 @@ Uygulamanın internet bağlantısı olmadan veya bağımsız bir şekilde çalı
 
 ---
 
-## 8. En Son Yapılan Entegrasyon Geliştirmeleri & Backend Aksiyon Kalemleri
+## 9. Rol Yetkileri ve 360° Değerlendirme Çevrimi Mantığı
 
-Haziran 2026 tarihinde yapılan son geliştirme döngüsünde aşağıdaki entegrasyon ve iş kuralları uygulanmıştır:
+Sistemdeki kullanıcı rolleri (Admin, HR, Manager, Employee) arasındaki yetki sınırları ve 360° performans değerlendirme çevriminin çalışma mekanizması aşağıda tanımlanmıştır:
 
-### 8.1 Yetkinlik Puanlama ve Otomatik Kaydetme (Auto-Save)
-* **Otomatik Kaydetme:** Çalışan detay sayfasında (`employee/[id]/page.tsx`) "Değerlendirmeyi Tamamla" butonuna tıklandığında, kullanıcının slider'lar ile yaptığı puan girişlerinin kaybolmaması için önce arka planda tüm skorlar otomatik olarak kaydedilir (`apiClient.assessments.upsertScore`), ardından değerlendirme başarıyla tamamlanır.
-* **Değerlendirici Kimliği Entegrasyonu:** Puanlar kaydedilirken `evaluatorEmployeeId` parametresi hem API Client hem de Mock API katmalarında desteklenmeye başlanmıştır. Giriş yapan kullanıcının rolüne göre değerlendirici kimliği dinamik olarak çözülerek backend'e gönderilir.
+### 9.1 Rollerin Değerlendirme Yetkileri (Temsili Veri Girişi / God Mode)
+* **Employee (Çalışan):** Yalnızca kendisine atanan değerlendirme anketlerini (kendi öz değerlendirmesi veya atandığı iş arkadaşlarının akran değerlendirmesi) doldurabilir. Başkası adına puan giremez.
+* **Manager (Yönetici):** Kendi ekibindeki çalışanların değerlendirme süreçlerini izleyebilir ve yönetici değerlendirmesi (Manager) olarak çalışana puan verebilir.
+* **Admin & HR (Sistem Yetkilileri):** Çalışanlarla doğrudan bir hiyerarşik bağı olmasa bile, **temsili veri girişi (proxy data entry)** yetkisine sahiptirler. 
+  - Arayüzdeki değerlendirici seçici dropdown (Yönetici, Öz, Akran, Ast) **sadece Admin ve HR rollerine gösterilir**.
+  - Bu sayede İK yetkilisi, sisteme erişemeyen veya puanlarını kâğıt üzerinde ileten herhangi bir değerlendiricinin (örneğin çalışanın kendisi veya yöneticisi) yerine puan girişi yapabilir.
 
-### 8.2 Hata Yönetimi & Gerçek Hata Mesajlarının Gösterimi
-* **Öncelikli Backend Mesajları:** Arayüzde `handleStartAssessment` gibi fonksiyonlarda hata yakalanırken, hata koduna göre (örn: 500) atanan hardcoded statik mesajlar yerine, **doğrudan backend'den dönen gerçek hata mesajı (`axiosError.response?.data?.message`) önceliklendirilmiştir.** Bu sayede veritabanı veya iş kuralları ihlalleri toaster üzerinde net bir şekilde görüntülenebilir.
+### 9.2 Değerlendirme Çevriminin Tamamlanma Mantığı
+Değerlendirme sürecinin ("Draft" statüsünden "Completed" statüsüne geçmesi) iki farklı şekilde gerçekleşir:
+1. **Otomatik Tamamlanma (Normal Akış):** Anket atanmış olan tüm taraflar (Çalışanın kendisi, yöneticisi ve varsa atanan akranları) puan girişlerini tamamlayıp gönderdiklerinde, sistem atamaların bittiğini algılar ve süreci otomatik olarak sonlandırır (`Completed`).
+2. **Manuel Tamamlanma (Yönetici/İK Kapatma - Bypass):** Süreçteki bazı değerlendiriciler puan girmeyi geciktirdiğinde veya süreç tıkanıp AI gelişim planı aşamasına geçilemediğinde, yetkili kullanıcı (HR/Admin/Manager) **"360° Sürecini Tamamla"** butonu ile süreci zorla sonlandırabilir. Bu işlem eksik anketleri bypass eder ve mevcut girilmiş puanların aritmetik ortalamasını alarak süreci tamamlar.
 
-### 8.3 Türkçe Yetkinlik İsimleri Eşleştirmesi (Mapping)
-* **Gelişmiş Map Çözümleyici:** Hem detay sayfasındaki grafik/tablolarda hem de anket sayfasında (`my-surveys/page.tsx`), veritabanından ham olarak dönebilecek olan C# özellik kodları (örn: `Tech_CodingQuality`, `Tech_DebuggingDepth` vb.) ile soyut kodlar (örn: `Dept_Comp1`, `Role_Comp1`) algılanarak `competency_mapping.json` dosyasındaki Türkçe karşılıklarına (`Kod Kalitesi`, `Hata Ayıklama Derinliği`) başarıyla dönüştürülmektedir.
+### 9.3 Arayüz İşlemleri ve Buton Mantığı
 
-### 8.4 [ÖNEMLİ] Backend Tarafında Yapılması Gereken Yetkilendirme Düzenlemeleri
-Uygulamanın gerçek API ile (canlı sunucu) hatasız çalışabilmesi için backend geliştiricisinin aşağıdaki 403 Forbidden yetki hatalarını düzeltmesi gerekmektedir:
-1. **`GET /api/employees/{id}` yetkisi:** Standart çalışanların (`Employee`), kendilerine 360 anket atanan kişilerin ad, departman ve rol bilgilerini anket ekranında görebilmesi için bu endpoint'e okuma yetkisi tanımlanmalıdır (aktif bir `AssessmentAssignment` kaydı olan hedefler için).
-2. **`GET /api/assessments/{id}/scores` yetkisi:** Standart çalışanların, atanmış oldukları değerlendirmeler için daha önce girdikleri taslak puanları yükleyebilmesi amacıyla bu endpoint'e erişimi (yalnızca kendi girdiği skorları okuyacak şekilde) açılmalıdır.
-3. **`GET /api/employees/{employeeId}/action-plans` yetkisi:** Standart çalışanların kendi ana sayfalarında kendi yapay zeka gelişim planlarını listeleyebilmeleri için bu endpoint'e yetki verilmelidir.
+Kullanıcıların yanlış yönlendirilmesini önlemek ve süreç yönetimini netleştirmek adına arayüzdeki butonlar ve konumları aşağıdaki gibi düzenlenmiştir:
+
+1. **Puanları Kaydet (Sol Kolon - Puan Kartı Altı):**
+   - **Tetiklediği Metot & API:** `handleSaveScores` -> `POST /api/assessments/{id}/scores` (Her yetkinlik için tekil upsert score).
+   - **İşlevi:** O an seçili olan değerlendirici rolünün (Öz, Yönetici, Akran veya Ast) 13 yetkinlik için girdiği puanları taslak olarak veri tabanına kaydeder. Değerlendirme döngüsünü sonlandırmaz, taslak olarak kalmasını sağlar.
+
+2. **360° Sürecini Tamamla (Kapat) (Sağ Kolon - Değerlendiriciler Panelinin Altı):**
+   - **Tetiklediği Metot & API:** `handleCompleteAssessment` -> `PUT /api/assessments/{id}/complete` (Zorla tamamla / Bypass).
+   - **Görünürlük:** Yalnızca süreç **Draft** statüsündeyken ve sisteme giriş yapan kullanıcı **Admin** veya **HR** rolündeyken sağ kolonda özel bir sarı uyarı kartı ("Süreç Kapatma (Bypass)") içerisinde görünür.
+   - **İşlevi:** Bazı değerlendiriciler puan girmeyi geciktirdiğinde veya süreç tıkandığında, İK veya Admin kullanıcısının mevcut puanların aritmetik ortalamasını alarak süreci tamamlandı (`Completed`) statüsüne zorlamasını sağlar. Bu buton tıklandığında öncelikle formda yapılmış güncel puan değişiklikleri otomatik olarak kaydedilir, ardından süreç sonlandırılır ve AI gelişim planı üretme aşamasına geçişe izin verilir.

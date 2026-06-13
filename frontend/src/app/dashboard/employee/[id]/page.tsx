@@ -71,6 +71,18 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     dueDate: ''
   });
 
+  // Action Plan Filter & Sort States
+  const [planFilter, setPlanFilter] = useState<'All' | 'Completed' | 'Pending' | 'AI' | 'Manual'>('All');
+  const [planSort, setPlanSort] = useState<'PriorityDesc' | 'PriorityAsc' | 'DueDate' | 'Title'>('PriorityDesc');
+
+  const isTaskOverdue = (dueDateStr: string | null | undefined, statusStr: string | null | undefined): boolean => {
+    if (!dueDateStr || statusStr === 'Completed' || statusStr === 'Cancelled') return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const taskDate = new Date(dueDateStr);
+    return taskDate < today;
+  };
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -224,7 +236,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         toast.error(res.message || 'Değerlendirici atanamadı.');
       }
     } catch (err: any) {
-      console.error('Error adding assignment:', err.message || err);
       toast.error(err.response?.data?.message || err.message || 'İşlem sırasında bir hata oluştu.');
     } finally {
       setIsAssigning(false);
@@ -286,7 +297,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       toast.success('Puanlar başarıyla kaydedildi.');
       fetchData();
     } catch (err: any) {
-      console.error('Error upserting scores:', err.message || err);
       toast.error(err.response?.data?.message || err.message || 'Puanlar kaydedilirken hata oluştu.');
     } finally {
       setIsActionLoading(false);
@@ -325,7 +335,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             toast.error(res.message || 'Hata oluştu.');
           }
         } catch (err: any) {
-          console.error('Error completing assessment:', err.message || err);
           const errMsg = err.response?.data?.message || 'Değerlendirme tamamlanırken bir hata oluştu.';
           toast.error(errMsg);
         } finally {
@@ -349,7 +358,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         toast.error(res.message || 'Gelişim planı oluşturulamadı.');
       }
     } catch (err: any) {
-      console.error('Error generating AI plan:', err.message || err);
       const errMsg = err.response?.data?.message || 'AI planlama servisiyle bağlantı kurulamadı.';
       toast.error(errMsg);
     } finally {
@@ -383,7 +391,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         setActionPlan({ ...actionPlan, items: updatedItems });
       }
     } catch (e: any) {
-      console.error('Error updating item:', e.message || e);
       const errMsg = e.response?.data?.message || 'Görev güncellenirken hata oluştu.';
       toast.error(errMsg);
     }
@@ -405,7 +412,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             toast.error(res.message || 'Görev silinemedi.');
           }
         } catch (e: any) {
-          console.error('Error deleting item:', e.message || e);
           const errMsg = e.response?.data?.message || 'Görev silinirken hata oluştu.';
           toast.error(errMsg);
         }
@@ -432,7 +438,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         toast.error(res.message || 'Görev eklenemedi.');
       }
     } catch (e: any) {
-      console.error('Error adding manual item:', e.message || e);
       const errMsg = e.response?.data?.message || 'Yeni görev eklenirken hata oluştu.';
       toast.error(errMsg);
     }
@@ -451,7 +456,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         toast.error(res.message || 'Gelişim planı onaylanamadı.');
       }
     } catch (e: any) {
-      console.error('Error approving plan:', e.message || e);
       const errMsg = e.response?.data?.message || 'Gelişim planı onaylanırken hata oluştu.';
       toast.error(errMsg);
     } finally {
@@ -471,7 +475,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         toast.error(res.message || 'Gelişim planı gönderilemedi.');
       }
     } catch (e: any) {
-      console.error('Error sending plan:', e.message || e);
       const errMsg = e.response?.data?.message || 'Gelişim planı gönderilirken hata oluştu.';
       toast.error(errMsg);
     } finally {
@@ -497,7 +500,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             toast.error(res.message || 'Plan iptal edilemedi.');
           }
         } catch (e: any) {
-          console.warn('Error canceling plan:', e.message || e);
           toast.error(e.response?.data?.message || e.message || 'Plan iptal edilirken bir hata oluştu.');
         } finally {
           setIsActionLoading(false);
@@ -716,7 +718,6 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       link.click();
       document.body.removeChild(link);
     } catch (err: any) {
-      console.error('Error downloading PDF:', err?.message || err);
       toast.error(err?.response?.data?.message || err?.message || 'PDF indirilirken hata oluştu.');
     }
   };
@@ -956,20 +957,13 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                   })}
                 </div>
 
-                <div className="flex space-x-3 pt-2">
+                <div className="pt-2">
                   <button
                     onClick={handleSaveScores}
                     disabled={isActionLoading}
-                    className="flex-1 rounded-xl bg-card border border-card-border hover:bg-card-border/50 py-3 text-xs font-semibold text-foreground transition"
+                    className="w-full rounded-xl bg-primary hover:bg-primary-hover py-3 text-xs font-semibold text-white transition shadow-lg shadow-primary/15"
                   >
-                    Taslak Kaydet
-                  </button>
-                  <button
-                    onClick={handleCompleteAssessment}
-                    disabled={isActionLoading}
-                    className="flex-1 rounded-xl bg-primary hover:bg-primary-hover py-3 text-xs font-semibold text-white transition shadow-lg shadow-primary/15"
-                  >
-                    Değerlendirmeyi Tamamla
+                    Puanları Kaydet
                   </button>
                 </div>
               </div>
@@ -1109,6 +1103,26 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               </div>
             )}
 
+            {/* Process Completion / Bypass Action Card */}
+            {activeAssessment && activeAssessment.status === 'Draft' && (user?.role === 'HR' || user?.role === 'Admin') && (
+              <div className="glass-panel rounded-2xl p-6 border border-warning/20 bg-warning/5 space-y-4">
+                <div className="flex items-center space-x-2.5 text-warning">
+                  <AlertTriangle className="h-5 w-5 shrink-0" />
+                  <h4 className="text-base font-bold text-foreground">Süreç Kapatma (Bypass)</h4>
+                </div>
+                <p className="text-xs text-muted leading-relaxed">
+                  Bazı değerlendiriciler henüz puan girmemiş olsa bile süreci manuel olarak kapatabilirsiniz. Bu işlem eksik atamaları bypass eder ve mevcut puanlarla süreci tamamlar.
+                </p>
+                <button
+                  onClick={handleCompleteAssessment}
+                  disabled={isActionLoading}
+                  className="flex w-full items-center justify-center space-x-2 rounded-xl bg-warning hover:bg-warning-hover py-3 px-4 font-semibold text-white shadow-lg shadow-warning/20 transition duration-150 disabled:opacity-50"
+                >
+                  <span>360° Sürecini Tamamla (Kapat)</span>
+                </button>
+              </div>
+            )}
+
             {/* AI Generator Panel */}
             {activeAssessment && activeAssessment.status === 'Completed' && (
               <div className="glass-panel rounded-2xl p-6 border border-primary/20 bg-gradient-to-br from-primary/10 to-transparent space-y-4">
@@ -1162,7 +1176,42 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             </div>
 
             {/* Lifecycle controls */}
-            <div className="flex flex-wrap gap-2.5">
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* Progress Circular Widget (If active/sent) */}
+              {(actionPlan.status === 'Sent' || actionPlan.status === 'Completed') && (
+                <div className="flex items-center space-x-3 bg-background border border-card-border rounded-xl px-4 py-1.5 shrink-0 mr-1.5">
+                  <div className="text-right">
+                    <span className="text-[9px] text-muted font-medium block">İlerleme</span>
+                    <span className="text-xs font-bold text-foreground">
+                      %{Math.round((actionPlan.items.filter(i => i.taskStatus === 'Completed').length / actionPlan.items.length) * 100)}
+                    </span>
+                  </div>
+                  <div className="relative h-9 w-9 flex items-center justify-center shrink-0">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                      <path
+                        className="text-card-border"
+                        strokeWidth="3.5"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="text-primary"
+                        strokeDasharray={`${Math.round((actionPlan.items.filter(i => i.taskStatus === 'Completed').length / actionPlan.items.length) * 100)}, 100`}
+                        strokeWidth="3.8"
+                        strokeLinecap="round"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </svg>
+                    <span className="absolute text-[8px] font-bold text-foreground">
+                      {actionPlan.items.filter(i => i.taskStatus === 'Completed').length}/{actionPlan.items.length}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               <button
                 onClick={handleDownloadPDF}
                 className="flex items-center space-x-1.5 rounded-xl border border-card-border bg-card hover:bg-card-border/50 py-2.5 px-4 text-xs font-semibold text-foreground transition"
@@ -1217,24 +1266,129 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
 
+          {/* Filters & Sorting Controls */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card/25 border border-card-border/60 rounded-2xl p-4">
+            {/* Filter pills */}
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setPlanFilter('All')}
+                className={`rounded-lg px-3 py-1.5 text-[10px] font-bold transition uppercase tracking-wider ${
+                  planFilter === 'All'
+                    ? 'bg-primary text-white shadow-md shadow-primary/10'
+                    : 'bg-card text-muted hover:text-foreground border border-card-border'
+                }`}
+              >
+                Tüm Görevler
+              </button>
+              <button
+                onClick={() => setPlanFilter('Pending')}
+                className={`rounded-lg px-3 py-1.5 text-[10px] font-bold transition uppercase tracking-wider ${
+                  planFilter === 'Pending'
+                    ? 'bg-warning/15 text-warning border border-warning/30 shadow-md shadow-warning/5'
+                    : 'bg-card text-muted hover:text-foreground border border-card-border'
+                }`}
+              >
+                Devam Edenler
+              </button>
+              <button
+                onClick={() => setPlanFilter('Completed')}
+                className={`rounded-lg px-3 py-1.5 text-[10px] font-bold transition uppercase tracking-wider ${
+                  planFilter === 'Completed'
+                    ? 'bg-success/15 text-success border border-success/30 shadow-md shadow-success/5'
+                    : 'bg-card text-muted hover:text-foreground border border-card-border'
+                }`}
+              >
+                Tamamlananlar
+              </button>
+              <button
+                onClick={() => setPlanFilter('AI')}
+                className={`rounded-lg px-3 py-1.5 text-[10px] font-bold transition uppercase tracking-wider ${
+                  planFilter === 'AI'
+                    ? 'bg-primary/15 text-primary border border-primary/30'
+                    : 'bg-card text-muted hover:text-foreground border border-card-border'
+                }`}
+              >
+                AI Önerileri
+              </button>
+              <button
+                onClick={() => setPlanFilter('Manual')}
+                className={`rounded-lg px-3 py-1.5 text-[10px] font-bold transition uppercase tracking-wider ${
+                  planFilter === 'Manual'
+                    ? 'bg-info/15 text-info border border-info/30'
+                    : 'bg-card text-muted hover:text-foreground border border-card-border'
+                }`}
+              >
+                Manuel Görevler
+              </button>
+            </div>
+
+            {/* Sorting Select */}
+            <div className="flex items-center space-x-2 w-full sm:w-auto self-stretch sm:self-auto shrink-0">
+              <span className="text-[10px] text-muted font-bold uppercase tracking-wider whitespace-nowrap">Sırala:</span>
+              <select
+                value={planSort}
+                onChange={(e) => setPlanSort(e.target.value as any)}
+                className="flex-1 sm:flex-initial rounded-xl bg-card border border-card-border py-2 px-3.5 text-xs text-foreground outline-none cursor-pointer focus:border-primary"
+              >
+                <option value="PriorityDesc">Öncelik (Yüksek ➔ Düşük)</option>
+                <option value="PriorityAsc">Öncelik (Düşük ➔ Yüksek)</option>
+                <option value="DueDate">Bitiş Tarihi (Yakın ➔ Uzak)</option>
+                <option value="Title">Görev Adı (A-Z)</option>
+              </select>
+            </div>
+          </div>
+
           {/* Action plan items list */}
           <div className="space-y-4">
             {(() => {
-               const priorityWeights: Record<ActionPriority, number> = { High: 3, Medium: 2, Low: 1 };
-              const sortedItems = [...actionPlan.items].sort((a, b) => {
-                const isCompletedA = a.taskStatus === 'Completed';
-                const isCompletedB = b.taskStatus === 'Completed';
-                if (isCompletedA && !isCompletedB) return 1;
-                if (!isCompletedA && isCompletedB) return -1;
+              const priorityWeights: Record<ActionPriority, number> = { High: 3, Medium: 2, Low: 1 };
+              
+              // 1. Filter items
+              let filtered = [...actionPlan.items];
+              if (planFilter === 'Completed') {
+                filtered = filtered.filter(i => i.taskStatus === 'Completed');
+              } else if (planFilter === 'Pending') {
+                filtered = filtered.filter(i => i.taskStatus !== 'Completed');
+              } else if (planFilter === 'AI') {
+                filtered = filtered.filter(i => i.source === 'AI');
+              } else if (planFilter === 'Manual') {
+                filtered = filtered.filter(i => i.source === 'Manual');
+              }
 
+              // 2. Sort items
+              filtered.sort((a, b) => {
+                if (planSort === 'Title') {
+                  return a.title.localeCompare(b.title);
+                }
+                if (planSort === 'DueDate') {
+                  const dateA = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+                  const dateB = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+                  return dateA - dateB;
+                }
+                
+                // Priority Sort
                 const weightA = priorityWeights[a.priority] || 0;
                 const weightB = priorityWeights[b.priority] || 0;
+                
+                if (planSort === 'PriorityAsc') {
+                  return weightA - weightB;
+                }
+                // Default: PriorityDesc
                 return weightB - weightA;
               });
-              return sortedItems.map((item) => (
+
+              if (filtered.length === 0) {
+                return (
+                  <div className="text-center py-12 text-xs text-muted border border-dashed border-card-border rounded-2xl">
+                    Kriterlere uygun gelişim görevi bulunamadı.
+                  </div>
+                );
+              }
+
+              return filtered.map((item) => (
                 <div key={item.id} className="glass-panel rounded-2xl p-6 border border-card-border flex flex-col md:flex-row justify-between gap-6 transition hover:border-card-border/80">
                   <div className="space-y-2 flex-1 min-w-0">
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 flex-wrap gap-1.5">
                       <span className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
                         item.source === 'AI'
                           ? 'bg-primary/10 border border-primary/20 text-primary'
@@ -1255,6 +1409,12 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                           {item.taskStatus === 'Completed' ? 'Tamamlandı' :
                            item.taskStatus === 'InProgress' ? 'Devam Ediyor' :
                            item.taskStatus === 'Cancelled' ? 'İptal Edildi' : 'Başlanmadı'}
+                        </span>
+                      )}
+                      {isTaskOverdue(item.dueDate, item.taskStatus) && (
+                        <span className="rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider border bg-danger/10 border-danger/20 text-danger animate-pulse flex items-center space-x-1">
+                          <AlertTriangle className="h-3 w-3 shrink-0" />
+                          <span>Süresi Geçti</span>
                         </span>
                       )}
                       <h5 className="text-sm font-bold text-foreground truncate">{item.title}</h5>

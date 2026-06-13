@@ -481,7 +481,7 @@ export default function EmployeesPage() {
                     <td className="py-4 px-6">
                       <span className="inline-flex items-center space-x-1 font-bold text-sm text-success">
                         <TrendingUp className="h-4 w-4 shrink-0" />
-                        <span>{emp.performanceScore || '3.5'}</span>
+                        <span>{emp.performanceScore !== undefined && emp.performanceScore !== null ? emp.performanceScore : '-'}</span>
                       </span>
                     </td>
                     <td className="py-4 px-6 text-right space-x-2">

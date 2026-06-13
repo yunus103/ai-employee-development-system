@@ -94,7 +94,7 @@ axiosInstance.interceptors.response.use(
       statusText: error.response?.statusText
     };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && originalRequest && !originalRequest.url?.includes('/api/auth/logout') && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -114,7 +114,8 @@ axiosInstance.interceptors.response.use(
         isRefreshing = false;
         // Redirect to login if no refresh token
         if (typeof window !== 'undefined') {
-          window.location.href = '/login?expired=true';
+          const encodedMsg = encodeURIComponent(errMsg);
+          window.location.href = `/login?expired=true&message=${encodedMsg}`;
         }
         return Promise.reject(cleanError);
       }
@@ -138,7 +139,9 @@ axiosInstance.interceptors.response.use(
         isRefreshing = false;
         localStorage.clear();
         if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-          window.location.href = '/login?expired=true';
+          const cleanRefreshError = new Error(refreshError.response?.data?.message || refreshError.message || 'Oturum yenilenirken hata oluştu.');
+          const encodedMsg = encodeURIComponent(cleanRefreshError.message);
+          window.location.href = `/login?expired=true&message=${encodedMsg}`;
         }
         
         const cleanRefreshError = new Error(refreshError.response?.data?.message || refreshError.message || 'Oturum yenilenirken hata oluştu.');

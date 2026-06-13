@@ -41,8 +41,11 @@ export default function LoginPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('expired') === 'true') {
-        setError('Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.');
+      const expired = params.get('expired') === 'true';
+      const msg = params.get('message');
+      
+      if (expired) {
+        setError(msg ? decodeURIComponent(msg) : 'Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.');
         // Clean query parameter from browser address bar
         const cleanUrl = window.location.pathname;
         window.history.replaceState({}, document.title, cleanUrl);
