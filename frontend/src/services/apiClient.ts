@@ -177,11 +177,27 @@ export const apiClient = {
     logout: async (): Promise<ApiResponse<Record<string, never>>> => {
       if (USE_MOCK) return mockApi.logout();
       const refreshToken = localStorage.getItem('refreshToken');
-      const res = await axiosInstance.post<ApiResponse<Record<string, never>>>('/api/auth/logout', { refreshToken });
+
+      // localStorage'ı her durumda temizle — API başarısız olsa bile oturum kapatılmalı.
+      // Backend dokümanı: POST /api/auth/logout [AllowAnonymous], her zaman 200 döner.
+      // axiosInstance yerine plain fetch kullanıyoruz: Axios interceptor devreye girmesin,
+      // 401 alınsa bile token yenileme/redirect döngüsü tetiklenmesin.
       if (typeof window !== 'undefined') {
         localStorage.clear();
       }
-      return res.data;
+
+      try {
+        const response = await fetch(`${API_URL}/api/auth/logout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken })
+        });
+        const data = await response.json();
+        return data;
+      } catch {
+        // Ağ hatası olsa bile localStorage temizlendi, sessizce devam et
+        return { success: true, message: null, data: {} };
+      }
     },
     getMe: async (): Promise<ApiResponse<UserSession>> => {
       if (USE_MOCK) return mockApi.getMe();
