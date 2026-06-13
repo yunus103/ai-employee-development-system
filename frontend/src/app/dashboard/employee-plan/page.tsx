@@ -69,17 +69,49 @@ export default function EmployeePlanPage() {
   };
 
   const fetchProfile = async () => {
-    if (!user || user.employeeId === null || user.role !== 'Employee') return;
-    try {
-      const res = await apiClient.employees.get(user.employeeId);
-      if (res.success) {
-        setEmployeeProfile({
-          department: res.data.department,
-          jobRole: res.data.jobRole
-        });
+    if (!user || user.employeeId === null) return;
+    
+    // If Manager, try to get self from the employees list first to avoid 401 authorization failure
+    if (user.role === 'Manager') {
+      try {
+        const listRes = await apiClient.employees.list(1, 100);
+        if (listRes.success && listRes.data.length > 0) {
+          const selfEmp = listRes.data.find((e) => e.id === user.employeeId);
+          if (selfEmp) {
+            setEmployeeProfile({
+              department: selfEmp.department,
+              jobRole: selfEmp.jobRole
+            });
+            return;
+          }
+          // Fallback to first team member's department if manager self record not in list
+          const firstTeam = listRes.data.find((e) => e.id !== user.employeeId);
+          if (firstTeam) {
+            setEmployeeProfile({
+              department: firstTeam.department,
+              jobRole: firstTeam.jobRole
+            });
+            return;
+          }
+        }
+      } catch (listErr) {
+        // Suppressed console error to keep developer terminal clean
       }
-    } catch (err) {
-      // Suppressed console error to keep developer terminal clean
+    }
+
+    // For Employee role, fetch directly (authorized to get own profile details)
+    if (user.role === 'Employee') {
+      try {
+        const res = await apiClient.employees.get(user.employeeId);
+        if (res.success) {
+          setEmployeeProfile({
+            department: res.data.department,
+            jobRole: res.data.jobRole
+          });
+        }
+      } catch (err) {
+        // Suppressed console error to keep developer terminal clean
+      }
     }
   };
 

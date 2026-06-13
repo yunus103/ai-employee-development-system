@@ -6,6 +6,7 @@ import { useStore } from '../store/useStore';
 import { apiClient } from '../services/apiClient';
 import { EmployeeTask, AssessmentScore, ActionPriority } from '../types';
 import competencyMapping from '../data/competency_mapping.json';
+import { formatCompetencyText } from '../utils/competencyFormatter';
 import {
   BookOpen,
   CheckCircle,
@@ -29,6 +30,7 @@ export default function EmployeeDashboard() {
   const { user } = useStore();
   const [tasks, setTasks] = useState<EmployeeTask[]>([]);
   const [scores, setScores] = useState<AssessmentScore[]>([]);
+  const [employeeProfile, setEmployeeProfile] = useState<{ department: string; jobRole: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const resolveCompetencyName = (code: string, name: string): string => {
@@ -76,6 +78,21 @@ export default function EmployeeDashboard() {
       if (!user || user.employeeId === null) return;
       setIsLoading(true);
       try {
+        // Fetch logged-in user profile details (only for Employee role)
+        if (user.role === 'Employee') {
+          try {
+            const profileRes = await apiClient.employees.get(user.employeeId);
+            if (profileRes.success && profileRes.data) {
+              setEmployeeProfile({
+                department: profileRes.data.department,
+                jobRole: profileRes.data.jobRole
+              });
+            }
+          } catch (profileErr) {
+            console.warn('Could not fetch employee profile details:', profileErr);
+          }
+        }
+
         // Fetch tasks
         const taskRes = await apiClient.tasks.getMy(1, 100);
         if (taskRes.success) {
@@ -290,8 +307,8 @@ export default function EmployeeDashboard() {
                         : 'bg-primary'
                     }`}></div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-foreground">{task.title}</p>
-                      <p className="truncate text-xs text-muted mt-0.5">{task.description}</p>
+                      <p className="truncate text-sm font-semibold text-foreground">{formatCompetencyText(task.title, employeeProfile?.department, employeeProfile?.jobRole)}</p>
+                      <p className="truncate text-xs text-muted mt-0.5">{formatCompetencyText(task.description, employeeProfile?.department, employeeProfile?.jobRole)}</p>
                     </div>
                     <span className={`shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
                       task.priority === 'High'
