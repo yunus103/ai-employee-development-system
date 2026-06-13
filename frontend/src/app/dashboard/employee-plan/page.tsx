@@ -18,6 +18,7 @@ import {
   FileDown,
   X
 } from 'lucide-react';
+import { formatCompetencyText } from '../../../utils/competencyFormatter';
 
 export default function EmployeePlanPage() {
   const { user } = useStore();
@@ -30,6 +31,7 @@ export default function EmployeePlanPage() {
   const [selectedFilter, setSelectedFilter] = useState<'All' | 'Todo' | 'InProgress' | 'Completed'>('All');
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [selectedTask, setSelectedTask] = useState<EmployeeTask | null>(null);
+  const [employeeProfile, setEmployeeProfile] = useState<{ department: string; jobRole: string } | null>(null);
 
   const isTaskOverdue = (dueDateStr: string | null | undefined, statusStr: string | null | undefined): boolean => {
     if (!dueDateStr || statusStr === 'Completed' || statusStr === 'Cancelled') return false;
@@ -66,11 +68,27 @@ export default function EmployeePlanPage() {
     }
   };
 
+  const fetchProfile = async () => {
+    if (!user || user.employeeId === null) return;
+    try {
+      const res = await apiClient.employees.get(user.employeeId);
+      if (res.success) {
+        setEmployeeProfile({
+          department: res.data.department,
+          jobRole: res.data.jobRole
+        });
+      }
+    } catch (err) {
+      // Suppressed console error to keep developer terminal clean
+    }
+  };
+
   useEffect(() => {
     let active = true;
     Promise.resolve().then(() => {
       if (active) {
         fetchTasks();
+        fetchProfile();
       }
     });
     return () => {
@@ -364,11 +382,11 @@ export default function EmployeePlanPage() {
                     <div className="flex justify-between items-start gap-2">
                       <div className="space-y-1 min-w-0 flex-1">
                         {renderDueDateBadge(task)}
-                        <h5 className="text-sm font-bold text-foreground leading-snug">{task.title}</h5>
+                        <h5 className="text-sm font-bold text-foreground leading-snug">{formatCompetencyText(task.title, employeeProfile?.department, employeeProfile?.jobRole)}</h5>
                       </div>
                       {renderPriorityBadge(task.priority)}
                     </div>
-                    <p className="text-xs text-muted leading-relaxed line-clamp-2">{task.description}</p>
+                    <p className="text-xs text-muted leading-relaxed line-clamp-2">{formatCompetencyText(task.description, employeeProfile?.department, employeeProfile?.jobRole)}</p>
 
                     {/* Resource Link Card */}
                     {task.resource && (
@@ -439,11 +457,11 @@ export default function EmployeePlanPage() {
                     <div className="flex justify-between items-start gap-2">
                       <div className="space-y-1 min-w-0 flex-1">
                         {renderDueDateBadge(task)}
-                        <h5 className="text-sm font-bold text-foreground leading-snug">{task.title}</h5>
+                        <h5 className="text-sm font-bold text-foreground leading-snug">{formatCompetencyText(task.title, employeeProfile?.department, employeeProfile?.jobRole)}</h5>
                       </div>
                       {renderPriorityBadge(task.priority)}
                     </div>
-                    <p className="text-xs text-muted leading-relaxed line-clamp-2">{task.description}</p>
+                    <p className="text-xs text-muted leading-relaxed line-clamp-2">{formatCompetencyText(task.description, employeeProfile?.department, employeeProfile?.jobRole)}</p>
 
                     {/* Resource Link Card */}
                     {task.resource && (
@@ -512,10 +530,10 @@ export default function EmployeePlanPage() {
                     className="glass-card opacity-75 rounded-xl p-5 border border-card-border bg-card-border/5 space-y-4 transition hover:border-card-border/80 cursor-pointer"
                   >
                     <div className="flex justify-between items-start">
-                      <h5 className="text-sm font-bold text-foreground leading-snug line-through">{task.title}</h5>
+                      <h5 className="text-sm font-bold text-foreground leading-snug line-through">{formatCompetencyText(task.title, employeeProfile?.department, employeeProfile?.jobRole)}</h5>
                       {renderPriorityBadge(task.priority)}
                     </div>
-                    <p className="text-xs text-muted leading-relaxed line-clamp-2">{task.description}</p>
+                    <p className="text-xs text-muted leading-relaxed line-clamp-2">{formatCompetencyText(task.description, employeeProfile?.department, employeeProfile?.jobRole)}</p>
 
                     {/* Resource Link Card */}
                     {task.resource && (
@@ -603,14 +621,14 @@ export default function EmployeePlanPage() {
                   ) : null
                 )}
               </div>
-              <h4 className="text-lg font-bold text-foreground leading-snug">{selectedTask.title}</h4>
+              <h4 className="text-lg font-bold text-foreground leading-snug">{formatCompetencyText(selectedTask.title, employeeProfile?.department, employeeProfile?.jobRole)}</h4>
             </div>
 
             {/* Description */}
             <div className="space-y-1.5">
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted">Açıklama</span>
               <p className="text-sm text-foreground/80 leading-relaxed bg-muted/5 border border-card-border rounded-xl p-4">
-                {selectedTask.description}
+                {formatCompetencyText(selectedTask.description, employeeProfile?.department, employeeProfile?.jobRole)}
               </p>
             </div>
 

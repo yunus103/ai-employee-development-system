@@ -16,6 +16,7 @@ import {
   AssessmentAssignment
 } from '../../../../types';
 import competencyMapping from '../../../../data/competency_mapping.json';
+import { formatCompetencyText } from '../../../../utils/competencyFormatter';
 import {
   ArrowLeft,
   Sparkles,
@@ -1417,9 +1418,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                           <span>Süresi Geçti</span>
                         </span>
                       )}
-                      <h5 className="text-sm font-bold text-foreground truncate">{item.title}</h5>
+                      <h5 className="text-sm font-bold text-foreground truncate">{formatCompetencyText(item.title, employee?.department, employee?.jobRole)}</h5>
                     </div>
-                    <p className="text-xs text-muted leading-relaxed">{item.description}</p>
+                    <p className="text-xs text-muted leading-relaxed">{formatCompetencyText(item.description, employee?.department, employee?.jobRole)}</p>
                   </div>
 
                   {/* Edit inline configs */}

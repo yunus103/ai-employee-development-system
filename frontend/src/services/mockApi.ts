@@ -904,7 +904,8 @@ export const mockApi = {
       // Department overrides content
       if (act.action_category === 'Department' && act.content_by_department) {
         // Resolve abstract name
-        const mappedName = (competencyMapping.dept_comp_labels as any)[employee.department]?.[act.target_competency] || '';
+        const deptDisplayLabels = (competencyMapping as any).dept_comp_display_labels[employee.department];
+        const mappedName = deptDisplayLabels?.[act.target_competency] || (competencyMapping.dept_comp_labels as any)[employee.department]?.[act.target_competency] || '';
         const deptContent = act.content_by_department[employee.department];
         if (deptContent) {
           title = `${deptContent.title}`;
@@ -914,7 +915,8 @@ export const mockApi = {
 
       // Role overrides content
       if (act.action_category === 'Role' && act.content_by_role) {
-        const mappedName = (competencyMapping.role_comp_labels as any)[employee.jobRole]?.[act.target_competency] || '';
+        const roleDisplayLabels = (competencyMapping as any).role_comp_display_labels[employee.jobRole];
+        const mappedName = roleDisplayLabels?.[act.target_competency] || (competencyMapping.role_comp_labels as any)[employee.jobRole]?.[act.target_competency] || '';
         const roleContent = act.content_by_role[employee.jobRole];
         if (roleContent) {
           title = `${roleContent.title}`;
