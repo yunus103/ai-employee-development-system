@@ -99,20 +99,7 @@ export default function EmployeePlanPage() {
       }
     }
 
-    // For Employee role, fetch directly (authorized to get own profile details)
-    if (user.role === 'Employee') {
-      try {
-        const res = await apiClient.employees.get(user.employeeId);
-        if (res.success) {
-          setEmployeeProfile({
-            department: res.data.department,
-            jobRole: res.data.jobRole
-          });
-        }
-      } catch (err) {
-        // Suppressed console error to keep developer terminal clean
-      }
-    }
+    // Employee direct fetch disabled to prevent 401 loop. Fallback/Heuristics used instead.
   };
 
   useEffect(() => {

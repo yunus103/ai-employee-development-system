@@ -78,20 +78,7 @@ export default function EmployeeDashboard() {
       if (!user || user.employeeId === null) return;
       setIsLoading(true);
       try {
-        // Fetch logged-in user profile details (only for Employee role)
-        if (user.role === 'Employee') {
-          try {
-            const profileRes = await apiClient.employees.get(user.employeeId);
-            if (profileRes.success && profileRes.data) {
-              setEmployeeProfile({
-                department: profileRes.data.department,
-                jobRole: profileRes.data.jobRole
-              });
-            }
-          } catch (profileErr) {
-            console.warn('Could not fetch employee profile details:', profileErr);
-          }
-        }
+        // Profile fetch removed to prevent 401 unauthorized loop for employees
 
         // Fetch tasks
         const taskRes = await apiClient.tasks.getMy(1, 100);
