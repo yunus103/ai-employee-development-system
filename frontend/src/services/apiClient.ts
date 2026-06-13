@@ -278,11 +278,13 @@ export const apiClient = {
     submitBulkScores: async (
       id: number,
       evaluatorEmployeeId: number,
-      scores: { competencyId: number; score: number }[]
+      scores: { competencyId: number; score: number }[],
+      evaluatorType?: EvaluatorType
     ): Promise<ApiResponse<AssessmentScore[]>> => {
-      if (USE_MOCK) return mockApi.submitBulkScores(id, evaluatorEmployeeId, scores);
+      if (USE_MOCK) return mockApi.submitBulkScores(id, evaluatorEmployeeId, scores, evaluatorType);
       const res = await axiosInstance.post<ApiResponse<AssessmentScore[]>>(`/api/assessments/${id}/scores/bulk`, {
         evaluatorEmployeeId,
+        evaluatorType,
         scores
       });
       return res.data;

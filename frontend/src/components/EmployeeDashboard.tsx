@@ -118,7 +118,7 @@ export default function EmployeeDashboard() {
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((t) => t.status === 'Completed').length;
   const inProgressTasks = tasks.filter((t) => t.status === 'InProgress').length;
-  const pendingTasks = tasks.filter((t) => t.status === 'Assigned').length;
+  const pendingTasks = tasks.filter((t) => t.status === 'Pending').length;
   const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   // Radar chart data preparation

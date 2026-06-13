@@ -184,7 +184,7 @@ export interface ActionPlan {
   items: ActionPlanItem[];
 }
 
-export type TaskStatus = 'Assigned' | 'InProgress' | 'Completed' | 'Cancelled';
+export type TaskStatus = 'Pending' | 'InProgress' | 'Completed' | 'Cancelled';
 
 export interface EmployeeTask {
   id: number;

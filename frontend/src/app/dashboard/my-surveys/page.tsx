@@ -151,7 +151,8 @@ export default function MySurveysPage() {
       const res = await apiClient.assessments.submitBulkScores(
         selectedSurvey.assessmentId,
         user?.employeeId || 0,
-        payload
+        payload,
+        selectedSurvey.evaluatorType
       );
 
       if (res.success) {

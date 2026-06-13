@@ -152,7 +152,7 @@ export default function EmployeePlanPage() {
   });
 
   // Group tasks into buckets
-  const todoTasks = filteredTasks.filter((t) => t.status === 'Assigned');
+  const todoTasks = filteredTasks.filter((t) => t.status === 'Pending');
   const inProgressTasks = filteredTasks.filter((t) => t.status === 'InProgress');
   const completedTasks = filteredTasks.filter((t) => t.status === 'Completed');
 
@@ -674,7 +674,7 @@ export default function EmployeePlanPage() {
             <div className="border-t border-card-border pt-4 flex items-center justify-between gap-4">
               <span className="text-xs text-muted">ID: #{selectedTask.id}</span>
               <div className="flex gap-2">
-                {selectedTask.status === 'Assigned' && (
+                {selectedTask.status === 'Pending' && (
                   <button
                     onClick={() => {
                       handleStatusChange(selectedTask.id, 'InProgress');

@@ -551,7 +551,8 @@ export const mockApi = {
   submitBulkScores: async (
     id: number,
     evaluatorEmployeeId: number,
-    scoresList: { competencyId: number; score: number }[]
+    scoresList: { competencyId: number; score: number }[],
+    evaluatorType?: EvaluatorType
   ): Promise<ApiResponse<AssessmentScore[]>> => {
     await delay(300);
     const metadataList = mockDb.getCompetencyMetadata();
@@ -567,17 +568,19 @@ export const mockApi = {
     }
     
     // Determine type
-    let determinedType: EvaluatorType = 'Peer';
-    if (evaluatorEmployeeId === assessment.employeeId) {
-      determinedType = 'Self';
-    } else if (assessment.employeeId) {
-      const targetEmp = employees.find(e => e.id === assessment.employeeId);
-      if (targetEmp && targetEmp.managerId === evaluatorEmployeeId) {
-        determinedType = 'Manager';
-      } else if (evaluatorEmp && targetEmp && evaluatorEmp.managerId === targetEmp.id) {
-        determinedType = 'Subordinate';
-      } else if (evaluatorEmp && targetEmp && evaluatorEmp.department === targetEmp.department) {
-        determinedType = 'Peer';
+    let determinedType: EvaluatorType = evaluatorType || 'Peer';
+    if (!evaluatorType) {
+      if (evaluatorEmployeeId === assessment.employeeId) {
+        determinedType = 'Self';
+      } else if (assessment.employeeId) {
+        const targetEmp = employees.find(e => e.id === assessment.employeeId);
+        if (targetEmp && targetEmp.managerId === evaluatorEmployeeId) {
+          determinedType = 'Manager';
+        } else if (evaluatorEmp && targetEmp && evaluatorEmp.managerId === targetEmp.id) {
+          determinedType = 'Subordinate';
+        } else if (evaluatorEmp && targetEmp && evaluatorEmp.department === targetEmp.department) {
+          determinedType = 'Peer';
+        }
       }
     }
 
@@ -1170,7 +1173,7 @@ export const mockApi = {
           employeeName: plan.employeeName,
           assignedByUserId: plan.createdByUserId,
           assignedByUserName: plan.createdByUserName,
-          status: 'Assigned',
+          status: 'Pending',
           assignedAt: new Date().toISOString(),
           dueDate: item.dueDate,
           completedAt: null
@@ -1249,11 +1252,11 @@ export const mockApi = {
     const currentStatus = tasks[idx].status;
 
     // Validate state transitions matching API_DOCUMENTATION:
-    // Assigned -> InProgress -> Completed
-    // Assigned -> Cancelled
+    // Pending -> InProgress -> Completed
+    // Pending -> Cancelled
     // InProgress -> Cancelled
     let isValid = false;
-    if (currentStatus === 'Assigned' && (newStatus === 'InProgress' || newStatus === 'Cancelled')) {
+    if (currentStatus === 'Pending' && (newStatus === 'InProgress' || newStatus === 'Cancelled')) {
       isValid = true;
     } else if (currentStatus === 'InProgress' && (newStatus === 'Completed' || newStatus === 'Cancelled')) {
       isValid = true;
