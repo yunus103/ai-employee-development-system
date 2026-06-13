@@ -162,11 +162,13 @@ Sistem, çalışanların 360° yetkinlik analizlerini toplayıp, bu analizlerden
   - Planı iptal eder (`Cancelled`).
 - [ ] **`GET /api/action-plans/{id}/export-pdf`**
   - Aksiyon planını PDF formatında dynamic stream olarak döner (Türkçe fontlu, öncelik sıralı).
+  - **Yetki Genişletmesi:** Normalde `HrOrManager` olan bu endpoint'e, ilgili gelişim planının sahibi olan çalışanın kendisi (`employeeId` eşleşmesi ile) istek attığında da PDF çıktısı başarıyla dönmeli, yetki hatası (403) verilmemelidir.
 
 ### 5.5 Tasks (Görevler & Anketler) Modülü
 
 - [ ] **`GET /api/tasks/my`**
   - Giriş yapan çalışanın aksiyon planından gelen gelişim görevlerini listeler.
+  - **Eksik Alan Düzeltmesi:** Dönüş yapan `EmployeeTaskDto` listesindeki her görev nesnesi, çalışanın kendi gelişim planını indirebilmesi için **`actionPlanId`** bilgisini, görevin detaylı kaynağına erişebilmesi için de **`resource`** ve **`deliveryType`** alanlarını barındırmalıdır.
 - [ ] **`GET /api/tasks/my-surveys`**
   - Giriş yapan çalışanın doldurması gereken aktif 360° anket atamalarını listeler (`MySurveyDto[]`).
 - [ ] **`PUT /api/tasks/{id}/status`**

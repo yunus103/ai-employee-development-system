@@ -1160,8 +1160,11 @@ export const mockApi = {
         const newTask: EmployeeTask = {
           id: newTaskId,
           actionPlanItemId: item.id,
+          actionPlanId: plan.id,
           title: item.title,
           description: item.description,
+          resource: item.resource,
+          deliveryType: item.deliveryType,
           priority: item.priority,
           employeeId: plan.employeeId,
           employeeName: plan.employeeName,

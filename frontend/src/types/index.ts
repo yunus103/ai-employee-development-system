@@ -189,6 +189,7 @@ export type TaskStatus = 'Assigned' | 'InProgress' | 'Completed' | 'Cancelled';
 export interface EmployeeTask {
   id: number;
   actionPlanItemId: number;
+  actionPlanId?: number;
   title: string;
   description: string;
   resource?: string | null;
