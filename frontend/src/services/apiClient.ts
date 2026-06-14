@@ -408,5 +408,28 @@ export const apiClient = {
       const res = await axiosInstance.put<ApiResponse<EmployeeTask>>(`/api/tasks/${id}/status`, { newStatus });
       return res.data;
     }
+  },
+  admin: {
+    resetData: async (confirmation: string): Promise<ApiResponse<{ deletedCounts: Record<string, number>; totalDeleted: number; executedAt: string }>> => {
+      if (USE_MOCK) {
+        return {
+          success: true,
+          message: 'Mock verileri temizlendi. Seed tablolar korundu.',
+          data: {
+            deletedCounts: {
+              "Assessments": 5,
+              "ActionPlans": 3
+            },
+            totalDeleted: 8,
+            executedAt: new Date().toISOString()
+          }
+        };
+      }
+      const res = await axiosInstance.post<ApiResponse<{ deletedCounts: Record<string, number>; totalDeleted: number; executedAt: string }>>(
+        '/api/admin/reset-data',
+        { confirmation }
+      );
+      return res.data;
+    }
   }
 };
