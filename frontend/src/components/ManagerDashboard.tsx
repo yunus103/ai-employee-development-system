@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '../store/useStore';
 import { apiClient } from '../services/apiClient';
-import { EmployeeDetail, Assessment, ActionPlan } from '../types';
+import { EmployeeDetail, Assessment, ActionPlan, MySurvey } from '../types';
 import {
   Users,
   ClipboardList,
@@ -20,12 +20,19 @@ export default function ManagerDashboard() {
   const [employees, setEmployees] = useState<EmployeeDetail[]>([]);
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [plans, setPlans] = useState<ActionPlan[]>([]);
+  const [mySurveys, setMySurveys] = useState<MySurvey[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
+        // Fetch manager's pending surveys to fill
+        const surveyRes = await apiClient.tasks.getMySurveys();
+        if (surveyRes.success) {
+          setMySurveys(surveyRes.data);
+        }
+
         // Fetch employees
         const empRes = await apiClient.employees.list(1, 100);
         if (empRes.success) {
@@ -69,7 +76,7 @@ export default function ManagerDashboard() {
 
   // Stats calculation
   const totalTeam = employees.filter((e) => e.id !== user?.employeeId).length; // exclude self if listed
-  const draftAssessments = assessments.filter((a) => a.status === 'Draft').length;
+  const draftAssessments = mySurveys.length;
   const completedAssessments = assessments.filter((a) => a.status === 'Completed').length;
   const generatedPlans = plans.filter((p) => p.status === 'Draft' || p.status === 'Edited').length;
 
@@ -221,17 +228,17 @@ export default function ManagerDashboard() {
           </div>
 
           <div className="mt-6 flex-1 space-y-4 max-h-[300px] overflow-y-auto">
-            {assessments.filter((a) => a.status === 'Draft').map((ass) => (
-              <div key={ass.id} className="glass-card rounded-xl p-4 border border-card-border flex flex-col space-y-3">
+            {mySurveys.map((survey) => (
+              <div key={survey.assignmentId} className="glass-card rounded-xl p-4 border border-card-border flex flex-col space-y-3">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-xs text-muted uppercase font-bold">Puanlama Bekleniyor</p>
-                    <p className="text-sm font-semibold text-foreground mt-0.5">{ass.employeeName}</p>
+                    <p className="text-sm font-semibold text-foreground mt-0.5">{survey.employeeName}</p>
                   </div>
                   <AlertCircle className="h-4 w-4 text-warning" />
                 </div>
                 <button
-                  onClick={() => router.push(`/dashboard/employee/${ass.employeeId}`)}
+                  onClick={() => router.push(`/dashboard/employee/${survey.employeeId}`)}
                   className="flex items-center justify-center space-x-1.5 rounded-lg bg-warning/10 hover:bg-warning/20 border border-warning/20 py-2 text-xs font-semibold text-warning transition duration-150"
                 >
                   <span>Anketi Doldur</span>
@@ -259,7 +266,7 @@ export default function ManagerDashboard() {
               </div>
             ))}
 
-            {assessments.filter((a) => a.status === 'Draft').length === 0 &&
+            {mySurveys.length === 0 &&
              assessments.filter((a) => a.status === 'Completed').length === 0 && (
               <div className="text-center p-8 text-xs text-muted">
                 Herhangi bir işlem bekleyen değerlendirme bulunmamaktadır. Tüm süreçler güncel!

@@ -24,7 +24,8 @@ import {
   Trash2,
   Plus,
   AlertTriangle,
-  Cpu
+  Cpu,
+  CheckCircle
 } from 'lucide-react';
 import {
   Radar,
@@ -285,18 +286,30 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     setIsActionLoading(true);
     try {
       const evaluatorEmpId = getEvaluatorEmployeeId();
-      for (const compId of Object.keys(scorecardInput).map(Number)) {
-        const val = scorecardInput[compId];
-        await apiClient.assessments.upsertScore(
-          activeAssessment.id,
-          compId,
-          scorecardEvaluator,
-          val,
-          evaluatorEmpId
-        );
+      if (!evaluatorEmpId) {
+        toast.error('Değerlendirici kimliği belirlenemiyor.');
+        setIsActionLoading(false);
+        return;
       }
-      toast.success('Puanlar başarıyla kaydedildi.');
-      fetchData();
+
+      const payload = Object.keys(scorecardInput).map(Number).map(compId => ({
+        competencyId: compId,
+        score: scorecardInput[compId]
+      }));
+
+      const res = await apiClient.assessments.submitBulkScores(
+        activeAssessment.id,
+        evaluatorEmpId,
+        payload,
+        scorecardEvaluator
+      );
+
+      if (res.success) {
+        toast.success('Puanlar başarıyla kaydedildi.');
+        fetchData();
+      } else {
+        toast.error(res.message || 'Puanlar kaydedilirken hata oluştu.');
+      }
     } catch (err: any) {
       toast.error(err.response?.data?.message || err.message || 'Puanlar kaydedilirken hata oluştu.');
     } finally {
@@ -316,14 +329,16 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         try {
           // 1. Auto-save current scorecard input scores first
           const evaluatorEmpId = getEvaluatorEmployeeId();
-          for (const compId of Object.keys(scorecardInput).map(Number)) {
-            const val = scorecardInput[compId];
-            await apiClient.assessments.upsertScore(
+          if (evaluatorEmpId) {
+            const payload = Object.keys(scorecardInput).map(Number).map(compId => ({
+              competencyId: compId,
+              score: scorecardInput[compId]
+            }));
+            await apiClient.assessments.submitBulkScores(
               activeAssessment.id,
-              compId,
-              scorecardEvaluator,
-              val,
-              evaluatorEmpId
+              evaluatorEmpId,
+              payload,
+              scorecardEvaluator
             );
           }
 
@@ -820,6 +835,12 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     { id: 13, code: 'Role_Comp2', category: 'Role' }
   ];
 
+  const isUserEvaluator = user?.role === 'Employee' || user?.role === 'Manager';
+  const myAssignment = assignments.find(
+    a => a.evaluatorEmployeeId === user?.employeeId && a.evaluatorType === scorecardEvaluator
+  );
+  const isCompletedForMe = isUserEvaluator && myAssignment?.isCompleted;
+
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Top action row */}
@@ -889,85 +910,95 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           <div className="lg:col-span-3 space-y-6">
             {/* If Assessment is Draft -> Input scorecard scores */}
             {activeAssessment && activeAssessment.status === 'Draft' ? (
-              <div className="glass-panel rounded-2xl p-6 border border-card-border space-y-6">
-                <div className="flex items-center justify-between border-b border-card-border pb-4">
-                  <div>
-                    <h4 className="text-base font-bold text-foreground">360° Puan Girişleri</h4>
-                    <p className="text-xs text-muted mt-0.5">Lütfen tüm yetkinlikler için derecelendirmeleri girin.</p>
+              isCompletedForMe ? (
+                <div className="glass-panel rounded-2xl p-10 text-center border border-card-border space-y-4">
+                  <CheckCircle className="h-12 w-12 text-success mx-auto animate-bounce" />
+                  <h4 className="text-base font-bold text-foreground">Değerlendirme Tamamlandı</h4>
+                  <p className="text-xs text-muted max-w-sm mx-auto">
+                    Bu çalışan için yetkinlik değerlendirme anketinizi başarıyla doldurup gönderdiniz. Katkınız için teşekkür ederiz.
+                  </p>
+                </div>
+              ) : (
+                <div className="glass-panel rounded-2xl p-6 border border-card-border space-y-6">
+                  <div className="flex items-center justify-between border-b border-card-border pb-4">
+                    <div>
+                      <h4 className="text-base font-bold text-foreground">360° Puan Girişleri</h4>
+                      <p className="text-xs text-muted mt-0.5">Lütfen tüm yetkinlikler için derecelendirmeleri girin.</p>
+                    </div>
+                    {/* Evaluator Selector - Only visible for HR or Admin */}
+                    {(user?.role === 'HR' || user?.role === 'Admin') ? (
+                      <select
+                        value={scorecardEvaluator}
+                        onChange={(e) => {
+                          const newEval = e.target.value as EvaluatorType;
+                          setScorecardEvaluator(newEval);
+                          
+                          // Update scorecardInput for the new evaluator
+                          const initial: Record<number, number> = {};
+                          for (let i = 1; i <= 13; i++) {
+                            initial[i] = 3.0;
+                          }
+                          const evaluatorScores = scores.filter(s => s.evaluatorType === newEval);
+                          for (const s of evaluatorScores) {
+                            initial[s.competencyId] = s.score;
+                          }
+                          setScorecardInput(initial);
+                        }}
+                        className="rounded-lg bg-card border border-card-border py-1.5 px-3 text-xs text-foreground outline-none cursor-pointer"
+                      >
+                        <option value="Manager">Yönetici Değerlendirmesi</option>
+                        <option value="Self">Öz Değerlendirme</option>
+                        <option value="Peer">Ekip Arkadaşı Değerlendirmesi</option>
+                        <option value="Subordinate">Ast Değerlendirmesi</option>
+                      </select>
+                    ) : (
+                      <span className="text-xs text-muted font-semibold bg-card border border-card-border py-1.5 px-3 rounded-lg">
+                        {scorecardEvaluator === 'Self'
+                          ? 'Öz Değerlendirme'
+                          : scorecardEvaluator === 'Manager'
+                          ? 'Yönetici Değerlendirmesi'
+                          : scorecardEvaluator === 'Subordinate'
+                          ? 'Ast Değerlendirmesi'
+                          : 'Akran Değerlendirmesi'}
+                      </span>
+                    )}
                   </div>
-                  {/* Evaluator Selector - Only visible for HR or Admin */}
-                  {(user?.role === 'HR' || user?.role === 'Admin') ? (
-                    <select
-                      value={scorecardEvaluator}
-                      onChange={(e) => {
-                        const newEval = e.target.value as EvaluatorType;
-                        setScorecardEvaluator(newEval);
-                        
-                        // Update scorecardInput for the new evaluator
-                        const initial: Record<number, number> = {};
-                        for (let i = 1; i <= 13; i++) {
-                          initial[i] = 3.0;
-                        }
-                        const evaluatorScores = scores.filter(s => s.evaluatorType === newEval);
-                        for (const s of evaluatorScores) {
-                          initial[s.competencyId] = s.score;
-                        }
-                        setScorecardInput(initial);
-                      }}
-                      className="rounded-lg bg-card border border-card-border py-1.5 px-3 text-xs text-foreground outline-none cursor-pointer"
-                    >
-                      <option value="Manager">Yönetici Değerlendirmesi</option>
-                      <option value="Self">Öz Değerlendirme</option>
-                      <option value="Peer">Ekip Arkadaşı Değerlendirmesi</option>
-                      <option value="Subordinate">Ast Değerlendirmesi</option>
-                    </select>
-                  ) : (
-                    <span className="text-xs text-muted font-semibold bg-card border border-card-border py-1.5 px-3 rounded-lg">
-                      {scorecardEvaluator === 'Self'
-                        ? 'Öz Değerlendirme'
-                        : scorecardEvaluator === 'Manager'
-                        ? 'Yönetici Değerlendirmesi'
-                        : scorecardEvaluator === 'Subordinate'
-                        ? 'Ast Değerlendirmesi'
-                        : 'Akran Değerlendirmesi'}
-                    </span>
-                  )}
-                </div>
 
-                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
-                  {competenciesMetadata.map((comp) => {
-                    const label = getCompetencyName(comp.code);
-                    const currentScore = scorecardInput[comp.id] || 3.0;
-                    return (
-                      <div key={comp.id} className="rounded-xl border border-card-border bg-card/30 p-4 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-semibold text-foreground">{label}</span>
-                          <span className="text-xs font-bold text-primary">{currentScore.toFixed(1)}</span>
+                  <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+                    {competenciesMetadata.map((comp) => {
+                      const label = getCompetencyName(comp.code);
+                      const currentScore = scorecardInput[comp.id] || 3.0;
+                      return (
+                        <div key={comp.id} className="rounded-xl border border-card-border bg-card/30 p-4 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-foreground">{label}</span>
+                            <span className="text-xs font-bold text-primary">{currentScore.toFixed(1)}</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="1.0"
+                            max="5.0"
+                            step="0.1"
+                            value={currentScore}
+                            onChange={(e) => handleScoreChange(comp.id, parseFloat(e.target.value))}
+                            className="w-full h-1 bg-card-border rounded-lg appearance-none cursor-pointer accent-primary"
+                          />
                         </div>
-                        <input
-                          type="range"
-                          min="1.0"
-                          max="5.0"
-                          step="0.1"
-                          value={currentScore}
-                          onChange={(e) => handleScoreChange(comp.id, parseFloat(e.target.value))}
-                          className="w-full h-1 bg-card-border rounded-lg appearance-none cursor-pointer accent-primary"
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
 
-                <div className="pt-2">
-                  <button
-                    onClick={handleSaveScores}
-                    disabled={isActionLoading}
-                    className="w-full rounded-xl bg-primary hover:bg-primary-hover py-3 text-xs font-semibold text-white transition shadow-lg shadow-primary/15"
-                  >
-                    Puanları Kaydet
-                  </button>
+                  <div className="pt-2">
+                    <button
+                      onClick={handleSaveScores}
+                      disabled={isActionLoading}
+                      className="w-full rounded-xl bg-primary hover:bg-primary-hover py-3 text-xs font-semibold text-white transition shadow-lg shadow-primary/15"
+                    >
+                      Puanları Kaydet
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )
             ) : activeAssessment && activeAssessment.status !== 'Draft' ? (
               // Heatmap summary
               <div className="glass-panel rounded-2xl p-6 border border-card-border space-y-6">
