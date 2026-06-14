@@ -263,6 +263,78 @@ export const mockApi = {
     return { success: true, message: 'Çalışan başarıyla oluşturuldu.', data: newEmployee };
   },
 
+  updateEmployee: async (id: number, data: Partial<EmployeeDetail>): Promise<ApiResponse<EmployeeDetail>> => {
+    await delay(300);
+    const employees = mockDb.getEmployees();
+    const idx = employees.findIndex((e) => e.id === id);
+    if (idx === -1) {
+      return { success: false, message: 'Çalışan bulunamadı.', data: null as any };
+    }
+
+    let managerName = employees[idx].managerName;
+    if (data.managerId !== undefined) {
+      if (data.managerId) {
+        const manager = employees.find((e) => e.id === Number(data.managerId));
+        managerName = manager ? manager.fullName : null;
+      } else {
+        managerName = null;
+      }
+    }
+
+    let department = employees[idx].department;
+    if (data.departmentId !== undefined) {
+      if (data.departmentId === 1) department = 'Human Resources';
+      else if (data.departmentId === 2) department = 'Technology';
+      else if (data.departmentId === 3) department = 'Sales & Marketing';
+      else if (data.departmentId === 4) department = 'Finance & Accounting';
+      else if (data.departmentId === 5) department = 'Operations';
+    }
+
+    const jobRoleMapping: Record<number, string> = {
+      1: 'HR Specialist',
+      2: 'Recruiter',
+      3: 'HR Manager',
+      4: 'Software Engineer',
+      5: 'Senior Software Engineer',
+      6: 'Data Scientist',
+      7: 'Machine Learning Engineer',
+      8: 'QA Engineer',
+      9: 'DevOps Engineer',
+      10: 'Technical Support Engineer',
+      11: 'Engineering Manager',
+      12: 'Sales Executive',
+      13: 'Sales Representative',
+      14: 'Account Manager',
+      15: 'Marketing Specialist',
+      16: 'Accountant',
+      17: 'Financial Analyst',
+      18: 'Payroll Specialist',
+      19: 'Finance Manager',
+      20: 'Operations Specialist',
+      21: 'Logistics Coordinator',
+      22: 'Production Engineer',
+      23: 'Field Supervisor',
+      24: 'Operations Manager'
+    };
+
+    let jobRole = employees[idx].jobRole;
+    if (data.jobRoleId !== undefined) {
+      jobRole = jobRoleMapping[data.jobRoleId] || jobRole;
+    }
+
+    const updatedEmployee: EmployeeDetail = {
+      ...employees[idx],
+      ...data,
+      managerName,
+      department,
+      jobRole
+    } as EmployeeDetail;
+
+    employees[idx] = updatedEmployee;
+    mockDb.setEmployees(employees);
+    return { success: true, message: 'Çalışan bilgileri başarıyla güncellendi.', data: updatedEmployee };
+  },
+
   getEmployeeFeatures: async (id: number, assessmentId: number): Promise<ApiResponse<any>> => {
     await delay(200);
     const employees = mockDb.getEmployees();

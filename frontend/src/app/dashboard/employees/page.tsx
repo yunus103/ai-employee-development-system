@@ -21,7 +21,8 @@ import {
   UserCheck,
   Briefcase,
   GraduationCap,
-  Smile
+  Smile,
+  Pencil
 } from 'lucide-react';
 
 export default function EmployeesPage() {
@@ -38,6 +39,7 @@ export default function EmployeesPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [employeeProgress, setEmployeeProgress] = useState<Record<number, { completed: number; total: number }>>({});
+  const [editingEmployeeId, setEditingEmployeeId] = useState<number | null>(null);
 
   // Form Drawer State
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
@@ -306,6 +308,35 @@ export default function EmployeesPage() {
     setFormFields(prev => ({ ...prev, [field]: val }));
   };
 
+  const handleEditClick = (emp: EmployeeDetail) => {
+    setEditingEmployeeId(emp.id);
+    setSelectedDeptName(emp.department);
+    setSelectedRoleName(emp.jobRole);
+    setFormFields({
+      employeeCode: emp.employeeCode || '',
+      fullName: emp.fullName || '',
+      email: emp.email || '',
+      age: emp.age || 30,
+      gender: emp.gender || 'Male',
+      managerId: emp.managerId === null ? '' : emp.managerId,
+      education: String(emp.education || '3'),
+      educationField: emp.educationField || '',
+      businessTravel: emp.businessTravel || 'Travel_Rarely',
+      maritalStatus: emp.maritalStatus || 'Single',
+      distanceFromHome: emp.distanceFromHome || 5,
+      environmentSatisfaction: emp.environmentSatisfaction || 3,
+      jobSatisfaction: emp.jobSatisfaction || 3,
+      workLifeBalance: emp.workLifeBalance || 3,
+      totalWorkingYears: emp.totalWorkingYears || 5,
+      yearsAtCompany: emp.yearsAtCompany || 2,
+      yearsInCurrentRole: emp.yearsInCurrentRole || 1,
+      yearsWithCurrManager: emp.yearsWithCurrManager || 1,
+      performanceScore: emp.performanceScore || 3.0,
+      attrition: emp.attrition || 'No'
+    });
+    setIsAddDrawerOpen(true);
+  };
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorList([]);
@@ -340,10 +371,14 @@ export default function EmployeesPage() {
     };
 
     try {
-      const res = await apiClient.employees.create(payload);
+      const res = editingEmployeeId !== null
+        ? await apiClient.employees.update(editingEmployeeId, payload)
+        : await apiClient.employees.create(payload);
+
       if (res.success) {
-        toast.success('Yeni çalışan başarıyla kaydedildi.');
+        toast.success(editingEmployeeId !== null ? 'Çalışan bilgileri başarıyla güncellendi.' : 'Yeni çalışan başarıyla kaydedildi.');
         setIsAddDrawerOpen(false);
+        setEditingEmployeeId(null);
         // Reset form
         setFormFields({
           employeeCode: '',
@@ -376,7 +411,7 @@ export default function EmployeesPage() {
           })
           .catch((err: any) => console.warn('Could not reload manager lookup list:', err.message || err));
       } else {
-        toast.error(res.message || 'Çalışan oluşturulamadı.');
+        toast.error(res.message || (editingEmployeeId !== null ? 'Çalışan güncellenemedi.' : 'Çalışan oluşturulamadı.'));
       }
     } catch (err: any) {
       console.warn('Error creating employee:', err.message || err);
@@ -430,7 +465,32 @@ export default function EmployeesPage() {
         </div>
         {user?.role === 'Admin' && (
           <button
-            onClick={() => setIsAddDrawerOpen(true)}
+            onClick={() => {
+              setEditingEmployeeId(null);
+              setFormFields({
+                employeeCode: '',
+                fullName: '',
+                email: '',
+                age: 30,
+                gender: 'Male',
+                managerId: '',
+                education: '3',
+                educationField: 'Computer Science',
+                businessTravel: 'Travel_Rarely',
+                maritalStatus: 'Single',
+                distanceFromHome: 5,
+                environmentSatisfaction: 3,
+                jobSatisfaction: 3,
+                workLifeBalance: 3,
+                totalWorkingYears: 5,
+                yearsAtCompany: 2,
+                yearsInCurrentRole: 1,
+                yearsWithCurrManager: 1,
+                performanceScore: 3.0,
+                attrition: 'No'
+              });
+              setIsAddDrawerOpen(true);
+            }}
             className="flex items-center space-x-1.5 rounded-xl bg-primary hover:bg-primary-hover px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/10 transition duration-150"
           >
             <Plus className="h-4 w-4" />
@@ -568,6 +628,16 @@ export default function EmployeesPage() {
                         </button>
                       )}
                       
+                      {(user?.role === 'HR' || user?.role === 'Admin') && (
+                        <button
+                          onClick={() => handleEditClick(emp)}
+                          className="inline-flex items-center space-x-1.5 rounded-lg border border-info/20 bg-info/5 hover:bg-info/10 py-1.5 px-3 text-xs font-bold text-info transition duration-150"
+                        >
+                          <Pencil className="h-3 w-3 shrink-0" />
+                          <span>Düzenle</span>
+                        </button>
+                      )}
+                      
                       <button
                         onClick={() => router.push(`/dashboard/employee/${emp.id}`)}
                         className="inline-flex items-center space-x-1.5 rounded-lg bg-primary hover:bg-primary-hover py-1.5 px-3 text-xs font-bold text-white shadow-sm shadow-primary/10 transition duration-150"
@@ -625,11 +695,17 @@ export default function EmployeesPage() {
             <div className="p-6 border-b border-card-border flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
-                  <UserPlus className="h-5 w-5" />
+                  {editingEmployeeId !== null ? <Pencil className="h-5 w-5" /> : <UserPlus className="h-5 w-5" />}
                 </div>
                 <div>
-                  <h4 className="text-base font-bold text-foreground">Yeni Çalışan Kaydet</h4>
-                  <p className="text-[10px] text-muted">Sistem veritabanına yeni çalışan profili ekler.</p>
+                  <h4 className="text-base font-bold text-foreground">
+                    {editingEmployeeId !== null ? 'Çalışan Bilgilerini Düzenle' : 'Yeni Çalışan Kaydet'}
+                  </h4>
+                  <p className="text-[10px] text-muted">
+                    {editingEmployeeId !== null 
+                      ? 'Mevcut çalışanın profil ve memnuniyet verilerini günceller.' 
+                      : 'Sistem veritabanına yeni çalışan profili ekler.'}
+                  </p>
                 </div>
               </div>
               <button
@@ -1051,8 +1127,8 @@ export default function EmployeesPage() {
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                     ) : (
                       <>
-                        <Plus className="h-4 w-4" />
-                        <span>Kaydı Tamamla</span>
+                        <CheckCircle className="h-4 w-4" />
+                        <span>{editingEmployeeId !== null ? 'Değişiklikleri Kaydet' : 'Kaydı Tamamla'}</span>
                       </>
                     )}
                   </button>
