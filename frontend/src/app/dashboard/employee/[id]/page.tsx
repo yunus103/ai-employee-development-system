@@ -77,6 +77,14 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const [planFilter, setPlanFilter] = useState<'All' | 'Completed' | 'Pending' | 'AI' | 'Manual'>('All');
   const [planSort, setPlanSort] = useState<'PriorityDesc' | 'PriorityAsc' | 'DueDate' | 'Title'>('PriorityDesc');
 
+  useEffect(() => {
+    if (employee) {
+      document.title = `${employee.fullName} — 360° AI Gelişim`;
+    } else {
+      document.title = 'Çalışan Detayı — 360° AI Gelişim';
+    }
+  }, [employee]);
+
   const isTaskOverdue = (dueDateStr: string | null | undefined, statusStr: string | null | undefined): boolean => {
     if (!dueDateStr || statusStr === 'Completed' || statusStr === 'Cancelled') return false;
     const today = new Date();

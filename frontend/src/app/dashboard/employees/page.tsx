@@ -120,8 +120,9 @@ export default function EmployeesPage() {
 
   // Auto-adjust is handled directly in the select dropdown's onChange handler
 
-  // Redirect standard employees
+  // Redirect standard employees and set title
   useEffect(() => {
+    document.title = 'Çalışan Listesi — 360° AI Gelişim';
     if (user && user.role === 'Employee') {
       router.push('/dashboard');
     }

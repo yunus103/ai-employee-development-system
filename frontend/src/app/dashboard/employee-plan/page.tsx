@@ -103,6 +103,7 @@ export default function EmployeePlanPage() {
   };
 
   useEffect(() => {
+    document.title = 'Gelişim Planım — 360° AI Gelişim';
     if (!user) return;
     let active = true;
     Promise.resolve().then(() => {

@@ -58,6 +58,7 @@ export default function MySurveysPage() {
   };
 
   useEffect(() => {
+    document.title = 'Değerlendirme Anketleri — 360° AI Gelişim';
     if (!user) return;
     let active = true;
     Promise.resolve().then(() => {
