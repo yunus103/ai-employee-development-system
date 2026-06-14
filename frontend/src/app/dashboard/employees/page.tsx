@@ -462,8 +462,16 @@ export default function EmployeesPage() {
       {/* Main Table Panel */}
       <div className="glass-panel rounded-2xl border border-card-border overflow-hidden">
         {isLoading ? (
-          <div className="flex h-60 items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          <div className="p-6 space-y-4 animate-pulse">
+            <div className="h-10 bg-card-border/30 rounded-xl w-full"></div>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex space-x-4">
+                <div className="h-12 bg-card-border/25 rounded-xl flex-1"></div>
+                <div className="h-12 bg-card-border/25 rounded-xl w-24"></div>
+                <div className="h-12 bg-card-border/25 rounded-xl w-32"></div>
+                <div className="h-12 bg-card-border/25 rounded-xl w-20"></div>
+              </div>
+            ))}
           </div>
         ) : employees.length === 0 ? (
           <div className="text-center py-20 text-sm text-muted">

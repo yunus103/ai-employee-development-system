@@ -37,8 +37,33 @@ export default function HRDashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      <div className="space-y-8 animate-pulse">
+        {/* Welcome Banner Skeleton */}
+        <div className="h-32 bg-card-border/20 border border-card-border rounded-3xl"></div>
+        {/* Metrics Grid Skeleton */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="glass-panel rounded-2xl p-6 border border-card-border h-36">
+              <div className="flex items-center justify-between">
+                <div className="h-4 bg-card-border/30 rounded w-1/3"></div>
+                <div className="h-8 w-8 bg-card-border/30 rounded-xl"></div>
+              </div>
+              <div className="mt-4 space-y-2">
+                <div className="h-8 bg-card-border/30 rounded w-1/2"></div>
+                <div className="h-3 bg-card-border/30 rounded w-3/4"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Department Table Skeleton */}
+        <div className="glass-panel rounded-2xl p-6 border border-card-border h-80 space-y-4">
+          <div className="h-6 bg-card-border/30 rounded w-1/4 mb-6"></div>
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-12 bg-card-border/30 rounded-xl"></div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

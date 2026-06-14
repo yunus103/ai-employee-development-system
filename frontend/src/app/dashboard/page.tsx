@@ -11,8 +11,13 @@ export default function DashboardPage() {
 
   if (!user) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      <div className="space-y-8 animate-pulse">
+        <div className="h-32 bg-card-border/20 border border-card-border rounded-3xl"></div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="glass-panel rounded-2xl p-6 border border-card-border h-36"></div>
+          ))}
+        </div>
       </div>
     );
   }

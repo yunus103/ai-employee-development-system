@@ -749,8 +749,32 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
   if (isLoading || !employee) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      <div className="space-y-8 animate-pulse">
+        {/* Employee Header Card Skeleton */}
+        <div className="glass-panel rounded-3xl p-8 border border-card-border h-48 space-y-4">
+          <div className="flex items-center space-x-6">
+            <div className="h-16 w-16 bg-card-border/30 rounded-2xl"></div>
+            <div className="flex-1 space-y-2">
+              <div className="h-6 bg-card-border/30 rounded w-1/4"></div>
+              <div className="h-4 bg-card-border/30 rounded w-1/3"></div>
+            </div>
+          </div>
+        </div>
+        {/* Two Columns Layout Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 glass-panel rounded-2xl p-6 border border-card-border h-[500px] space-y-4">
+            <div className="h-6 bg-card-border/30 rounded w-1/4"></div>
+            <div className="h-80 bg-card-border/20 rounded-xl"></div>
+          </div>
+          <div className="glass-panel rounded-2xl p-6 border border-card-border h-[500px] space-y-4">
+            <div className="h-6 bg-card-border/30 rounded w-1/2"></div>
+            <div className="space-y-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-14 bg-card-border/30 rounded-xl"></div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

@@ -247,8 +247,20 @@ export default function MySurveysPage() {
 
   if (isLoading && surveys.length === 0 && !selectedSurvey) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      <div className="space-y-8 animate-pulse">
+        <div className="h-10 bg-card-border/20 border border-card-border rounded-xl w-1/4"></div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="glass-panel rounded-2xl p-6 border border-card-border h-48 space-y-4">
+              <div className="space-y-2">
+                <div className="h-3 bg-card-border/30 rounded w-1/4"></div>
+                <div className="h-5 bg-card-border/30 rounded w-1/2"></div>
+                <div className="h-3 bg-card-border/30 rounded w-3/4"></div>
+              </div>
+              <div className="h-10 bg-card-border/30 rounded-xl w-full"></div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

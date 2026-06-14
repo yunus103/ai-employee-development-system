@@ -164,8 +164,27 @@ export default function EmployeePlanPage() {
 
   if (isLoading && tasks.length === 0) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      <div className="space-y-8 animate-pulse">
+        {/* Title/Stats Skeleton */}
+        <div className="flex justify-between items-center h-20">
+          <div className="h-10 bg-card-border/20 border border-card-border rounded-xl w-1/4"></div>
+          <div className="h-14 bg-card-border/20 border border-card-border rounded-xl w-1/3"></div>
+        </div>
+        {/* Kanban Columns Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((col) => (
+            <div key={col} className="glass-panel rounded-2xl p-5 border border-card-border space-y-4 h-[600px]">
+              <div className="h-6 bg-card-border/30 rounded w-1/3 mb-4"></div>
+              {[1, 2].map((card) => (
+                <div key={card} className="glass-card rounded-xl p-5 border border-card-border h-48 space-y-4">
+                  <div className="h-4 bg-card-border/30 rounded w-1/4"></div>
+                  <div className="h-6 bg-card-border/30 rounded w-3/4"></div>
+                  <div className="h-12 bg-card-border/20 rounded-xl"></div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
