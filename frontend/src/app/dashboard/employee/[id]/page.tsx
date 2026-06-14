@@ -245,6 +245,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   };
 
   useEffect(() => {
+    if (!user) return;
     let active = true;
     Promise.resolve().then(() => {
       if (active) {
