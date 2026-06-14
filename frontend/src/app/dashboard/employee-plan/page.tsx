@@ -198,6 +198,7 @@ export default function EmployeePlanPage() {
   const totalCount = tasks.length;
   const completedCount = tasks.filter((t) => t.status === 'Completed').length;
   const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+  const overdueCount = tasks.filter((t) => isTaskOverdue(t.dueDate, t.status)).length;
 
   const renderPriorityBadge = (priority: ActionPriority) => {
     let colorClasses = 'bg-muted/10 border-muted/20 text-muted';
@@ -309,6 +310,20 @@ export default function EmployeePlanPage() {
           </div>
         </div>
       </div>
+      {/* Overdue Tasks Warning Banner */}
+      {overdueCount > 0 && (
+        <div className="rounded-2xl bg-gradient-to-r from-danger/20 via-danger/10 to-transparent border border-danger/20 p-4 flex items-center space-x-3.5 animate-pulse">
+          <div className="rounded-xl bg-danger/25 p-2 text-danger border border-danger/30">
+            <AlertTriangle className="h-5 w-5" />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-foreground">Gecikmiş Görevleriniz Var!</h4>
+            <p className="text-xs text-muted mt-0.5">
+              Kişisel gelişim planınızda süresi geçen <strong>{overdueCount}</strong> adet görev bulunuyor. Lütfen en kısa sürede bu görevleri tamamlamaya çalışın.
+            </p>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="flex items-center space-x-3 rounded-xl bg-danger/10 border border-danger/20 p-4 text-sm text-danger">
