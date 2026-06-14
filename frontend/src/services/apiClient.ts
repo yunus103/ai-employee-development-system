@@ -29,6 +29,16 @@ if (typeof window !== 'undefined') {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5100';
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK !== 'false'; // Defaults to true unless explicitly 'false'
 
+// Helper to safely construct API endpoints (prevents protocol-relative URL bugs like //api/... when API_URL is '/')
+const getAbsoluteUrl = (path: string): string => {
+  if (API_URL === '/') {
+    return path;
+  }
+  const base = API_URL.replace(/\/$/, '');
+  const relative = path.replace(/^\//, '');
+  return `${base}/${relative}`;
+};
+
 // Axios Instance
 const axiosInstance = axios.create({
   baseURL: API_URL,
@@ -121,7 +131,7 @@ axiosInstance.interceptors.response.use(
       }
 
       try {
-        const response = await axios.post(`${API_URL}/api/auth/refresh`, { refreshToken });
+        const response = await axios.post(getAbsoluteUrl('/api/auth/refresh'), { refreshToken });
         const { accessToken, refreshToken: newRefreshToken } = response.data.data;
         
         localStorage.setItem('accessToken', accessToken);
@@ -187,10 +197,10 @@ export const apiClient = {
       }
 
       try {
-        const response = await fetch(`${API_URL}/api/auth/logout`, {
+        const response = await fetch(getAbsoluteUrl('/api/auth/logout'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refreshToken })
+          body: JSON.stringify({ refreshToken: refreshToken || '' })
         });
         const data = await response.json();
         return data;
