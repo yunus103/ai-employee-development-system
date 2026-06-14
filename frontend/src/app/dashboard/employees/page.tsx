@@ -145,7 +145,8 @@ export default function EmployeesPage() {
   const fetchEmployees = async () => {
     setIsLoading(true);
     try {
-      const res = await apiClient.employees.list(page, pageSize);
+      // Fetch all employees in a single batch to allow correct client-side filtering and pagination
+      const res = await apiClient.employees.list(1, 100);
       if (res.success) {
         let filtered = res.data;
         
@@ -170,9 +171,25 @@ export default function EmployeesPage() {
           filtered = filtered.filter((e) => e.department === selectedDept);
         }
 
-        setEmployees(filtered);
-        setTotalCount(res.totalCount);
-        setTotalPages(res.totalPages);
+        const count = filtered.length;
+        setTotalCount(count);
+        
+        const pages = Math.ceil(count / pageSize);
+        setTotalPages(pages);
+
+        // Adjust active page if it exceeds the max page limit after filtering
+        let activePage = page;
+        const maxPage = Math.max(pages, 1);
+        if (page > maxPage) {
+          activePage = maxPage;
+          setPage(maxPage);
+        }
+
+        // Slice filtered results for the active page
+        const startIndex = (activePage - 1) * pageSize;
+        const paginated = filtered.slice(startIndex, startIndex + pageSize);
+
+        setEmployees(paginated);
       }
     } catch (err: any) {
       console.warn('Error fetching employees list:', err.message || err);
