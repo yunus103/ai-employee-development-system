@@ -43,16 +43,20 @@ export default function ManagerDashboard() {
           const allAssessments: Assessment[] = [];
           const allPlans: ActionPlan[] = [];
           
-          for (const emp of empRes.data) {
-            const assRes = await apiClient.employees.getAssessments(emp.id, 1, 50);
-            if (assRes.success) {
-              allAssessments.push(...assRes.data);
-            }
-            const planRes = await apiClient.employees.getActionPlans(emp.id);
-            if (planRes.success) {
-              allPlans.push(...planRes.data);
-            }
-          }
+          await Promise.all(
+            empRes.data.map(async (emp) => {
+              const [assRes, planRes] = await Promise.all([
+                apiClient.employees.getAssessments(emp.id, 1, 50),
+                apiClient.employees.getActionPlans(emp.id)
+              ]);
+              if (assRes.success) {
+                allAssessments.push(...assRes.data);
+              }
+              if (planRes.success) {
+                allPlans.push(...planRes.data);
+              }
+            })
+          );
           
           setAssessments(allAssessments);
           setPlans(allPlans);
