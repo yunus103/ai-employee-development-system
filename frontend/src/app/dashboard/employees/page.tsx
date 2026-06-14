@@ -37,6 +37,7 @@ export default function EmployeesPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [employeeProgress, setEmployeeProgress] = useState<Record<number, { completed: number; total: number }>>({});
 
   // Form Drawer State
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
@@ -191,6 +192,27 @@ export default function EmployeesPage() {
         const paginated = filtered.slice(startIndex, startIndex + pageSize);
 
         setEmployees(paginated);
+
+        // Fetch action plan progress for visible page employees in parallel
+        const progressMap: Record<number, { completed: number; total: number }> = {};
+        await Promise.all(
+          paginated.map(async (emp) => {
+            try {
+              const planRes = await apiClient.employees.getActionPlans(emp.id);
+              if (planRes.success && planRes.data.length > 0) {
+                const activePlan = planRes.data.find(p => p.status === 'Sent' || p.status === 'Completed') || planRes.data[0];
+                if (activePlan && activePlan.items) {
+                  const completed = activePlan.items.filter(i => i.taskStatus === 'Completed').length;
+                  const total = activePlan.items.length;
+                  progressMap[emp.id] = { completed, total };
+                }
+              }
+            } catch (err) {
+              // Silent catch for individual fetch issues
+            }
+          })
+        );
+        setEmployeeProgress(progressMap);
       }
     } catch (err: any) {
       console.warn('Error fetching employees list:', err.message || err);
@@ -487,6 +509,7 @@ export default function EmployeesPage() {
                   <th className="py-4.5 px-6">Pozisyon</th>
                   <th className="py-4.5 px-6">Departman</th>
                   <th className="py-4.5 px-6">Skor</th>
+                  <th className="py-4.5 px-6">Gelişim Planı</th>
                   <th className="py-4.5 px-6 text-right">İşlemler</th>
                 </tr>
               </thead>
@@ -509,6 +532,29 @@ export default function EmployeesPage() {
                         <TrendingUp className="h-4 w-4 shrink-0" />
                         <span>{emp.performanceScore !== undefined && emp.performanceScore !== null ? emp.performanceScore : '-'}</span>
                       </span>
+                    </td>
+                    <td className="py-4 px-6">
+                      {(() => {
+                        const progress = employeeProgress[emp.id];
+                        if (progress && progress.total > 0) {
+                          const percent = Math.round((progress.completed / progress.total) * 100);
+                          return (
+                            <div className="w-28 space-y-1">
+                              <div className="flex justify-between text-[9px] font-semibold">
+                                <span className="text-primary">{percent}%</span>
+                                <span className="text-muted">{progress.completed}/{progress.total}</span>
+                              </div>
+                              <div className="h-1 w-full bg-card-border rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-primary transition-all duration-300" 
+                                  style={{ width: `${percent}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        }
+                        return <span className="text-[10px] text-muted">Plan yok</span>;
+                      })()}
                     </td>
                     <td className="py-4 px-6 text-right space-x-2">
                       {/* Only HR/Manager can start evaluation */}
