@@ -22,7 +22,8 @@ import {
   Briefcase,
   GraduationCap,
   Smile,
-  Pencil
+  Pencil,
+  CheckCircle
 } from 'lucide-react';
 
 export default function EmployeesPage() {
