@@ -565,20 +565,20 @@ export default function EmployeesPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-card-border bg-card/30 text-xs font-bold uppercase tracking-wider text-muted">
-                  <th className="py-4.5 px-6">Kod</th>
-                  <th className="py-4.5 px-6">Ad Soyad</th>
-                  <th className="py-4.5 px-6">Pozisyon</th>
-                  <th className="py-4.5 px-6">Departman</th>
-                  <th className="py-4.5 px-6">Skor</th>
-                  <th className="py-4.5 px-6">Gelişim Planı</th>
-                  <th className="py-4.5 px-6 text-right">İşlemler</th>
+                  <th className="py-4.5 px-3 xl:px-4 2xl:px-6 whitespace-nowrap">Kod</th>
+                  <th className="py-4.5 px-3 xl:px-4 2xl:px-6 whitespace-nowrap">Ad Soyad</th>
+                  <th className="py-4.5 px-3 xl:px-4 2xl:px-6 whitespace-nowrap">Pozisyon</th>
+                  <th className="py-4.5 px-3 xl:px-4 2xl:px-6 whitespace-nowrap">Departman</th>
+                  <th className="py-4.5 px-3 xl:px-4 2xl:px-6 whitespace-nowrap">Skor</th>
+                  <th className="py-4.5 px-3 xl:px-4 2xl:px-6 whitespace-nowrap">Gelişim Planı</th>
+                  <th className="py-4.5 px-3 xl:px-4 2xl:px-6 text-right whitespace-nowrap">İşlemler</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-card-border">
                 {employees.map((emp) => (
                   <tr key={emp.id} className="hover:bg-card/20 transition">
-                    <td className="py-4 px-6 text-sm font-semibold text-primary">{emp.employeeCode}</td>
-                    <td className="py-4 px-6">
+                    <td className="py-4 px-3 xl:px-4 2xl:px-6 text-sm font-semibold text-primary whitespace-nowrap">{emp.employeeCode}</td>
+                    <td className="py-4 px-3 xl:px-4 2xl:px-6 whitespace-nowrap">
                       <div className="flex items-center space-x-3">
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary font-bold text-xs">
                           {emp.fullName[0]}
@@ -586,15 +586,15 @@ export default function EmployeesPage() {
                         <span className="text-sm font-semibold text-foreground">{emp.fullName}</span>
                       </div>
                     </td>
-                    <td className="py-4 px-6 text-sm text-muted">{emp.jobRole}</td>
-                    <td className="py-4 px-6 text-sm text-muted">{emp.department}</td>
-                    <td className="py-4 px-6">
+                    <td className="py-4 px-3 xl:px-4 2xl:px-6 text-sm text-muted whitespace-nowrap">{emp.jobRole}</td>
+                    <td className="py-4 px-3 xl:px-4 2xl:px-6 text-sm text-muted whitespace-nowrap">{emp.department}</td>
+                    <td className="py-4 px-3 xl:px-4 2xl:px-6 whitespace-nowrap">
                       <span className="inline-flex items-center space-x-1 font-bold text-sm text-success">
                         <TrendingUp className="h-4 w-4 shrink-0" />
                         <span>{emp.performanceScore !== undefined && emp.performanceScore !== null ? emp.performanceScore : '-'}</span>
                       </span>
                     </td>
-                    <td className="py-4 px-6">
+                    <td className="py-4 px-3 xl:px-4 2xl:px-6 whitespace-nowrap">
                       {(() => {
                         const progress = employeeProgress[emp.id];
                         if (progress && progress.total > 0) {
@@ -617,34 +617,37 @@ export default function EmployeesPage() {
                         return <span className="text-[10px] text-muted">Plan yok</span>;
                       })()}
                     </td>
-                    <td className="py-4 px-6 text-right space-x-2">
+                    <td className="py-4 px-3 xl:px-4 2xl:px-6 text-right space-x-1.5 md:space-x-2 whitespace-nowrap">
                       {/* Only HR/Manager can start evaluation */}
                       {(user?.role === 'HR' || user?.role === 'Manager') && (
                         <button
                           onClick={() => handleStartAssessment(emp.id)}
-                          className="inline-flex items-center space-x-1.5 rounded-lg border border-warning/20 bg-warning/5 hover:bg-warning/10 py-1.5 px-3 text-xs font-bold text-warning transition duration-150"
+                          className="inline-flex items-center space-x-1 xl:space-x-1.5 rounded-lg border border-warning/20 bg-warning/5 hover:bg-warning/10 py-1.5 px-2 xl:px-3 text-xs font-bold text-warning transition duration-150"
+                          title="360 Değerlendirmeyi Başlat"
                         >
                           <Play className="h-3 w-3 shrink-0" />
-                          <span>360 Başlat</span>
+                          <span className="hidden xl:inline">360 Başlat</span>
                         </button>
                       )}
                       
                       {(user?.role === 'HR' || user?.role === 'Admin') && (
                         <button
                           onClick={() => handleEditClick(emp)}
-                          className="inline-flex items-center space-x-1.5 rounded-lg border border-info/20 bg-info/5 hover:bg-info/10 py-1.5 px-3 text-xs font-bold text-info transition duration-150"
+                          className="inline-flex items-center space-x-1 xl:space-x-1.5 rounded-lg border border-info/20 bg-info/5 hover:bg-info/10 py-1.5 px-2 xl:px-3 text-xs font-bold text-info transition duration-150"
+                          title="Çalışan Profilini Düzenle"
                         >
                           <Pencil className="h-3 w-3 shrink-0" />
-                          <span>Düzenle</span>
+                          <span className="hidden xl:inline">Düzenle</span>
                         </button>
                       )}
                       
                       <button
                         onClick={() => router.push(`/dashboard/employee/${emp.id}`)}
-                        className="inline-flex items-center space-x-1.5 rounded-lg bg-primary hover:bg-primary-hover py-1.5 px-3 text-xs font-bold text-white shadow-sm shadow-primary/10 transition duration-150"
+                        className="inline-flex items-center space-x-1 xl:space-x-1.5 rounded-lg bg-primary hover:bg-primary-hover py-1.5 px-2 xl:px-3 text-xs font-bold text-white shadow-sm shadow-primary/10 transition duration-150"
+                        title="Gelişim Analizi ve Aksiyon Planı"
                       >
                         <ExternalLink className="h-3 w-3 shrink-0" />
-                        <span>Analiz ve Plan</span>
+                        <span className="hidden xl:inline">Analiz ve Plan</span>
                       </button>
                     </td>
                   </tr>
