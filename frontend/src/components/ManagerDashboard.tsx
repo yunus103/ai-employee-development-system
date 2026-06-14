@@ -24,6 +24,7 @@ export default function ManagerDashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) return;
     const fetchData = async () => {
       setIsLoading(true);
       try {

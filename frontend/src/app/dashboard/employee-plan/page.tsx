@@ -103,6 +103,7 @@ export default function EmployeePlanPage() {
   };
 
   useEffect(() => {
+    if (!user) return;
     let active = true;
     Promise.resolve().then(() => {
       if (active) {

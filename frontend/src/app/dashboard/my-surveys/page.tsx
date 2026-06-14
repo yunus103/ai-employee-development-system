@@ -58,6 +58,7 @@ export default function MySurveysPage() {
   };
 
   useEffect(() => {
+    if (!user) return;
     let active = true;
     Promise.resolve().then(() => {
       if (active) {
@@ -72,7 +73,7 @@ export default function MySurveysPage() {
 
   // Synchronize scores when selected survey changes
   useEffect(() => {
-    if (!selectedSurvey) return;
+    if (!user || !selectedSurvey) return;
 
     let active = true;
     const loadScores = async () => {
