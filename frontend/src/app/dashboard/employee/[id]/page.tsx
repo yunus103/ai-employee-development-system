@@ -45,6 +45,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const { user } = useStore();
   const [employee, setEmployee] = useState<EmployeeDetail | null>(null);
   const [activeAssessment, setActiveAssessment] = useState<Assessment | null>(null);
+  const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [scores, setScores] = useState<AssessmentScore[]>([]);
   const [actionPlan, setActionPlan] = useState<ActionPlan | null>(null);
   
@@ -156,6 +157,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       try {
         const assRes = await apiClient.employees.getAssessments(employeeId, 1, 100);
         if (assRes.success) {
+          setAssessments(assRes.data);
           const active = assRes.data[0]; // latest assessment
           if (active) {
             setActiveAssessment(active);
@@ -219,6 +221,47 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       }
     } catch (err) {
       // Silent catch to prevent terminal noise; fallback handled gracefully in UI
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAssessmentChange = async (assessmentId: number) => {
+    const selected = assessments.find(a => a.id === assessmentId);
+    if (!selected) return;
+    
+    setActiveAssessment(selected);
+    setIsLoading(true);
+    try {
+      try {
+        const assignRes = await apiClient.assessments.listAssignments(selected.id);
+        if (assignRes.success) {
+          setAssignments(assignRes.data);
+        }
+      } catch (assignErr) {
+        // Silent catch
+      }
+      
+      try {
+        const scoreRes = await apiClient.assessments.getScores(selected.id);
+        if (scoreRes.success) {
+          setScores(scoreRes.data);
+        }
+      } catch (scoreErr) {
+        // Silent catch
+      }
+
+      try {
+        const planRes = await apiClient.employees.getActionPlans(employeeId);
+        if (planRes.success && planRes.data.length > 0) {
+          const matchedPlan = planRes.data.find(p => p.assessmentId === selected.id) || planRes.data[0];
+          setActionPlan(matchedPlan);
+        } else {
+          setActionPlan(null);
+        }
+      } catch (planErr) {
+        // Silent catch
+      }
     } finally {
       setIsLoading(false);
     }
@@ -905,34 +948,58 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           </div>
         </div>
 
-        {/* Tab switcher */}
-        <div className="flex bg-background border border-card-border rounded-xl p-1 shrink-0 w-full md:w-auto">
-          <button
-            onClick={() => setActiveTab('assessment')}
-            className={`flex-1 md:flex-initial rounded-lg py-2 px-4 text-xs font-bold transition ${
-              activeTab === 'assessment'
-                ? 'bg-card text-foreground shadow-md'
-                : 'text-muted hover:text-foreground'
-            }`}
-          >
-            Değerlendirme & Analiz
-          </button>
-          <button
-            onClick={() => {
-              if (!actionPlan) {
-                toast.warning('Öncelikle değerlendirme sürecini tamamlayıp AI gelişim planını üretmelisiniz.');
-                return;
-              }
-              setActiveTab('plan');
-            }}
-            className={`flex-1 md:flex-initial rounded-lg py-2 px-4 text-xs font-bold transition ${
-              activeTab === 'plan'
-                ? 'bg-card text-foreground shadow-md'
-                : 'text-muted hover:text-foreground'
-            }`}
-          >
-            Aksiyon Planı
-          </button>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 shrink-0 w-full md:w-auto">
+          {/* Assessment Cycle Dropdown Selector */}
+          {assessments.length > 0 && (
+            <div className="flex items-center space-x-2 bg-background border border-card-border rounded-xl px-3 py-2">
+              <span className="text-xs font-semibold text-muted">Dönem:</span>
+              {assessments.length > 1 ? (
+                <select
+                  value={activeAssessment?.id || ''}
+                  onChange={(e) => handleAssessmentChange(Number(e.target.value))}
+                  className="bg-transparent text-xs font-bold text-foreground focus:outline-none cursor-pointer"
+                >
+                  {assessments.map((ass) => (
+                    <option key={ass.id} value={ass.id}>
+                      {ass.cycleName} ({ass.status === 'Completed' || ass.status === 'Analyzed' || ass.status === 'ActionPlanGenerated' || ass.status === 'Approved' || ass.status === 'SentToEmployee' ? 'Tamamlandı' : 'Aktif'})
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span className="text-xs font-bold text-foreground">{activeAssessment?.cycleName}</span>
+              )}
+            </div>
+          )}
+
+          {/* Tab switcher */}
+          <div className="flex bg-background border border-card-border rounded-xl p-1 w-full sm:w-auto">
+            <button
+              onClick={() => setActiveTab('assessment')}
+              className={`flex-1 md:flex-initial rounded-lg py-2 px-4 text-xs font-bold transition ${
+                activeTab === 'assessment'
+                  ? 'bg-card text-foreground shadow-md'
+                  : 'text-muted hover:text-foreground'
+              }`}
+            >
+              Değerlendirme & Analiz
+            </button>
+            <button
+              onClick={() => {
+                if (!actionPlan) {
+                  toast.warning('Öncelikle değerlendirme sürecini tamamlayıp AI gelişim planını üretmelisiniz.');
+                  return;
+                }
+                setActiveTab('plan');
+              }}
+              className={`flex-1 md:flex-initial rounded-lg py-2 px-4 text-xs font-bold transition ${
+                activeTab === 'plan'
+                  ? 'bg-card text-foreground shadow-md'
+                  : 'text-muted hover:text-foreground'
+              }`}
+            >
+              Aksiyon Planı
+            </button>
+          </div>
         </div>
       </div>
 
