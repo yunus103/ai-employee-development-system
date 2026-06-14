@@ -982,7 +982,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                             step="0.1"
                             value={currentScore}
                             onChange={(e) => handleScoreChange(comp.id, parseFloat(e.target.value))}
-                            className="w-full h-1 bg-card-border rounded-lg appearance-none cursor-pointer accent-primary"
+                            className="w-full h-5 bg-transparent appearance-none cursor-pointer"
                           />
                         </div>
                       );

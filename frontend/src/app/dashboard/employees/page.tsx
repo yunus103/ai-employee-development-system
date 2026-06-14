@@ -849,7 +849,7 @@ export default function EmployeesPage() {
                           step="0.1"
                           value={formFields.performanceScore}
                           onChange={(e) => handleInputChange('performanceScore', parseFloat(e.target.value))}
-                          className="w-full h-1.5 bg-card-border rounded-lg appearance-none cursor-pointer accent-primary"
+                          className="w-full h-5 bg-transparent appearance-none cursor-pointer"
                         />
                         <span className="text-[10px] text-muted">5.0</span>
                       </div>

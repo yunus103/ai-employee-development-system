@@ -231,6 +231,19 @@ export default function MySurveysPage() {
     return competencyCode;
   };
 
+  const getCategoryBadgeClass = (category: string) => {
+    switch (category) {
+      case 'Core':
+        return 'bg-primary/10 border border-primary/20 text-primary';
+      case 'Department':
+        return 'bg-info/10 border border-info/20 text-info';
+      case 'Role':
+        return 'bg-warning/10 border border-warning/20 text-warning';
+      default:
+        return 'bg-muted/10 border border-muted/20 text-muted';
+    }
+  };
+
   if (isLoading && surveys.length === 0 && !selectedSurvey) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
@@ -367,13 +380,13 @@ export default function MySurveysPage() {
                       <div key={comp.id} className="rounded-2xl border border-card-border bg-card/30 p-5 space-y-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <span className="rounded bg-card-border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-muted mr-2">
+                            <span className={`rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${getCategoryBadgeClass(comp.category)} mr-2`}>
                               {comp.category}
                             </span>
                             <span className="text-sm font-semibold text-foreground">{label}</span>
                           </div>
-                          <span className="flex items-center space-x-1 font-bold text-sm text-primary">
-                            <Star className="h-4 w-4 shrink-0 fill-current text-primary" />
+                          <span className="flex items-center space-x-1 font-bold text-sm text-warning">
+                            <Star className="h-4 w-4 shrink-0 fill-warning text-warning" />
                             <span>{scores[comp.id]?.toFixed(1) || '3.0'}</span>
                           </span>
                         </div>
@@ -388,7 +401,7 @@ export default function MySurveysPage() {
                             step="0.1"
                             value={scores[comp.id] || 3.0}
                             onChange={(e) => handleScoreChange(comp.id, parseFloat(e.target.value))}
-                            className="w-full h-1.5 bg-card-border rounded-lg appearance-none cursor-pointer accent-primary"
+                            className="w-full h-5 bg-transparent appearance-none cursor-pointer"
                           />
                           <span className="text-xs text-muted shrink-0">5.0</span>
                         </div>
