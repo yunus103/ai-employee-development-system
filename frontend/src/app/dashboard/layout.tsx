@@ -31,6 +31,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     ml: 'checking' | 'ok' | 'error' | 'not-loaded';
   }>({ api: 'checking', ml: 'checking' });
 
+  // Pending surveys state
+  const [pendingSurveyCount, setPendingSurveyCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchPendingSurveys = async () => {
+      try {
+        const res = await apiClient.tasks.getMySurveys();
+        if (res.success) {
+          setPendingSurveyCount(res.data.length);
+        }
+      } catch (err) {
+        // Suppress errors to keep terminal clean
+      }
+    };
+    fetchPendingSurveys();
+    const interval = setInterval(fetchPendingSurveys, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
+
   useEffect(() => {
     const checkSystemHealth = async () => {
       if (apiClient.isMock) {
@@ -160,14 +180,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <button
                   key={item.path}
                   onClick={() => router.push(item.path)}
-                  className={`flex w-full items-center space-x-3.5 rounded-xl px-4 py-3 text-sm font-medium transition duration-150 ${
+                  className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition duration-150 ${
                     isActive
                       ? 'bg-primary text-white shadow-lg shadow-primary/10'
                       : 'text-muted hover:bg-card-border hover:text-foreground'
                   }`}
                 >
-                  <Icon className="h-5 w-5 shrink-0" />
-                  <span>{item.label}</span>
+                  <div className="flex items-center space-x-3.5">
+                    <Icon className="h-5 w-5 shrink-0" />
+                    <span>{item.label}</span>
+                  </div>
+                  {item.path === '/dashboard/my-surveys' && pendingSurveyCount > 0 && (
+                    <span className={`flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold ${
+                      isActive 
+                        ? 'bg-white text-primary' 
+                        : 'bg-primary text-white'
+                    }`}>
+                      {pendingSurveyCount}
+                    </span>
+                  )}
                 </button>
               );
             })}
