@@ -181,18 +181,6 @@ export const mockApi = {
     };
   },
 
-  updateEmployee: async (id: number, data: Partial<EmployeeDetail>): Promise<ApiResponse<EmployeeDetail>> => {
-    await delay(300);
-    const employees = mockDb.getEmployees();
-    const idx = employees.findIndex((e) => e.id === id);
-    if (idx === -1) {
-      return { success: false, message: 'Çalışan bulunamadı.', data: null as any };
-    }
-    employees[idx] = { ...employees[idx], ...data } as EmployeeDetail;
-    mockDb.setEmployees(employees);
-    return { success: true, message: 'Çalışan güncellendi.', data: employees[idx] };
-  },
-
   createEmployee: async (data: Omit<EmployeeDetail, 'id' | 'managerName'>): Promise<ApiResponse<EmployeeDetail>> => {
     await delay(300);
     const employees = mockDb.getEmployees();
