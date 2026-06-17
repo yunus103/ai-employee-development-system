@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useStore } from '../../../store/useStore';
 import { apiClient } from '../../../services/apiClient';
 import { MySurvey, EvaluatorType, EmployeeDetail } from '../../../types';
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react';
 
 export default function MySurveysPage() {
+  const router = useRouter();
   const { user } = useStore();
   const [employees, setEmployees] = useState<EmployeeDetail[]>([]);
   const [surveys, setSurveys] = useState<MySurvey[]>([]);
@@ -113,6 +115,11 @@ export default function MySurveysPage() {
   }, [selectedSurvey, user]);
 
   const handleStartEvaluation = async (survey: MySurvey) => {
+    if (user && user.role !== 'Employee') {
+      router.push(`/dashboard/employee/${survey.employeeId}`);
+      return;
+    }
+
     setSelectedSurvey(survey);
     setSubmitSuccess(false);
     setEvaluatorType(survey.evaluatorType);
