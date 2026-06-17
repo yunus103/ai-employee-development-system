@@ -25,7 +25,8 @@ import {
   Plus,
   AlertTriangle,
   Cpu,
-  CheckCircle
+  CheckCircle,
+  Star
 } from 'lucide-react';
 import {
   Radar,
@@ -872,6 +873,19 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     return competencyCode;
   };
 
+  const getCategoryBadgeClass = (category: string) => {
+    switch (category) {
+      case 'Core':
+        return 'bg-primary/10 border border-primary/20 text-primary';
+      case 'Department':
+        return 'bg-info/10 border border-info/20 text-info';
+      case 'Role':
+        return 'bg-warning/10 border border-warning/20 text-warning';
+      default:
+        return 'bg-muted/10 border border-muted/20 text-muted';
+    }
+  };
+
   // Group scores by competency for Radar chart representation
   const radarData = scores.length > 0
     ? Array.from(new Set(scores.map(s => s.competencyCode))).map(code => {
@@ -1069,20 +1083,32 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                       const label = getCompetencyName(comp.code);
                       const currentScore = scorecardInput[comp.id] || 3.0;
                       return (
-                        <div key={comp.id} className="rounded-xl border border-card-border bg-card/30 p-4 space-y-3">
+                        <div key={comp.id} className="rounded-2xl border border-card-border bg-card/30 p-5 space-y-4">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-foreground">{label}</span>
-                            <span className="text-xs font-bold text-primary">{currentScore.toFixed(1)}</span>
+                            <div>
+                              <span className={`rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${getCategoryBadgeClass(comp.category)} mr-2`}>
+                                {comp.category}
+                              </span>
+                              <span className="text-sm font-semibold text-foreground">{label}</span>
+                            </div>
+                            <span className="flex items-center space-x-1 font-bold text-sm text-warning">
+                              <Star className="h-4 w-4 shrink-0 fill-warning text-warning" />
+                              <span>{currentScore.toFixed(1)}</span>
+                            </span>
                           </div>
-                          <input
-                            type="range"
-                            min="1.0"
-                            max="5.0"
-                            step="0.1"
-                            value={currentScore}
-                            onChange={(e) => handleScoreChange(comp.id, parseFloat(e.target.value))}
-                            className="w-full h-5 bg-transparent appearance-none cursor-pointer"
-                          />
+                          <div className="flex items-center space-x-4">
+                            <span className="text-xs text-muted shrink-0">1.0</span>
+                            <input
+                              type="range"
+                              min="1.0"
+                              max="5.0"
+                              step="0.1"
+                              value={currentScore}
+                              onChange={(e) => handleScoreChange(comp.id, parseFloat(e.target.value))}
+                              className="w-full h-5 bg-transparent appearance-none cursor-pointer"
+                            />
+                            <span className="text-xs text-muted shrink-0">5.0</span>
+                          </div>
                         </div>
                       );
                     })}
