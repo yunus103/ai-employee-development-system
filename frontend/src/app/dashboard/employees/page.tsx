@@ -777,7 +777,7 @@ export default function EmployeesPage() {
                 {/* TAB 1: BASIC INFO */}
                 {activeFormTab === 'basic' && (
                   <div className="space-y-4 animate-fadeIn">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Ad Soyad *</label>
                         <input
@@ -802,7 +802,7 @@ export default function EmployeesPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Çalışan Kodu</label>
                         <input
@@ -827,7 +827,7 @@ export default function EmployeesPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Cinsiyet</label>
                         <select
@@ -858,7 +858,7 @@ export default function EmployeesPage() {
                 {/* TAB 2: JOB INFO */}
                 {activeFormTab === 'job' && (
                   <div className="space-y-4 animate-fadeIn">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Departman</label>
                         <select
@@ -892,7 +892,7 @@ export default function EmployeesPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Yönetici</label>
                         <select
@@ -937,7 +937,7 @@ export default function EmployeesPage() {
                 {/* TAB 3: EDUCATION & PERFORMANCE */}
                 {activeFormTab === 'edu' && (
                   <div className="space-y-4 animate-fadeIn">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Eğitim Seviyesi</label>
                         <select
@@ -1007,7 +1007,7 @@ export default function EmployeesPage() {
                 {/* TAB 4: SATISFACTION & EXPERIENCE */}
                 {activeFormTab === 'satis' && (
                   <div className="space-y-4 animate-fadeIn">
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Ortam Memnuniyeti</label>
                         <select
@@ -1049,7 +1049,7 @@ export default function EmployeesPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Toplam Çalışma Süresi (Yıl)</label>
                         <input
@@ -1072,7 +1072,7 @@ export default function EmployeesPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold text-muted uppercase mb-1.5">Mevcut Pozisyon Süresi (Yıl)</label>
                         <input

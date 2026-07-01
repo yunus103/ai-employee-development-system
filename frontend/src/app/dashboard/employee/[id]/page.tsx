@@ -1654,7 +1654,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-muted uppercase tracking-wider mb-2">Öncelik</label>
                       <select

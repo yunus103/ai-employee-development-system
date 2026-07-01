@@ -116,8 +116,8 @@ export default function LoginPage() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
       {/* Decorative Blur Spheres */}
-      <div className="absolute -top-40 -left-40 h-[400px] w-[400px] rounded-full bg-primary/20 blur-[120px]"></div>
-      <div className="absolute -bottom-40 -right-40 h-[400px] w-[400px] rounded-full bg-info/10 blur-[120px]"></div>
+      <div className="absolute -top-40 -left-40 h-[400px] w-[400px] rounded-full bg-primary/20 blur-[120px] pointer-events-none"></div>
+      <div className="absolute -bottom-40 -right-40 h-[400px] w-[400px] rounded-full bg-info/10 blur-[120px] pointer-events-none"></div>
 
       <div className="z-10 w-full max-w-md">
         {/* Brand Logo & Title */}
